@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v5.7.1 (Premium)</title>
+    <title>PROJECT: MONK MODE | v5.7.2 (Premium)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -557,7 +557,7 @@
                 <i class="fas fa-biohazard text-neon-green text-2xl"></i>
                 <div>
                     <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v5.7.1</span></h1>
+                            class="text-sm text-text-muted">v5.7.2</span></h1>
                     <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
                     </div>
                 </div>
@@ -622,7 +622,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '5.7.1 Premium',
+            VERSION: '5.7.2 Premium',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -1017,8 +1017,42 @@
                     return a.name.localeCompare(b.name);
                 });
             },
-            async getStats() { return await Utils.storage.get(CONFIG.KEYS.MEASURE) || {}; },
-            async saveStats(s) { await Utils.storage.set(CONFIG.KEYS.MEASURE, s); },
+            async getStats() {
+                const data = await Utils.storage.get(CONFIG.KEYS.MEASURE);
+                if (!data) return { current: {}, history: [] };
+                // Migration: eski format (düz obje) ise yeni formata çevir
+                if (!data.current && !data.history) {
+                    return { current: data, history: [] };
+                }
+                return data;
+            },
+            async saveStats(s) {
+                const existing = await this.getStats();
+                const today = Utils.dateStr();
+                const current = existing.current || {};
+                const history = existing.history || [];
+
+                // Mevcut değerler varsa ve bugün kaydedilmediyse history'e ekle
+                if (Object.keys(current).length > 0 && current.chest) {
+                    const lastEntry = history[history.length - 1];
+                    const lastDate = lastEntry ? lastEntry.date : null;
+                    if (lastDate !== today && current.savedAt !== today) {
+                        history.push({
+                            date: current.savedAt || today,
+                            chest: current.chest,
+                            arm: current.arm,
+                            waist: current.waist,
+                            leg: current.leg
+                        });
+                    }
+                }
+
+                // Yeni current değerlerini kaydet
+                existing.current = { ...s, savedAt: today };
+                existing.history = history.slice(-30); // Son 30 kayıt
+                await Utils.storage.set(CONFIG.KEYS.MEASURE, existing);
+            },
+
             async getHistory() { return await Utils.storage.get(CONFIG.KEYS.WEIGHT_HISTORY) || {}; },
 
             // Streak & Progress Tracking
@@ -1379,14 +1413,112 @@
             },
             async progress() {
                 const hist = await Store.getHistory();
-                const stats = await Store.getStats();
+                const statsData = await Store.getStats();
+                const stats = statsData.current || {};
+                const measureHistory = statsData.history || [];
                 const dates = Object.keys(hist).sort().slice(-7);
+
+                // Weight history bars
                 let bars = dates.length ? dates.map(d => {
                     const h = ((hist[d] - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 80 + 10;
                     return `<div class="w-full bg-gray-800 hover:bg-neon-green/50 relative group rounded-t transition-all" style="height:${h}%"><div class="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] bg-black px-1 rounded opacity-0 group-hover:opacity-100 transition">${hist[d]}</div></div>`;
                 }).join('') : '<div class="text-gray-600 text-xs w-full text-center self-center">Veri yok.</div>';
-                return `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up"><div class="${THEME.card} h-64 flex flex-col"><span class="text-[10px] text-gray-500 font-bold mb-4">AĞIRLIK GEÇMİŞİ</span><div class="flex items-end justify-between gap-1 flex-1 border-b border-gray-800">${bars}</div></div><div class="${THEME.card}"><div class="flex justify-between mb-4"><span class="text-[10px] text-gray-500 font-bold">ÖLÇÜLER (CM)</span><button onclick="Actions.saveStats()" class="text-neon-green text-xs font-bold">KAYDET</button></div><div class="grid grid-cols-2 gap-4">${['chest', 'arm', 'waist', 'leg'].map(k => `<div><label class="text-[10px] text-gray-500 block mb-1 uppercase">${k}</label><input type="number" id="stat-${k}" value="${stats[k] || ''}" class="${THEME.input} text-center"></div>`).join('')}</div></div></div>`;
+
+                // Trend helper function
+                const getTrend = (key) => {
+                    if (measureHistory.length === 0) return { icon: '', color: '', diff: 0 };
+                    const last = measureHistory[measureHistory.length - 1];
+                    const current = parseFloat(stats[key]) || 0;
+                    const prev = parseFloat(last[key]) || 0;
+                    if (current === 0 || prev === 0) return { icon: '', color: '', diff: 0 };
+                    const diff = current - prev;
+                    if (diff > 0) return { icon: '↑', color: key === 'waist' ? 'text-neon-red' : 'text-neon-green', diff: diff.toFixed(1) };
+                    if (diff < 0) return { icon: '↓', color: key === 'waist' ? 'text-neon-green' : 'text-neon-red', diff: Math.abs(diff).toFixed(1) };
+                    return { icon: '=', color: 'text-gray-500', diff: 0 };
+                };
+
+                // Measurement labels in Turkish
+                const labels = { chest: 'GÖĞÜS', arm: 'KOL', waist: 'BEL', leg: 'BACAK' };
+
+                // Last saved info
+                const savedAt = stats.savedAt || null;
+                const savedInfo = savedAt ? `<span class="text-neon-green text-[10px]">✓ ${savedAt}</span>` : '<span class="text-gray-600 text-[10px]">Henüz kayıt yok</span>';
+
+                // Measurement mini charts (last 5 entries from history)
+                const getMiniChart = (key) => {
+                    if (measureHistory.length < 2) return '';
+                    const lastFive = measureHistory.slice(-5);
+                    const values = lastFive.map(h => parseFloat(h[key]) || 0).filter(v => v > 0);
+                    if (values.length < 2) return '';
+                    const max = Math.max(...values);
+                    const min = Math.min(...values);
+                    const range = max - min || 1;
+                    const bars = values.map(v => {
+                        const height = ((v - min) / range) * 20 + 5;
+                        return `<div class="w-1 bg-neon-blue/60 rounded-t" style="height:${height}px"></div>`;
+                    }).join('');
+                    return `<div class="flex items-end gap-0.5 h-6">${bars}</div>`;
+                };
+
+                // Build measurement inputs with trends
+                const measurementInputs = ['chest', 'arm', 'waist', 'leg'].map(k => {
+                    const trend = getTrend(k);
+                    const miniChart = getMiniChart(k);
+                    return `
+                        <div class="bg-surface-raised p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[10px] text-gray-500 font-bold uppercase">${labels[k]}</label>
+                                <div class="flex items-center gap-2">
+                                    ${miniChart}
+                                    ${trend.icon ? `<span class="${trend.color} text-xs font-bold">${trend.icon}${trend.diff > 0 ? trend.diff : ''}</span>` : ''}
+                                </div>
+                            </div>
+                            <input type="number" id="stat-${k}" value="${stats[k] || ''}" placeholder="cm" class="${THEME.input} text-center text-lg font-bold">
+                        </div>
+                    `;
+                }).join('');
+
+                // History section
+                let historySection = '';
+                if (measureHistory.length > 0) {
+                    const lastThree = measureHistory.slice(-3).reverse();
+                    historySection = `
+                        <div class="mt-4 pt-4 border-t border-gray-800">
+                            <div class="text-[10px] text-gray-500 font-bold mb-2">SON KAYITLAR</div>
+                            <div class="space-y-1 text-[10px]">
+                                ${lastThree.map(h => `
+                                    <div class="flex justify-between text-gray-400 bg-gray-900/50 p-2 rounded">
+                                        <span class="text-gray-600">${h.date}</span>
+                                        <span>G:${h.chest || '-'} K:${h.arm || '-'} B:${h.waist || '-'} B:${h.leg || '-'}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
+                    <div class="${THEME.card} h-64 flex flex-col">
+                        <span class="text-[10px] text-gray-500 font-bold mb-4">AĞIRLIK GEÇMİŞİ</span>
+                        <div class="flex items-end justify-between gap-1 flex-1 border-b border-gray-800">${bars}</div>
+                    </div>
+                    <div class="${THEME.card}">
+                        <div class="flex justify-between mb-4 items-center">
+                            <div>
+                                <span class="text-[10px] text-gray-500 font-bold block">ÖLÇÜLER (CM)</span>
+                                ${savedInfo}
+                            </div>
+                            <button onclick="Actions.saveStats()" class="bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black text-xs font-bold px-4 py-2 rounded-lg transition-all">
+                                <i class="fas fa-save mr-1"></i>KAYDET
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">${measurementInputs}</div>
+                        ${historySection}
+                    </div>
+                </div>`;
             },
+
             async anatomy() {
                 const view = UI.activeView;
                 const paths = {
@@ -1411,7 +1543,7 @@
                         </div>
                     </details>
                 `).join('');
-                return `<div class="animate-slide-up"><div class="flex items-center gap-3 mb-4 border-b border-gray-800 pb-3"><i class="fas fa-brain text-neon-purple text-xl"></i><div><h2 class="font-header font-bold text-white">ZİHİNSEL SAVAŞ</h2><div class="text-[10px] text-gray-500 mt-1">Mental Hardening Protokolü v5.7.1</div></div></div>${phases}</div>`;
+                return `<div class="animate-slide-up"><div class="flex items-center gap-3 mb-4 border-b border-gray-800 pb-3"><i class="fas fa-brain text-neon-purple text-xl"></i><div><h2 class="font-header font-bold text-white">ZİHİNSEL SAVAŞ</h2><div class="text-[10px] text-gray-500 mt-1">Mental Hardening Protokolü v5.7.2</div></div></div>${phases}</div>`;
             }
         };
 
@@ -1667,14 +1799,17 @@
                 setTimeout(() => this.openMealModal(), 500);
             },
             async saveStats() {
-                await Store.saveStats({
+                const newStats = {
                     chest: document.getElementById('stat-chest').value,
                     arm: document.getElementById('stat-arm').value,
                     waist: document.getElementById('stat-waist').value,
                     leg: document.getElementById('stat-leg').value
-                });
-                UI.showToast("Ölçüler kaydedildi.");
+                };
+                await Store.saveStats(newStats);
+                UI.showToast("Ölçüler kaydedildi ✓");
+                this.switchTab('progress'); // UI'ı yenile
             },
+
             showExercise(id) {
                 const ex = DB.EXERCISES[id];
                 UI.modal.open(ex.title, `<div class="text-sm text-gray-300 mb-4">${ex.desc}</div><div class="bg-gray-900 p-4 rounded border border-gray-700"><div class="text-[10px] text-gray-500 font-bold mb-2">OPERASYON ADIMLARI</div><ul class="space-y-2 text-xs">${ex.steps.map(s => `<li class="flex gap-2"><i class="fas fa-caret-right text-neon-green"></i>${s}</li>`).join('')}</ul></div>`);
