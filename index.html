@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v5.6.1 (Optimized)</title>
+    <title>PROJECT: MONK MODE | v5.6.2 (Optimized)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Orbitron:wght@500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700;800&family=Orbitron:wght@500;700&display=swap"
         rel="stylesheet">
 
     <script>
@@ -275,6 +275,276 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #00ff41;
         }
+
+        /* ============================================
+           PHASE 1: PREMIUM UI ENHANCEMENTS
+           Estetik: Endüstriyel/Taktiksel Premium
+           ============================================ */
+
+        /* Typography Enhancement */
+        body {
+            font-family: 'Inter', 'JetBrains Mono', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            letter-spacing: 0.01em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .font-mono,
+        code,
+        pre,
+        input[type="number"] {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            letter-spacing: -0.02em;
+        }
+
+        /* Smooth Global Transitions */
+        *,
+        *::before,
+        *::after {
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Card Hover Lift Effect */
+        .card-hover-lift {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .card-hover-lift:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 255, 65, 0.1);
+        }
+
+        /* Progress Bar Shimmer */
+        .progress-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.15) 50%,
+                    transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Enhanced Checkbox Bounce */
+        .custom-checkbox {
+            transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .custom-checkbox:hover {
+            border-color: #00ff41;
+            box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+        }
+
+        .custom-checkbox:checked {
+            animation: checkBounce 0.25s ease-out;
+        }
+
+        @keyframes checkBounce {
+            0% {
+                transform: scale(1);
+            }
+
+            40% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Tab Navigation Underline */
+        .tab-btn {
+            position: relative;
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #00ff41;
+            transition: width 0.25s ease, left 0.25s ease;
+        }
+
+        .tab-btn:hover::after,
+        .tab-btn.active-tab::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .tab-btn:hover i,
+        .tab-btn.active-tab i {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
+
+        /* Button Press Feedback */
+        button,
+        .btn-press {
+            transition: transform 0.1s ease, background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        button:active,
+        .btn-press:active {
+            transform: scale(0.97);
+        }
+
+        /* Input Focus Glow */
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #00ff41 !important;
+            box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.15), 0 0 12px rgba(0, 255, 65, 0.1);
+        }
+
+        /* Toast Slide-In Animation */
+        .toast {
+            animation: toastSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes toastSlideIn {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal Scale-In Animation */
+        .modal.active .modal-content {
+            animation: modalScaleIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalScaleIn {
+            0% {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* View Container Smooth Transition */
+        #view-container {
+            transition: opacity 0.15s ease;
+        }
+
+        /* ============================================
+           PHASE 3: VISUAL POLISH
+           ============================================ */
+
+        /* Exercise Card Hover */
+        .exercise-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .exercise-card:hover {
+            background: rgba(0, 255, 65, 0.03);
+            border-color: rgba(0, 255, 65, 0.3) !important;
+            transform: translateX(4px);
+        }
+
+        .exercise-card:hover i {
+            color: #00ff41;
+        }
+
+        /* Meal Item Hover */
+        .meal-item {
+            transition: all 0.2s ease;
+        }
+
+        .meal-item:hover {
+            background: rgba(0, 255, 65, 0.05);
+            transform: translateX(3px);
+        }
+
+        /* Details/Summary Smooth Open */
+        details {
+            transition: all 0.25s ease;
+        }
+
+        details summary {
+            cursor: pointer;
+        }
+
+        details[open] summary~* {
+            animation: detailsOpen 0.25s ease-out;
+        }
+
+        @keyframes detailsOpen {
+            0% {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Touch Feedback */
+        @media (hover: none) {
+            .card-hover-lift:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+
+            .exercise-card:active {
+                background: rgba(0, 255, 65, 0.08);
+                transform: scale(0.99);
+            }
+
+            .meal-item:active {
+                background: rgba(0, 255, 65, 0.08);
+            }
+
+            button:active {
+                transform: scale(0.95);
+            }
+
+            .tab-btn:active {
+                background: rgba(0, 255, 65, 0.1);
+            }
+        }
+
+        /* Scrollbar animation on scroll */
+        .custom-scrollbar {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 
@@ -287,7 +557,7 @@
                 <i class="fas fa-biohazard text-neon-green text-xl animate-pulse"></i>
                 <div>
                     <h1 class="font-header font-bold text-white tracking-wider text-sm md:text-base">PROTOCOL <span
-                            class="text-xs text-gray-500">v5.6.1</span></h1>
+                            class="text-xs text-gray-500">v5.6.2</span></h1>
                     <div class="text-[9px] text-neon-green font-bold tracking-widest">FIELD TEST APPROVED</div>
                 </div>
             </div>
@@ -349,7 +619,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '5.6.1 Optimized',
+            VERSION: '5.6.2 Optimized',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -358,13 +628,14 @@
                 MEASURE: 'monk_body_stats',
                 WEIGHT_HISTORY: 'monk_weight_history',
                 CUSTOM_FOODS: 'monk_custom_foods',
-                DAILY_PLAN: 'monk_daily_plan'
+                DAILY_PLAN: 'monk_daily_plan',
+                STREAK: 'monk_streak_data'
             },
             TARGETS: { START: 45.0, GOAL: 60.0, CAL: 3000, PROT: 225, CARB: 375, FAT: 67 }
         };
 
         const THEME = {
-            card: "bg-cyber-panel border border-gray-800 hover:border-gray-600 rounded-lg p-5 transition-all shadow-lg",
+            card: "bg-cyber-panel border border-gray-800 hover:border-gray-600 rounded-lg p-5 transition-all shadow-lg card-hover-lift",
             btn: "bg-gray-800 hover:bg-neon-green hover:text-black text-white border border-gray-600 font-bold py-2 px-4 rounded transition flex items-center justify-center gap-2",
             input: "bg-gray-900 border border-gray-700 text-white rounded p-2 focus:border-neon-green outline-none w-full transition-colors"
         };
@@ -693,6 +964,7 @@
                 let tasks = await this.getWorkout(date);
                 tasks = tasks.includes(id) ? tasks.filter(t => t !== id) : [...tasks, id];
                 await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
+                await this.updateStreak(); // Update streak on task toggle
             },
             async saveWeight(w) {
                 this.state.weight = parseFloat(w);
@@ -741,7 +1013,72 @@
             },
             async getStats() { return await Utils.storage.get(CONFIG.KEYS.MEASURE) || {}; },
             async saveStats(s) { await Utils.storage.set(CONFIG.KEYS.MEASURE, s); },
-            async getHistory() { return await Utils.storage.get(CONFIG.KEYS.WEIGHT_HISTORY) || {}; }
+            async getHistory() { return await Utils.storage.get(CONFIG.KEYS.WEIGHT_HISTORY) || {}; },
+
+            // Streak & Progress Tracking
+            async getStreak() {
+                const streakData = await Utils.storage.get(CONFIG.KEYS.STREAK) || { count: 0, lastDate: null };
+                const today = Utils.dateStr();
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+
+                // If last activity was today, return current streak
+                if (streakData.lastDate === today) {
+                    return streakData.count;
+                }
+                // If last activity was yesterday, streak continues but needs update
+                if (streakData.lastDate === yesterdayStr) {
+                    return streakData.count;
+                }
+                // Otherwise streak is broken
+                return 0;
+            },
+            async updateStreak() {
+                const today = Utils.dateStr();
+                const workout = await this.getWorkout(today);
+                const day = new Date().getDay();
+                const plan = DB.WEEKLY_PLAN[day];
+
+                // Only update streak if at least half of tasks are done
+                if (workout.length >= Math.ceil(plan.tasks.length / 2)) {
+                    let streakData = await Utils.storage.get(CONFIG.KEYS.STREAK) || { count: 0, lastDate: null };
+
+                    if (streakData.lastDate !== today) {
+                        const yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        const yesterdayStr = yesterday.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+
+                        if (streakData.lastDate === yesterdayStr) {
+                            streakData.count += 1;
+                        } else if (streakData.lastDate !== today) {
+                            streakData.count = 1; // Reset streak
+                        }
+                        streakData.lastDate = today;
+                        await Utils.storage.set(CONFIG.KEYS.STREAK, streakData);
+                    }
+                }
+            },
+            async getTodayProgress() {
+                const today = Utils.dateStr();
+                const day = new Date().getDay();
+                const plan = DB.WEEKLY_PLAN[day];
+                const workout = await this.getWorkout(today);
+                const meals = await this.getMeals(today);
+
+                const totalCal = meals.reduce((sum, m) => sum + m.cal, 0);
+                const tasksDone = workout.length;
+                const tasksTotal = plan.tasks.length;
+
+                return {
+                    tasksDone,
+                    tasksTotal,
+                    tasksPercent: Math.round((tasksDone / tasksTotal) * 100),
+                    calories: totalCal,
+                    caloriesTarget: CONFIG.TARGETS.CAL,
+                    caloriesPercent: Math.round((totalCal / CONFIG.TARGETS.CAL) * 100)
+                };
+            }
         };
 
         // --- UI ---
@@ -878,25 +1215,68 @@
                 const fuelDone = Store.state.fuelDate === Utils.dateStr();
                 const fuelCardClass = fuelDone ? "border-l-4 border-l-neon-yellow" : "border-2 border-neon-red animate-pulse-urgent";
 
+                // Get streak and today's progress
+                const streak = await Store.getStreak();
+                const progress = await Store.getTodayProgress();
+
                 return `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-up">
+                        <!-- STREAK CARD -->
+                        <div class="${THEME.card} text-center border-l-4 ${streak > 0 ? 'border-l-neon-green' : 'border-l-gray-600'}">
+                            <div class="text-[10px] text-gray-500 font-bold tracking-widest mb-2">🔥 STREAK</div>
+                            <div class="text-5xl font-header font-bold ${streak > 0 ? 'text-neon-green' : 'text-gray-600'}">${streak}</div>
+                            <div class="text-[10px] text-gray-400 mt-1">${streak > 0 ? 'Gün Üst Üste' : 'Seri Kırıldı'}</div>
+                        </div>
+                        
+                        <!-- TODAY'S PROGRESS -->
                         <div class="${THEME.card}">
-                            <span class="text-[10px] text-gray-500 font-bold tracking-widest">SYSTEM LOAD</span>
+                            <div class="text-[10px] text-gray-500 font-bold tracking-widest mb-3">📊 BUGÜNKÜ DURUM</div>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-400">Görevler</span>
+                                        <span class="text-neon-blue font-bold">${progress.tasksDone}/${progress.tasksTotal}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                        <div class="h-full bg-neon-blue transition-all duration-500 progress-shimmer" style="width: ${progress.tasksPercent}%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-400">Kalori</span>
+                                        <span class="text-neon-orange font-bold">${progress.calories}/${progress.caloriesTarget}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                        <div class="h-full bg-neon-orange transition-all duration-500" style="width: ${Math.min(100, progress.caloriesPercent)}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- SYSTEM LOAD (WEIGHT) -->
+                        <div class="${THEME.card}">
+                            <span class="text-[10px] text-gray-500 font-bold tracking-widest">⚖️ SYSTEM LOAD</span>
                             <div class="flex items-end gap-4 mb-4">
                                 <input type="number" value="${Store.state.weight}" class="bg-transparent border-b border-gray-600 text-4xl font-bold text-white w-24 focus:border-neon-green outline-none" onchange="Actions.saveWeight(this.value)">
                                 <span class="text-xs text-gray-500 mb-2">KG / ${CONFIG.TARGETS.GOAL}</span>
                             </div>
-                            <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden"><div class="h-full bg-neon-green transition-all duration-1000" style="width: ${p}%"></div></div>
+                            <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden"><div class="h-full bg-neon-green transition-all duration-1000 progress-shimmer" style="width: ${p}%"></div></div>
                         </div>
-                        <div class="${THEME.card} ${fuelCardClass} relative">
-                            <span class="text-[10px] text-gray-500 font-bold tracking-widest">FUEL STATUS</span>
+                        
+                        <!-- FUEL STATUS -->
+                        <div class="${THEME.card} ${fuelCardClass} relative lg:col-span-2">
+                            <span class="text-[10px] text-gray-500 font-bold tracking-widest">⛽ FUEL STATUS</span>
                             <div class="flex justify-between items-center mt-2">
                                 <div><div class="text-xl font-bold text-white">GAINER SHAKE</div><div class="text-[10px] text-gray-400">Süt+Yulaf+Fıstık+Muz</div></div>
                                 <button onclick="Actions.injectFuel()" class="border px-4 py-2 rounded font-bold text-xs ${fuelDone ? 'bg-neon-yellow text-black' : 'text-red-500 border-red-500 hover:bg-red-500 hover:text-black'}">${fuelDone ? 'ENJEKTE EDİLDİ' : 'BEKLİYOR (ACİL)'}</button>
                             </div>
                             ${!fuelDone ? '<div class="absolute top-2 right-2 text-neon-red text-xs animate-pulse"><i class="fas fa-exclamation-circle"></i></div>' : ''}
                         </div>
-                        <div class="col-span-1 md:col-span-2 ${THEME.card} text-center py-8 bg-gray-900"><div class="text-xl font-bold text-white italic">"Aksak ayakla yürü, ama yürü."</div></div>
+                        
+                        <!-- MOTIVATIONAL QUOTE -->
+                        <div class="${THEME.card} text-center py-6 bg-gray-900/50">
+                            <div class="text-lg font-bold text-white italic">"Aksak ayakla yürü, ama yürü."</div>
+                        </div>
                     </div>`;
             },
             async training() {
@@ -916,7 +1296,7 @@
                         ${plan.tasks.map(tid => {
                     const ex = DB.EXERCISES[tid];
                     const isDone = done.includes(tid);
-                    return `<div class="flex items-center justify-between p-4 border rounded ${isDone ? 'border-neon-green bg-gray-900' : 'border-gray-700 bg-gray-900/30'} cursor-pointer hover:border-gray-500" onclick="if(!event.target.type) Actions.showExercise('${tid}')">
+                    return `<div class="exercise-card flex items-center justify-between p-4 border rounded ${isDone ? 'border-neon-green bg-gray-900' : 'border-gray-700 bg-gray-900/30'}" onclick="if(!event.target.type) Actions.showExercise('${tid}')">
                                 <div class="flex items-center gap-4"><i class="fas fa-info-circle text-gray-500"></i><div><div class="font-bold text-white">${ex.title}</div><div class="text-[10px] text-gray-500">${ex.tags.join(', ')}</div></div></div>
                                 <input type="checkbox" class="custom-checkbox" ${isDone ? 'checked' : ''} onclick="event.stopPropagation(); Actions.toggleTask('${tid}')">
                             </div>`;
@@ -935,7 +1315,7 @@
                     } else {
                         amountDisplay = `(${m.amount} ${m.unit || 'Adet'})`;
                     }
-                    return `<div class="flex justify-between items-center text-xs bg-gray-900 p-3 rounded mb-1 border border-gray-800 hover:border-gray-600 transition group"><div><span class="text-white font-bold">${m.name}</span> <span class="text-gray-500 text-[10px]">${amountDisplay}</span></div><div class="flex items-center gap-3"><span class="text-neon-green font-mono">${m.cal} kcal</span><button onclick="Actions.deleteMeal(${idx})" class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition" title="Sil"><i class="fas fa-trash-alt"></i></button></div></div>`;
+                    return `<div class="meal-item flex justify-between items-center text-xs bg-gray-900 p-3 rounded mb-1 border border-gray-800 group"><div><span class="text-white font-bold">${m.name}</span> <span class="text-gray-500 text-[10px]">${amountDisplay}</span></div><div class="flex items-center gap-3"><span class="text-neon-green font-mono">${m.cal} kcal</span><button onclick="Actions.deleteMeal(${idx})" class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition" title="Sil"><i class="fas fa-trash-alt"></i></button></div></div>`;
                 }).join('') || '<div class="text-center text-gray-600 py-4 border-2 border-dashed border-gray-800 rounded">HENÜZ YAKIT GİRİLMEDİ<br><span class="text-[10px] text-neon-red">SİSTEM ZAYIFLIYOR!</span></div>';
 
                 // BRUTAL REALITY LOGIC
