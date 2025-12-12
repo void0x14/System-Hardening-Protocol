@@ -639,7 +639,8 @@
                 STREAK: 'monk_streak_data',
                 BACKUP: 'monk_last_backup_date',
                 SLEEP: 'monk_sleep_log_',
-                WATER: 'monk_water_'
+                WATER: 'monk_water_',
+                EXERCISE_HISTORY: 'monk_exercise_history'
             },
             TARGETS: { START: 45.0, GOAL: 60.0, CAL: 3000, PROT: 225, CARB: 375, FAT: 67, WATER: 8, SLEEP: 7.5 },
             MILESTONES: [
@@ -1229,16 +1230,63 @@
                 const key = 'monk_workout_data_' + date;
                 const data = await Utils.storage.get(key) || {};
                 if (!data[taskId]) data[taskId] = [];
+                const w = parseFloat(weight) || 0;
+                const r = parseFloat(reps) || 0;
                 data[taskId][setIndex] = {
-                    weight: parseFloat(weight) || 0,
-                    reps: parseFloat(reps) || 0,
+                    weight: w,
+                    reps: r,
                     timestamp: new Date().toISOString(),
                     completed: isDone
                 };
                 await Utils.storage.set(key, data);
+
+                // Egzersiz geçmişine de kaydet (uzun vadeli takip)
+                if (isDone && w > 0 && r > 0) {
+                    await this.saveToExerciseHistory(taskId, w, r);
+                }
+
                 const hasCompletedSet = data[taskId].some(s => s && s.completed);
                 if (hasCompletedSet) await this.setTaskDone(taskId, true);
-                return true;
+                return { weight: w, reps: r, volume: w * r };
+            },
+
+            // --- YENİ: Egzersiz Geçmişi Takibi ---
+            async saveToExerciseHistory(exerciseId, weight, reps) {
+                const history = await Utils.storage.get(CONFIG.KEYS.EXERCISE_HISTORY) || {};
+                if (!history[exerciseId]) history[exerciseId] = [];
+                history[exerciseId].push({
+                    date: Utils.dateStr(),
+                    weight: weight,
+                    reps: reps,
+                    volume: weight * reps,
+                    timestamp: new Date().toISOString()
+                });
+                // Son 100 kayıt tut
+                if (history[exerciseId].length > 100) {
+                    history[exerciseId] = history[exerciseId].slice(-100);
+                }
+                await Utils.storage.set(CONFIG.KEYS.EXERCISE_HISTORY, history);
+            },
+
+            async getExerciseHistory(exerciseId) {
+                const history = await Utils.storage.get(CONFIG.KEYS.EXERCISE_HISTORY) || {};
+                return history[exerciseId] || [];
+            },
+
+            async getPersonalBest(exerciseId) {
+                const history = await this.getExerciseHistory(exerciseId);
+                if (history.length === 0) return null;
+                // PR = max volume (ağırlık × tekrar)
+                let maxVolume = 0;
+                let prRecord = null;
+                history.forEach(record => {
+                    const vol = record.volume || (record.weight * record.reps);
+                    if (vol > maxVolume) {
+                        maxVolume = vol;
+                        prRecord = { ...record, volume: vol };
+                    }
+                });
+                return prRecord;
             },
 
             async setTaskDone(id, status) {
@@ -1703,7 +1751,12 @@
                                     <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300" id="icon-${tid}"></i>
                                 </div>
                                 <div id="body-${tid}" class="hidden bg-black/20 p-4 border-t border-gray-800">
-                                    <div class="text-[10px] text-gray-400 mb-4 p-2 bg-gray-800/50 rounded italic border-l-2 border-neon-blue">${ex.desc}</div>
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="text-[10px] text-gray-400 p-2 bg-gray-800/50 rounded italic border-l-2 border-neon-blue flex-1 mr-3">${ex.desc}</div>
+                                        <button onclick="event.stopPropagation(); Actions.showExercise('${tid}')" class="flex-shrink-0 w-10 h-10 rounded-lg bg-neon-blue/10 hover:bg-neon-blue/30 border border-neon-blue/50 text-neon-blue flex items-center justify-center transition" title="Detaylı Bilgi & PR">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </div>
                                     <div class="space-y-1">
                                         ${setsHtml}
                                     </div>
@@ -2314,9 +2367,102 @@
                 this.switchTab('progress'); // UI'ı yenile
             },
 
-            showExercise(id) {
+            async showExercise(id) {
                 const ex = DB.EXERCISES[id];
-                UI.modal.open(ex.title, `<div class="text-sm text-gray-300 mb-4">${ex.desc}</div><div class="bg-gray-900 p-4 rounded border border-gray-700"><div class="text-[10px] text-gray-500 font-bold mb-2">OPERASYON ADIMLARI</div><ul class="space-y-2 text-xs">${ex.steps.map(s => `<li class="flex gap-2"><i class="fas fa-caret-right text-neon-green"></i>${s}</li>`).join('')}</ul></div>`);
+                const history = await Store.getExerciseHistory(id);
+                const pr = await Store.getPersonalBest(id);
+
+                // Hedef set/tekrar parse
+                const targetMatch = ex.desc.match(/(\d+)\s*Set\s*x\s*(\d+)/i);
+                const targetSets = targetMatch ? targetMatch[1] : '3-4';
+                const targetReps = targetMatch ? targetMatch[2] : '12';
+
+                // Son 5 antrenman için mini grafik
+                const last5 = history.slice(-5);
+                const maxVol = Math.max(...last5.map(h => h.volume || 0), 1);
+                const miniChart = last5.length > 0
+                    ? last5.map(h => {
+                        const height = Math.max(8, ((h.volume || 0) / maxVol) * 60);
+                        return `<div class="flex-1 flex flex-col items-center gap-1">
+                            <div class="w-full bg-neon-blue/60 rounded-t transition-all" style="height:${height}px"></div>
+                            <div class="text-[8px] text-gray-600">${h.date ? h.date.split('-')[2] : ''}</div>
+                        </div>`;
+                    }).join('')
+                    : '<div class="text-gray-600 text-xs text-center w-full">Henüz veri yok</div>';
+
+                // Adımları numaralı göster
+                const stepsHtml = ex.steps.map((s, i) => `
+                    <div class="flex items-start gap-3 p-2 bg-gray-800/50 rounded-lg">
+                        <div class="w-6 h-6 rounded-full bg-neon-green/20 border border-neon-green/50 flex items-center justify-center text-neon-green font-bold text-xs flex-shrink-0">${i + 1}</div>
+                        <span class="text-gray-200 text-sm">${s}</span>
+                    </div>
+                `).join('');
+
+                const modalContent = `
+                    <div class="space-y-5">
+                        <!-- Başlık ve Etiketler -->
+                        <div class="flex items-center gap-3 pb-4 border-b border-gray-800">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-green/20 to-neon-blue/20 flex items-center justify-center text-2xl">
+                                <i class="fas fa-dumbbell text-neon-green"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap gap-2">
+                                    ${ex.tags.map(t => `<span class="text-[10px] px-2 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700">${t}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Açıklama -->
+                        <div class="text-sm text-gray-300 leading-relaxed p-3 bg-gray-900/50 rounded-lg border-l-3 border-neon-blue">
+                            ${ex.desc}
+                        </div>
+                        
+                        <!-- Operasyon Adımları -->
+                        <div>
+                            <div class="text-[10px] text-gray-500 font-bold tracking-widest mb-3">
+                                <i class="fas fa-list-ol mr-2 text-neon-green"></i>OPERASYON ADIMLARI
+                            </div>
+                            <div class="space-y-2">
+                                ${stepsHtml}
+                            </div>
+                        </div>
+                        
+                        <!-- PR ve Geçmiş Grid -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- PR Kartı -->
+                            <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-4 rounded-xl border border-gray-700">
+                                <div class="text-[10px] text-gray-500 font-bold mb-2">
+                                    <i class="fas fa-trophy text-neon-yellow mr-1"></i>KİŞİSEL REKOR (PR)
+                                </div>
+                                ${pr
+                        ? `<div class="text-2xl font-bold text-white">${pr.volume} <span class="text-sm text-gray-500">vol</span></div>
+                                       <div class="text-xs text-gray-500 mt-1">${pr.weight}kg × ${pr.reps} tekrar</div>
+                                       <div class="text-[10px] text-gray-600 mt-2">${pr.date || ''}</div>`
+                        : `<div class="text-gray-600 text-sm">Henüz kayıt yok</div>
+                                       <div class="text-[10px] text-gray-700 mt-1">İlk setini tamamla!</div>`
+                    }
+                            </div>
+                            
+                            <!-- Mini Grafik -->
+                            <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-4 rounded-xl border border-gray-700">
+                                <div class="text-[10px] text-gray-500 font-bold mb-2">
+                                    <i class="fas fa-chart-bar text-neon-blue mr-1"></i>SON 5 ANTRENMAN
+                                </div>
+                                <div class="flex items-end gap-1 h-16">
+                                    ${miniChart}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hedef -->
+                        <div class="text-center p-4 bg-neon-green/10 rounded-xl border border-neon-green/30">
+                            <div class="text-[10px] text-gray-500 font-bold mb-1">🎯 HEDEF</div>
+                            <div class="text-xl font-bold text-neon-green">${targetSets} Set × ${targetReps} Tekrar</div>
+                        </div>
+                    </div>
+                `;
+
+                UI.modal.open(ex.title, modalContent);
             },
             showPhase(id) {
                 const p = DB.MENTAL_PHASES.find(x => x.id == id);
@@ -2480,7 +2626,11 @@
                     return;
                 }
 
-                await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
+                // Önceki PR'ı al
+                const oldPR = await Store.getPersonalBest(taskId);
+                const oldPRVolume = oldPR ? oldPR.volume : 0;
+
+                const result = await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
 
                 if (isDoneBtn) {
                     const btn = event.currentTarget || event.target.closest('button');
@@ -2497,7 +2647,14 @@
                         rInput.classList.replace('border-gray-600', 'border-neon-green');
                         rInput.classList.add('text-neon-green');
                     }
-                    UI.showToast("Set Kaydedildi ✓");
+
+                    // PR kontrolü ve anlamlı geri bildirim
+                    const newVolume = result.volume;
+                    if (newVolume > oldPRVolume && oldPRVolume > 0) {
+                        UI.showToast(`🎉 YENİ REKOR! ${newVolume} volume (${result.weight}kg × ${result.reps})`, "success");
+                    } else {
+                        UI.showToast(`Set ${setIdx + 1} ✓ | ${newVolume} volume`, "success");
+                    }
                 }
             }
         };
