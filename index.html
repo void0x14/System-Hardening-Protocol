@@ -640,7 +640,8 @@
                 BACKUP: 'monk_last_backup_date',
                 SLEEP: 'monk_sleep_log_',
                 WATER: 'monk_water_',
-                EXERCISE_HISTORY: 'monk_exercise_history'
+                EXERCISE_HISTORY: 'monk_exercise_history',
+                MENTAL_PROGRESS: 'monk_mental_progress'
             },
             TARGETS: { START: 45.0, GOAL: 60.0, CAL: 3000, PROT: 225, CARB: 375, FAT: 67, WATER: 8, SLEEP: 7.5 },
             MILESTONES: [
@@ -2182,21 +2183,148 @@
                 return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button onclick="Actions.setAnatomyView('front')" class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ÖN</button><button onclick="Actions.setAnatomyView('back')" class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${sel.system}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">GÖREV</div><div class="text-base text-gray-200">${sel.function}</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p></div>'}</div></div>`;
             },
             async mental() {
-                const phases = DB.MENTAL_PHASES.map(p => `
-                    <details class="group bg-gray-900/40 border border-gray-800 hover:border-neon-purple/80 rounded-lg p-4 transition-all mb-3">
-                        <summary class="flex items-center justify-between cursor-pointer list-none">
-                            <div class="flex items-center gap-4"><div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-xs font-bold text-gray-500 group-hover:text-neon-purple border border-gray-700 group-hover:border-neon-purple transition">${p.id}</div><div><div class="font-bold text-gray-200 group-hover:text-white transition text-sm">${p.title}</div><div class="text-[10px] text-gray-500 group-hover:text-gray-400 transition mt-1">${p.desc}</div></div></div><i class="fas fa-chevron-down text-gray-700 group-open:rotate-180 group-open:text-neon-purple transition-transform"></i>
-                        </summary>
-                        <div class="mt-4 pt-4 border-t border-gray-800 text-xs text-gray-300 space-y-4">
-                            <div><div class="text-[9px] text-gray-500 font-bold mb-1">ÇEKİRDEK FİKİR</div><p>${p.core}</p></div>
-                            <div><div class="text-[9px] text-gray-500 font-bold mb-1">NİYET / AMAÇ</div><p>${p.intent}</p></div>
-                            <div><div class="text-[9px] text-gray-500 font-bold mb-1">STRATEJİ</div><ul class="space-y-1">${p.strategy.map(s => `<li class="flex gap-2"><i class="fas fa-caret-right text-neon-purple"></i><span>${s}</span></li>`).join('')}</ul></div>
-                            <div><div class="text-[9px] text-gray-500 font-bold mb-1">PRATİK</div><ul class="space-y-1">${p.practice.map(s => `<li class="flex gap-2"><i class="fas fa-bolt text-neon-green"></i><span>${s}</span></li>`).join('')}</ul></div>
-                            <div class="flex justify-end"><button onclick="Actions.showPhase(${p.id})" class="text-[10px] px-3 py-1 border border-gray-700 hover:border-neon-purple rounded-full text-gray-500 hover:text-neon-purple font-mono transition">MODAL AÇ</button></div>
+                // Faz ikonları
+                const phaseIcons = ['🐆', '🎭', '🤖', '🔧', '⚡', '🎯', '🍀', '🔄'];
+
+                // Mental progress verisini al
+                const mentalData = await Utils.storage.get(CONFIG.KEYS.MENTAL_PROGRESS) || {
+                    completedPhases: [],
+                    dailyPractice: {},
+                    lastPracticeDate: null
+                };
+
+                // Günün fazı (sırayla döner)
+                const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+                const todayPhaseIndex = dayOfYear % 8;
+                const todayPhase = DB.MENTAL_PHASES[todayPhaseIndex];
+
+                // İlerleme yüzdesi
+                const completedCount = mentalData.completedPhases?.length || 0;
+                const progressPercent = Math.round((completedCount / 8) * 100);
+
+                // Rastgele günlük pratik
+                const allPractices = DB.MENTAL_PHASES.flatMap((p, idx) =>
+                    p.practice.map(pr => ({ text: pr, phaseId: p.id, icon: phaseIcons[idx] }))
+                );
+                const dailyPractice = allPractices[dayOfYear % allPractices.length];
+                const practiceKey = Utils.dateStr();
+                const isPracticeDone = mentalData.dailyPractice?.[practiceKey] === true;
+
+                // Faz kartları
+                const phaseCards = DB.MENTAL_PHASES.map((p, idx) => {
+                    const icon = phaseIcons[idx];
+                    const isCompleted = mentalData.completedPhases?.includes(p.id);
+                    const isToday = idx === todayPhaseIndex;
+
+                    return `
+                        <div class="group relative bg-gradient-to-br ${isToday ? 'from-purple-900/40 to-gray-900' : 'from-gray-900 to-gray-800'} 
+                            border-2 ${isToday ? 'border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.2)]' : isCompleted ? 'border-neon-green/50' : 'border-gray-700'} 
+                            rounded-2xl p-5 transition-all hover:border-neon-purple/80 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] cursor-pointer"
+                            onclick="Actions.showPhase(${p.id})">
+                            
+                            ${isToday ? '<div class="absolute -top-2 -right-2 bg-neon-purple text-black text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">BUGÜN</div>' : ''}
+                            ${isCompleted ? '<div class="absolute top-3 right-3 text-neon-green text-lg">✓</div>' : ''}
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 border border-purple-500/30 
+                                    flex items-center justify-center text-3xl ${isToday ? 'animate-pulse' : ''} 
+                                    group-hover:scale-110 transition-transform">
+                                    ${icon}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-[10px] text-purple-400 font-mono mb-1">FAZ ${p.id}</div>
+                                    <div class="font-bold text-white text-base group-hover:text-purple-200 transition">${p.title.replace(/FAZ \d+: /, '')}</div>
+                                    <div class="text-xs text-gray-400 mt-2 leading-relaxed">${p.desc}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-700/50 flex justify-between items-center">
+                                <div class="text-[10px] text-gray-500">
+                                    <i class="fas fa-list-check mr-1"></i>${p.strategy.length} Strateji • ${p.practice.length} Pratik
+                                </div>
+                                <div class="text-neon-purple text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                                    DETAY <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </div>
                         </div>
-                    </details>
-            `).join('');
-                return `<div class="animate-slide-up"><div class="flex items-center gap-3 mb-4 border-b border-gray-800 pb-3"><i class="fas fa-brain text-neon-purple text-xl"></i><div><h2 class="font-header font-bold text-white">ZİHİNSEL SAVAŞ</h2><div class="text-[10px] text-gray-500 mt-1">Mental Hardening Protokolü v5.8.0</div></div></div>${phases}</div>`;
+                    `;
+                }).join('');
+
+                return `
+                    <div class="animate-slide-up space-y-6">
+                        <!-- Header -->
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                                    <i class="fas fa-brain text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="font-header font-bold text-white text-xl">ZİHİNSEL SAVAŞ</h2>
+                                    <div class="text-xs text-gray-500">Mental Hardening Protokolü v5.9.4</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold ${progressPercent === 100 ? 'text-neon-green' : 'text-neon-purple'}">${progressPercent}%</div>
+                                <div class="text-[10px] text-gray-500">${completedCount}/8 Faz</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Günün Fazı Spotlight -->
+                        <div class="bg-gradient-to-r from-purple-900/30 via-gray-900 to-pink-900/30 rounded-2xl p-6 border border-purple-500/30 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
+                            <div class="relative z-10">
+                                <div class="text-[10px] text-purple-400 font-bold tracking-widest mb-3">
+                                    <i class="fas fa-star mr-1"></i>GÜNÜN FAZI
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="text-5xl">${phaseIcons[todayPhaseIndex]}</div>
+                                    <div>
+                                        <div class="text-xl font-bold text-white">${todayPhase.title}</div>
+                                        <div class="text-sm text-gray-400 mt-1">${todayPhase.desc}</div>
+                                    </div>
+                                </div>
+                                <button onclick="Actions.showPhase(${todayPhase.id})" 
+                                    class="mt-4 px-4 py-2 bg-purple-600/20 border border-purple-500/50 rounded-lg text-purple-300 text-sm font-bold hover:bg-purple-600/40 transition">
+                                    <i class="fas fa-book-open mr-2"></i>Fazı İncele
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Günlük Pratik -->
+                        <div class="bg-gray-900 rounded-xl p-5 border ${isPracticeDone ? 'border-neon-green' : 'border-gray-700'}">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="text-[10px] text-gray-500 font-bold tracking-widest">
+                                    <i class="fas fa-bolt text-neon-yellow mr-1"></i>GÜNLÜK PRATİK
+                                </div>
+                                ${isPracticeDone ? '<span class="text-neon-green text-xs font-bold">✓ TAMAMLANDI</span>' : ''}
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="text-2xl">${dailyPractice.icon}</div>
+                                <div class="flex-1">
+                                    <div class="text-sm text-gray-300 leading-relaxed">${dailyPractice.text}</div>
+                                    <div class="text-[10px] text-gray-600 mt-2">Faz ${dailyPractice.phaseId}</div>
+                                </div>
+                            </div>
+                            ${!isPracticeDone ? `
+                                <button onclick="Actions.completeDailyPractice()" 
+                                    class="mt-4 w-full py-3 bg-neon-green/10 border-2 border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black transition-all">
+                                    <i class="fas fa-check mr-2"></i>Bunu Yaptım!
+                                </button>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="bg-gray-800/50 rounded-full h-3 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-purple-600 to-pink-500 transition-all duration-500" 
+                                style="width: ${progressPercent}%"></div>
+                        </div>
+                        
+                        <!-- Faz Kartları Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${phaseCards}
+                        </div>
+                    </div>
+                `;
             }
         };
 
@@ -2592,10 +2720,142 @@
 
                 UI.modal.open(ex.title, modalContent);
             },
-            showPhase(id) {
+            async showPhase(id) {
+                const phaseIcons = ['🐆', '🎭', '🤖', '🔧', '⚡', '🎯', '🍀', '🔄'];
                 const p = DB.MENTAL_PHASES.find(x => x.id == id);
-                UI.modal.open(p.title, `<div class="space-y-4 text-sm text-gray-300"><div class="bg-gray-900 p-3 rounded border border-gray-800"><div class="text-[9px] text-gray-500 font-bold mb-1">ÖZET</div><p>${p.desc}</p></div><div class="bg-gray-900 p-3 rounded border border-gray-800"><div class="text-[9px] text-gray-500 font-bold mb-1">ÇEKİRDEK</div><p>${p.core}</p></div><div class="grid grid-cols-2 gap-2"><div class="bg-gray-900 p-3 rounded"><div class="text-[9px] text-gray-500 font-bold mb-1">STRATEJİ</div><ul class="space-y-1 text-xs">${p.strategy.map(s => `<li>- ${s}</li>`).join('')}</ul></div><div class="bg-gray-900 p-3 rounded"><div class="text-[9px] text-gray-500 font-bold mb-1">PRATİK</div><ul class="space-y-1 text-xs">${p.practice.map(s => `<li>- ${s}</li>`).join('')}</ul></div></div></div>`);
+                const idx = DB.MENTAL_PHASES.findIndex(x => x.id == id);
+                const icon = phaseIcons[idx] || '🧠';
+
+                // Mental progress'i kontrol et
+                const mentalData = await Utils.storage.get(CONFIG.KEYS.MENTAL_PROGRESS) || { completedPhases: [] };
+                const isCompleted = mentalData.completedPhases?.includes(id);
+
+                const modalContent = `
+                    <div class="space-y-5">
+                        <!-- Header -->
+                        <div class="flex items-center gap-4 pb-4 border-b border-gray-800">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/30 to-pink-600/30 border border-purple-500/40 
+                                flex items-center justify-center text-4xl">
+                                ${icon}
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-xs text-purple-400 font-mono mb-1">FAZ ${p.id} / 8</div>
+                                <div class="text-lg font-bold text-white">${p.title.replace(/FAZ \d+: /, '')}</div>
+                                <div class="text-xs text-gray-500 mt-1">${p.desc}</div>
+                            </div>
+                            ${isCompleted ? '<div class="text-neon-green text-2xl">✓</div>' : ''}
+                        </div>
+                        
+                        <!-- Çekirdek Fikir -->
+                        <div class="bg-gradient-to-br from-purple-900/20 to-gray-900 p-4 rounded-xl border border-purple-500/20">
+                            <div class="text-[10px] text-purple-400 font-bold tracking-widest mb-2">
+                                <i class="fas fa-lightbulb mr-1"></i>ÇEKİRDEK FİKİR
+                            </div>
+                            <p class="text-sm text-gray-300 leading-relaxed">${p.core}</p>
+                        </div>
+                        
+                        <!-- Niyet -->
+                        <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-800">
+                            <div class="text-[10px] text-gray-500 font-bold tracking-widest mb-2">
+                                <i class="fas fa-bullseye mr-1"></i>NİYET / AMAÇ
+                            </div>
+                            <p class="text-sm text-gray-400 leading-relaxed">${p.intent}</p>
+                        </div>
+                        
+                        <!-- Strateji ve Pratik -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gray-900 p-4 rounded-xl border-l-4 border-purple-500">
+                                <div class="text-[10px] text-purple-400 font-bold tracking-widest mb-3">
+                                    <i class="fas fa-chess mr-1"></i>STRATEJİ
+                                </div>
+                                <ul class="space-y-2">
+                                    ${p.strategy.map(s => `
+                                        <li class="flex gap-2 text-xs text-gray-300">
+                                            <i class="fas fa-caret-right text-purple-400 mt-0.5"></i>
+                                            <span>${s}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            <div class="bg-gray-900 p-4 rounded-xl border-l-4 border-neon-green">
+                                <div class="text-[10px] text-neon-green font-bold tracking-widest mb-3">
+                                    <i class="fas fa-bolt mr-1"></i>PRATİK UYGULAMALAR
+                                </div>
+                                <ul class="space-y-2">
+                                    ${p.practice.map(s => `
+                                        <li class="flex gap-2 text-xs text-gray-300">
+                                            <i class="fas fa-check text-neon-green mt-0.5"></i>
+                                            <span>${s}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3 pt-4 border-t border-gray-800">
+                            ${!isCompleted ? `
+                                <button onclick="Actions.markPhaseComplete(${p.id})" 
+                                    class="flex-1 py-3 bg-neon-green/10 border-2 border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black transition-all">
+                                    <i class="fas fa-check-double mr-2"></i>Bu Fazı Anladım
+                                </button>
+                            ` : `
+                                <div class="flex-1 py-3 bg-neon-green/10 border border-neon-green/30 text-neon-green text-center font-bold rounded-xl">
+                                    <i class="fas fa-trophy mr-2"></i>Faz Tamamlandı!
+                                </div>
+                            `}
+                            <button onclick="UI.modal.close()" 
+                                class="px-6 py-3 bg-gray-800 border border-gray-700 text-gray-400 font-bold rounded-xl hover:bg-gray-700 hover:text-white transition-all">
+                                Kapat
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                UI.modal.open(p.title, modalContent);
             },
+
+            // Mental progress actions
+            async completeDailyPractice() {
+                const mentalData = await Utils.storage.get(CONFIG.KEYS.MENTAL_PROGRESS) || {
+                    completedPhases: [],
+                    dailyPractice: {}
+                };
+                const today = Utils.dateStr();
+                mentalData.dailyPractice = mentalData.dailyPractice || {};
+                mentalData.dailyPractice[today] = true;
+                await Utils.storage.set(CONFIG.KEYS.MENTAL_PROGRESS, mentalData);
+
+                // Epik overlay göster
+                UI.showEpicOverlay('🧠', 'ZİHİN GÜÇLENDİ!', 'Günlük pratik tamamlandı. Bir adım daha ileridesin.', '#a855f7');
+
+                setTimeout(() => this.switchTab('mental'), 2300);
+            },
+
+            async markPhaseComplete(phaseId) {
+                const mentalData = await Utils.storage.get(CONFIG.KEYS.MENTAL_PROGRESS) || {
+                    completedPhases: [],
+                    dailyPractice: {}
+                };
+                mentalData.completedPhases = mentalData.completedPhases || [];
+
+                if (!mentalData.completedPhases.includes(phaseId)) {
+                    mentalData.completedPhases.push(phaseId);
+                    await Utils.storage.set(CONFIG.KEYS.MENTAL_PROGRESS, mentalData);
+
+                    UI.modal.close();
+
+                    // Tüm fazlar tamamlandı mı kontrol et
+                    if (mentalData.completedPhases.length >= 8) {
+                        UI.showEpicOverlay('👑', 'MENTAL MASTER!', 'Tüm fazları tamamladın. Zihinsel savaşı kazandın!', '#fbbf24');
+                    } else {
+                        UI.showEpicOverlay('⭐', 'FAZ TAMAMLANDI!', `${mentalData.completedPhases.length}/8 faz tamamlandı.`, '#a855f7');
+                    }
+
+                    setTimeout(() => this.switchTab('mental'), 2300);
+                }
+            },
+
             setAnatomyView(v) { UI.activeView = v; Store.state.selectedMuscle = null; this.switchTab('anatomy'); },
             selectMuscle(id) { Store.state.selectedMuscle = id; this.switchTab('anatomy'); },
 

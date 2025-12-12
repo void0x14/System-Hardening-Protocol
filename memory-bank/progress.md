@@ -2,17 +2,21 @@
 
 ## Çalışan Özellikler
 - ✅ Dashboard (streak, kilo, su, uyku takibi)
-- ✅ Antrenman sekmesi (günlük program, set/tekrar girişi)
+- ✅ Antrenman sekmesi (premium set input, PR takibi)
 - ✅ Premium egzersiz bilgi modalı
 - ✅ Uzun vadeli egzersiz geçmişi takibi
 - ✅ PR (Kişisel Rekor) sistemi
-- ✅ Premium Set Input UI
-- ✅ **Epik Overlay Sistemi (showEpicOverlay)**
-- ✅ **System Boot epik başlangıç**
-- ✅ **Gainer Shake epik overlay**
-- ✅ **Günlük görevler tamamlandığında zafer overlay'i**
+- ✅ Epik overlay sistemi (showEpicOverlay)
+- ✅ System Boot epik başlangıç
+- ✅ Gainer Shake epik overlay
+- ✅ Günlük görevler tamamlandığında zafer overlay'i
 - ✅ Beslenme sekmesi (kalori/makro takibi)
-- ✅ Zihinsel Savaş (8 faz)
+- ✅ **Zihinsel Savaş - TAMAMEN YENİLENDİ**
+  - Premium 2x4 grid faz kartları
+  - Günün fazı spotlight
+  - Günlük pratik bölümü
+  - Faz tamamlama takibi
+  - Premium modal tasarımı
 - ✅ Anatomi Lab (interaktif)
 - ✅ Gelişim (kilo grafiği, ölçüler, haftalık özet)
 - ✅ Veri yedekleme/geri yükleme
@@ -20,28 +24,37 @@
 
 ## Son Güncelleme (12 Aralık 2025)
 
+### v5.9.4 - Zihinsel Sekmesi Tam Yenileme
+- `mental()` renderer tamamen yeniden yazıldı
+- Premium faz kartları (gradient, glassmorphism, ikonlar)
+- Günün fazı spotlight bölümü
+- Günlük pratik bölümü + "Bunu Yaptım" butonu
+- İlerleme çubuğu (0% - 100%)
+- `showPhase()` premium modal tasarımı
+- "Bu Fazı Anladım" butonu ile faz tamamlama
+- `completeDailyPractice()` fonksiyonu
+- `markPhaseComplete()` fonksiyonu
+- Tüm fazlar tamamlandığında "MENTAL MASTER" overlay
+- `CONFIG.KEYS.MENTAL_PROGRESS` storage key
+
 ### v5.9.3 - Epik Overlay Sistemi
-- `UI.showEpicOverlay(emoji, text, sub, color)` fonksiyonu
-- Gainer Shake turuncu epik overlay (#ff6b35)
-- Günlük görevler tamamlandığında yeşil zafer overlay'i
-- 500ms gecikme ile overlay (UI güncellemesi bekleniyor)
+- `UI.showEpicOverlay()` fonksiyonu
+- Gainer Shake turuncu overlay
+- Günlük görevler tamamlandığında zafer overlay
 
 ### v5.9.2 - Antrenman UI Overhaul
 - Premium set input UI
-- Açıklama metni iyileştirmesi
-- Her kartta %ilerleme gösterimi
-- startWorkout() tam ekran epik overlay
+- startWorkout() epik overlay
 
 ### v5.9.1 - Egzersiz Takip Sistemi
-- Premium egzersiz bilgi kartı modalı
-- Egzersiz geçmişi takibi
-- PR algılama ve gösterimi
+- Premium egzersiz bilgi modalı
+- PR sistemi
 
 ## Bilinen Sorunlar
 - Tüm bildirilen sorunlar çözüldü ✅
 
 ## Sürüm Geçmişi
-- v5.9.3: Epik overlay sistemi (Gainer, Günlük tamamlanma)
+- v5.9.4: Zihinsel sekmesi tam yenileme
+- v5.9.3: Epik overlay sistemi
 - v5.9.2: Set input UI, epik motivasyon overlay
 - v5.9.1: Premium egzersiz modalı, PR sistemi
-- v5.9.0: Mevcut stabil sürüm
