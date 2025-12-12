@@ -1299,6 +1299,22 @@
                 }
                 await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
                 await this.updateStreak();
+
+                // Tüm görevler tamamlandý mı kontrol et
+                const day = new Date().getDay();
+                const plan = DB.WEEKLY_PLAN[day];
+                if (tasks.length >= plan.tasks.length) {
+                    // Tüm görevler tamamlandı!
+                    const messages = [
+                        { emoji: "🏆", text: "GÜN TAMAMLANDI!", sub: "Bugünü fethetttin. Yarın daha güçlü dön." },
+                        { emoji: "👑", text: "KRAL GİBİ!", sub: "Disiplin = Özgürlük. Bunu kanıtladın." },
+                        { emoji: "🔥", text: "YANDIN AMA AYAKTASIN!", sub: "Acı büyüme demek. Tebrikler." },
+                        { emoji: "⭐", text: "YİLDİZ PERFORMANS!", sub: "Bugün kendini aştın." },
+                        { emoji: "💪", text: "CANAVAR MOD!", sub: "Hiçbir şey seni durduramaz." }
+                    ];
+                    const msg = messages[Math.floor(Math.random() * messages.length)];
+                    setTimeout(() => UI.showEpicOverlay(msg.emoji, msg.text, msg.sub, '#00ff41'), 500);
+                }
             },
 
             async getVolumeStats() {
@@ -1537,6 +1553,78 @@
                 }
 
                 this.renderPortionInputs();
+            },
+            // Epik tam ekran overlay gösterici
+            showEpicOverlay(emoji, text, sub, color = '#00ff41') {
+                const overlay = document.createElement('div');
+                overlay.id = 'epic-overlay-' + Date.now();
+                overlay.innerHTML = `
+                    <div style="
+                        position: fixed;
+                        inset: 0;
+                        background: radial-gradient(ellipse at center, ${color}15 0%, rgba(10,10,15,0.98) 70%);
+                        z-index: 9999;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        animation: overlayFadeIn 0.3s ease-out;
+                    ">
+                        <div style="
+                            font-size: 120px;
+                            animation: emojiPulse 0.5s ease-out;
+                            text-shadow: 0 0 60px ${color}80;
+                        ">${emoji}</div>
+                        <div style="
+                            font-family: 'Orbitron', sans-serif;
+                            font-size: clamp(28px, 8vw, 64px);
+                            font-weight: 900;
+                            color: ${color};
+                            text-align: center;
+                            margin-top: 20px;
+                            text-shadow: 0 0 30px ${color}80, 0 0 60px ${color}50;
+                            animation: textSlideUp 0.4s ease-out 0.1s both;
+                            letter-spacing: 4px;
+                        ">${text}</div>
+                        <div style="
+                            font-size: clamp(14px, 3vw, 20px);
+                            color: #6b7280;
+                            margin-top: 16px;
+                            text-align: center;
+                            animation: textSlideUp 0.4s ease-out 0.2s both;
+                            max-width: 80%;
+                        ">${sub}</div>
+                        <div style="
+                            margin-top: 40px;
+                            width: 200px;
+                            height: 4px;
+                            background: #333;
+                            border-radius: 4px;
+                            overflow: hidden;
+                            animation: textSlideUp 0.4s ease-out 0.3s both;
+                        ">
+                            <div style="
+                                width: 100%;
+                                height: 100%;
+                                background: linear-gradient(90deg, ${color}, #00f3ff);
+                                animation: progressFill 1.5s ease-out forwards;
+                                transform-origin: left;
+                            "></div>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+                        @keyframes emojiPulse { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
+                        @keyframes textSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                        @keyframes progressFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+                        @keyframes overlayFadeOut { from { opacity: 1; } to { opacity: 0; } }
+                    </style>
+                `;
+                document.body.appendChild(overlay);
+                setTimeout(() => {
+                    overlay.firstElementChild.style.animation = 'overlayFadeOut 0.3s ease-out forwards';
+                    setTimeout(() => overlay.remove(), 300);
+                }, 2000);
             }
         };
 
@@ -2123,7 +2211,20 @@
                 }
             },
             async saveWeight(v) { const num = parseFloat(v); if (isNaN(num) || num <= 0 || num > 300) { UI.showToast("Geçersiz kilo!", "error"); return; } if (await Store.saveWeight(num)) { UI.showToast("Kilo güncellendi."); this.switchTab('dashboard'); } },
-            async injectFuel() { await Store.saveFuel(); UI.showToast("Yakıt alındı."); this.switchTab('dashboard'); },
+            async injectFuel() {
+                await Store.saveFuel();
+                // Epik gainer shake overlay
+                const messages = [
+                    { emoji: "⛽", text: "YAKIT ALINDI!", sub: "Motor çalışıyor. Kaslar büyüyor." },
+                    { emoji: "🍼", text: "SHAKE İÇİLDİ!", sub: "Protein sızıyor. Anabolizma aktif." },
+                    { emoji: "🚀", text: "GÜÇ YÜKLENDİ!", sub: "Enerji deposu %100. Hazırsın." },
+                    { emoji: "💪", text: "KAS YAPIMI BAŞLADI!", sub: "Her yudum seni güçlendiriyor." },
+                    { emoji: "🥤", text: "GAINER TAMAM!", sub: "Bulk sezonunda önemli adım." }
+                ];
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                UI.showEpicOverlay(msg.emoji, msg.text, msg.sub, '#ff6b35');
+                setTimeout(() => this.switchTab('dashboard'), 2300);
+            },
 
             // --- v5.8.0: SLEEP & WATER ACTIONS ---
             async saveSleep() {
@@ -2573,19 +2674,107 @@
             startWorkout() {
                 // Motive edici mesajlar
                 const messages = [
-                    "🔥 YANMAYA HAZIR OL!",
-                    "💪 GÜÇ SENDİR!",
-                    "⚡ SİSTEM AKTİF!",
-                    "🎯 HEDEF KİLİTLİ!",
-                    "🚀 KALKIS BAŞARILI!"
+                    { emoji: "🔥", text: "YANMAYA HAZIR OL!", sub: "Acı geçici, gurur kalıcı." },
+                    { emoji: "💪", text: "GÜÇ SENDİR!", sub: "Limitler zihninde, kır onları." },
+                    { emoji: "⚡", text: "SİSTEM AKTİF!", sub: "Her rep seni daha güçlü yapıyor." },
+                    { emoji: "🎯", text: "HEDEF KİLİTLİ!", sub: "Bugün dünden daha iyi ol." },
+                    { emoji: "🚀", text: "KALKIŞ BAŞARILI!", sub: "Başlamak bitirmenin yarısı." },
+                    { emoji: "👊", text: "SAVAŞ ZAMANI!", sub: "Bahaneler zayıflar içindir." },
+                    { emoji: "🦁", text: "ASLAN GİBİ!", sub: "Korku ile cesaret aynı yerde yaşar." }
                 ];
-                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                const msg = messages[Math.floor(Math.random() * messages.length)];
 
                 // Modalı kapat
                 UI.modal.close();
 
-                // Motive edici toast göster
-                UI.showToast(randomMsg, "success");
+                // Tam ekran overlay oluştur
+                const overlay = document.createElement('div');
+                overlay.id = 'workout-start-overlay';
+                overlay.innerHTML = `
+                    <div style="
+                        position: fixed;
+                        inset: 0;
+                        background: radial-gradient(ellipse at center, rgba(0,255,65,0.15) 0%, rgba(10,10,15,0.98) 70%);
+                        z-index: 9999;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        animation: overlayFadeIn 0.3s ease-out;
+                    ">
+                        <div style="
+                            font-size: 120px;
+                            animation: emojiPulse 0.5s ease-out;
+                            text-shadow: 0 0 60px rgba(0,255,65,0.5);
+                        ">${msg.emoji}</div>
+                        <div style="
+                            font-family: 'Orbitron', sans-serif;
+                            font-size: clamp(28px, 8vw, 64px);
+                            font-weight: 900;
+                            color: #00ff41;
+                            text-align: center;
+                            margin-top: 20px;
+                            text-shadow: 0 0 30px rgba(0,255,65,0.5), 0 0 60px rgba(0,255,65,0.3);
+                            animation: textSlideUp 0.4s ease-out 0.1s both;
+                            letter-spacing: 4px;
+                        ">${msg.text}</div>
+                        <div style="
+                            font-size: clamp(14px, 3vw, 20px);
+                            color: #6b7280;
+                            margin-top: 16px;
+                            text-align: center;
+                            animation: textSlideUp 0.4s ease-out 0.2s both;
+                            max-width: 80%;
+                        ">${msg.sub}</div>
+                        <div style="
+                            margin-top: 40px;
+                            width: 200px;
+                            height: 4px;
+                            background: #333;
+                            border-radius: 4px;
+                            overflow: hidden;
+                            animation: textSlideUp 0.4s ease-out 0.3s both;
+                        ">
+                            <div style="
+                                width: 100%;
+                                height: 100%;
+                                background: linear-gradient(90deg, #00ff41, #00f3ff);
+                                animation: progressFill 1.5s ease-out forwards;
+                                transform-origin: left;
+                            "></div>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes overlayFadeIn {
+                            from { opacity: 0; }
+                            to { opacity: 1; }
+                        }
+                        @keyframes emojiPulse {
+                            0% { transform: scale(0.3); opacity: 0; }
+                            50% { transform: scale(1.2); }
+                            100% { transform: scale(1); opacity: 1; }
+                        }
+                        @keyframes textSlideUp {
+                            from { transform: translateY(30px); opacity: 0; }
+                            to { transform: translateY(0); opacity: 1; }
+                        }
+                        @keyframes progressFill {
+                            from { transform: scaleX(0); }
+                            to { transform: scaleX(1); }
+                        }
+                        @keyframes overlayFadeOut {
+                            from { opacity: 1; }
+                            to { opacity: 0; }
+                        }
+                    </style>
+                `;
+                document.body.appendChild(overlay);
+
+                // 2 saniye sonra kapat
+                setTimeout(() => {
+                    overlay.firstElementChild.style.animation = 'overlayFadeOut 0.3s ease-out forwards';
+                    setTimeout(() => overlay.remove(), 300);
+                }, 2000);
             },
 
             // --- PHASE 1: SETTINGS & DATA ---
