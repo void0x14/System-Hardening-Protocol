@@ -1,44 +1,41 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**v6.0.0 - Kapsamlı JSDoc Dokümantasyonu** - TAMAMLANDI ✅
+**v6.0.0 - Egzersiz Video Entegrasyonu** - TAMAMLANDI ✅
 
 ### Son Güncelleme (12 Aralık 2025)
 
-#### JSDoc Dokümantasyonu - Detaylı
-Tüm ana objeler ve kritik fonksiyonlar dokümante edildi.
-IDE'de fonksiyon üzerine gelindiğinde açıklamalar görünür.
+#### YouTube Video Eğitimi
+Egzersiz detay modal'ına YouTube video entegrasyonu eklendi.
 
-**Dokümante Edilen:**
+**Özellikler:**
+- 📹 11 egzersiz için video eğitimi
+- 🎬 Collapsed varsayılan (kullanıcı talebine bırakıldı)
+- 🖱️ Tıklayınca expand/collapse
+- 🎨 Premium kırmızı gradient UI (YouTube teması)
+- 📱 Responsive 16:9 aspect ratio
 
-| Kategori | Fonksiyon Sayısı | Örnek Fonksiyonlar |
-|----------|------------------|-------------------|
-| Utils | 4 | dateStr, storage.get/set, getRandomMeal |
-| Store Core | 11 | init, saveWeight, addMeal, getMeals |
-| Store Advanced | 6 | getAllFoods, getStats, getStreak |
-| UI | 11 | modal.open/close, showToast, showEpicOverlay |
-| Renderers | başlık | dashboard, training, nutrition |
-| Actions | başlık | switchTab, toggleOverride, showExercise |
+**Video Eklenen Egzersizler:**
+| Egzersiz | YouTube ID |
+|----------|-----------|
+| Squat | xqvCmoLULNY |
+| Goblet Squat | MxsFDhcyFyE |
+| Push-up | IODxDxX7oi4 |
+| One Arm Row | pYcpY20QaE8 |
+| RKC Plank | kL_NJAkCQBg |
+| Farmer's Walk | Fkzk_RqlYig |
+| Hammer Curl | zC3nLlEvin4 |
+| Mountain Climber | nmwgirgXLYM |
+| Leg Raise | JB2oyawG9KI |
+| Superman | z6PJMT2y8GQ |
 
-**Toplam JSDoc:** ~140 satır
-
-#### JSDoc İçerik Formatı
-```javascript
-/**
- * Kısa açıklama.
- * @async
- * @param {string} key - Parametre açıklaması
- * @returns {Promise<Object>} Dönüş tipi açıklaması
- * @example
- * await Store.addMeal({name: 'Yumurta', cal: 150});
- */
-```
+#### Video Yok → Bölüm Görünmez
+`videoId` olmayan egzersizlerde (kegel, bulk ye, vb.) video bölümü görünmez.
 
 ### Bugünkü Tüm Değişiklikler
-1. Antrenman set input UI premium tasarım
-2. Egzersiz bilgi modalı premium tasarım
-3. Epik overlay sistemi
-4. Zihinsel sekmesi tam yenileme
-5. Modal ESC + backdrop kapatma
-6. Versiyon v6.0.0 standardizasyonu
-7. **Kapsamlı JSDoc kod dokümantasyonu**
+1. Antrenman premium UI
+2. Zihinsel sekmesi yenileme
+3. Modal ESC/backdrop kapatma
+4. Versiyon v6.0.0
+5. Kapsamlı JSDoc dokümantasyonu
+6. **Egzersiz video entegrasyonu**
