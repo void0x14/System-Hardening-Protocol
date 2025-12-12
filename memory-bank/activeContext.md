@@ -1,49 +1,36 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**Zihinsel Sekmesi Tam UI/UX Yenileme** - TAMAMLANDI ✅
+**v6.0.0 Yayınlandı** - TAMAMLANDI ✅
 
 ### Son Güncelleme (12 Aralık 2025)
 
-#### mental() Renderer - Tam Yenileme
-- ✅ Premium başlık (gradient ikon, ilerleme yüzdesi)
-- ✅ **Günün Fazı Spotlight** - Her gün farklı faz öne çıkar
-- ✅ **Günlük Pratik Bölümü** - Rastgele pratik + "Bunu Yaptım!" butonu
-- ✅ **İlerleme Çubuğu** - Tamamlanan faz sayısı / 8
-- ✅ **2x4 Premium Grid Kartları**
-  - Her faz için benzersiz ikon (🐆🎭🤖🔧⚡🎯🍀🔄)
-  - Bugün badge'i, tamamlandı işareti
-  - Gradient arka plan, hover efektleri
-  - Strateji/pratik sayısı gösterimi
+#### Modal Kapatma İyileştirmesi
+- ✅ **ESC tuşu ile kapatma** - `_escHandler` ile dinleyici yönetimi
+- ✅ **Backdrop tıklama ile kapatma** - Modal dışına tıklayınca kapanır
+- ✅ Modal açıldığında listener eklenir, kapandığında kaldırılır
 
-#### showPhase() Modal - Premium Tasarım
-- ✅ Büyük faz ikonu (16x16)
-- ✅ Gradient çekirdek fikir kartı
-- ✅ 2 kolonlu strateji/pratik grid
-- ✅ "Bu Fazı Anladım" butonu
-- ✅ Tamamlandığında yeşil tik gösterimi
+#### Versiyon Standardizasyonu (v6.0.0)
+Tüm versiyon referansları senkronize edildi:
+- ✅ `<title>` → v6.0.0
+- ✅ Nav bar → v6.0.0
+- ✅ `CONFIG.VERSION` → '6.0.0'
+- ✅ Mental renderer → v6.0.0
 
-#### Yeni Action Fonksiyonları
-- ✅ `completeDailyPractice()` - Günlük pratik tamamlama + epik overlay
-- ✅ `markPhaseComplete(phaseId)` - Faz tamamlama + epik overlay
-- ✅ 8/8 faz tamamlandığında "MENTAL MASTER" özel overlay
+### Bugünkü Tüm Değişiklikler
+1. Antrenman set input UI premium tasarım
+2. Egzersiz bilgi modalı premium tasarım
+3. Epik overlay sistemi (UI.showEpicOverlay)
+4. System Boot epik başlangıç
+5. Gainer Shake epik overlay
+6. Günlük görevler tamamlandığında zafer overlay
+7. Zihinsel sekmesi tam yenileme (günün fazı, pratik takibi)
+8. Modal ESC + backdrop kapatma
+9. Versiyon v6.0.0 standardizasyonu
 
-#### CONFIG Güncellemesi
-- ✅ `CONFIG.KEYS.MENTAL_PROGRESS: 'monk_mental_progress'`
-
-### Veri Yapısı
-```javascript
-monk_mental_progress: {
-    completedPhases: [1, 2, 3, ...], // Tamamlanan faz ID'leri
-    dailyPractice: {
-        "2025-12-12": true,  // Günlük pratik tamamlandı mı
-        ...
-    }
-}
-```
-
-### Önceki Çalışmalar (Aynı Seans)
-- Epik overlay sistemi (Gainer, Günlük tamamlanma, System Boot)
-- Premium antrenman set input UI
-- Egzersiz bilgi modalı premium tasarım
-- Uzun vadeli egzersiz geçmişi takibi
+### Versiyon Değişiklik Kuralı
+Bundan sonra versiyon güncellenirken güncellenecek yerler:
+1. `<title>` etiketi (satır ~7)
+2. Nav bar içindeki `<span>` (satır ~560)
+3. `CONFIG.VERSION` (satır ~629)
+4. Mental renderer metni (satır ~2274)
