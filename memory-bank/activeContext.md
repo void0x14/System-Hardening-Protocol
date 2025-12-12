@@ -1,36 +1,44 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**v6.0.0 Yayınlandı** - TAMAMLANDI ✅
+**v6.0.0 - Kapsamlı JSDoc Dokümantasyonu** - TAMAMLANDI ✅
 
 ### Son Güncelleme (12 Aralık 2025)
 
-#### Modal Kapatma İyileştirmesi
-- ✅ **ESC tuşu ile kapatma** - `_escHandler` ile dinleyici yönetimi
-- ✅ **Backdrop tıklama ile kapatma** - Modal dışına tıklayınca kapanır
-- ✅ Modal açıldığında listener eklenir, kapandığında kaldırılır
+#### JSDoc Dokümantasyonu - Detaylı
+Tüm ana objeler ve kritik fonksiyonlar dokümante edildi.
+IDE'de fonksiyon üzerine gelindiğinde açıklamalar görünür.
 
-#### Versiyon Standardizasyonu (v6.0.0)
-Tüm versiyon referansları senkronize edildi:
-- ✅ `<title>` → v6.0.0
-- ✅ Nav bar → v6.0.0
-- ✅ `CONFIG.VERSION` → '6.0.0'
-- ✅ Mental renderer → v6.0.0
+**Dokümante Edilen:**
+
+| Kategori | Fonksiyon Sayısı | Örnek Fonksiyonlar |
+|----------|------------------|-------------------|
+| Utils | 4 | dateStr, storage.get/set, getRandomMeal |
+| Store Core | 11 | init, saveWeight, addMeal, getMeals |
+| Store Advanced | 6 | getAllFoods, getStats, getStreak |
+| UI | 11 | modal.open/close, showToast, showEpicOverlay |
+| Renderers | başlık | dashboard, training, nutrition |
+| Actions | başlık | switchTab, toggleOverride, showExercise |
+
+**Toplam JSDoc:** ~140 satır
+
+#### JSDoc İçerik Formatı
+```javascript
+/**
+ * Kısa açıklama.
+ * @async
+ * @param {string} key - Parametre açıklaması
+ * @returns {Promise<Object>} Dönüş tipi açıklaması
+ * @example
+ * await Store.addMeal({name: 'Yumurta', cal: 150});
+ */
+```
 
 ### Bugünkü Tüm Değişiklikler
 1. Antrenman set input UI premium tasarım
 2. Egzersiz bilgi modalı premium tasarım
-3. Epik overlay sistemi (UI.showEpicOverlay)
-4. System Boot epik başlangıç
-5. Gainer Shake epik overlay
-6. Günlük görevler tamamlandığında zafer overlay
-7. Zihinsel sekmesi tam yenileme (günün fazı, pratik takibi)
-8. Modal ESC + backdrop kapatma
-9. Versiyon v6.0.0 standardizasyonu
-
-### Versiyon Değişiklik Kuralı
-Bundan sonra versiyon güncellenirken güncellenecek yerler:
-1. `<title>` etiketi (satır ~7)
-2. Nav bar içindeki `<span>` (satır ~560)
-3. `CONFIG.VERSION` (satır ~629)
-4. Mental renderer metni (satır ~2274)
+3. Epik overlay sistemi
+4. Zihinsel sekmesi tam yenileme
+5. Modal ESC + backdrop kapatma
+6. Versiyon v6.0.0 standardizasyonu
+7. **Kapsamlı JSDoc kod dokümantasyonu**
