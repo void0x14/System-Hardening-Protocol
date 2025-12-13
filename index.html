@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v6.1.0</title>
+    <title>PROJECT: MONK MODE | v6.2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -627,7 +627,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '6.1.0',
+            VERSION: '6.2.0',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -658,6 +658,214 @@
             btn: "bg-surface-raised hover:bg-neon-green hover:text-gunmetal text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2",
             input: "bg-surface-raised border-0 text-white rounded-lg p-3 focus:ring-2 focus:ring-neon-green/30 outline-none w-full transition-all",
             label: "text-xs uppercase tracking-[0.2em] text-text-muted font-bold mb-3 block"
+        };
+
+        /**
+         * @namespace Components
+         * @description Reusable UI component factory functions.
+         * Each function returns an HTML string for common UI patterns.
+         * Purpose: Eliminate template duplication, improve DRY compliance.
+         */
+        const Components = {
+            /**
+             * Standard card wrapper with optional accent border
+             * @param {string} label - Card header label (emoji + text)
+             * @param {string} content - Inner HTML content
+             * @param {string} [accent=''] - Extra classes (e.g., 'border-neon-green/30')
+             * @param {string} [extra=''] - Additional wrapper classes
+             */
+            card: (label, content, accent = '', extra = '') => `
+                <div class="${THEME.card} ${accent} ${extra}">
+                    <div class="${THEME.label}">${label}</div>
+                    ${content}
+                </div>`,
+
+            /**
+             * Progress bar component
+             * @param {number} percent - Progress percentage (0-100)
+             * @param {string} [color='neon-green'] - Tailwind color class
+             * @param {string} [height='h-2'] - Height class
+             */
+            progressBar: (percent, color = 'neon-green', height = 'h-2') => `
+                <div class="w-full bg-surface-raised ${height} rounded-full overflow-hidden">
+                    <div class="${height} bg-${color} rounded-full transition-all" style="width: ${Math.min(100, percent)}%"></div>
+                </div>`,
+
+            /**
+             * Labeled progress row (label + value + bar)
+             * @param {string} label - Left label text
+             * @param {string} value - Right value display
+             * @param {number} percent - Progress percentage
+             * @param {string} [color='neon-green'] - Bar color
+             */
+            progressRow: (label, value, percent, color = 'neon-green') => `
+                <div>
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-text-muted">${label}</span>
+                        <span class="text-${color} font-bold">${value}</span>
+                    </div>
+                    ${Components.progressBar(percent, color)}
+                </div>`,
+
+            /**
+             * Stat display card (centered value with label)
+             * @param {string} label - Top label
+             * @param {string|number} value - Main value
+             * @param {string} [unit=''] - Value suffix
+             * @param {string} [color='white'] - Value color
+             * @param {string} [accent=''] - Border accent class
+             */
+            statCard: (label, value, unit = '', color = 'white', accent = '') => `
+                <div class="${THEME.card} text-center py-3 ${accent}">
+                    <div class="text-[9px] text-gray-500 font-bold">${label}</div>
+                    <div class="text-xl font-bold text-${color} mt-1">${value} ${unit ? `<span class="text-[10px] text-gray-500">${unit}</span>` : ''}</div>
+                </div>`,
+
+            /**
+             * Mini stat card for grids (no card wrapper)
+             * @param {string} label - Top label
+             * @param {string|number} value - Main value
+             * @param {string} [unit=''] - Value suffix
+             * @param {string} [labelColor='gray-500'] - Label color
+             * @param {string} [valueColor='white'] - Value color
+             */
+            statMini: (label, value, unit = '', labelColor = 'gray-500', valueColor = 'white') => `
+                <div class="text-center py-3">
+                    <div class="text-[9px] text-${labelColor} font-bold">${label}</div>
+                    <div class="text-xl font-bold text-${valueColor} mt-1">${value} ${unit ? `<span class="text-[10px] text-gray-500">${unit}</span>` : ''}</div>
+                </div>`,
+
+            /**
+             * Badge/tag component
+             * @param {string} text - Badge text
+             * @param {string} [type='default'] - 'success', 'warning', 'error', 'info', 'default'
+             */
+            badge: (text, type = 'default') => {
+                const styles = {
+                    success: 'text-neon-green bg-neon-green/10 border-neon-green/30',
+                    warning: 'text-accent-orange bg-accent-orange/10 border-accent-orange/30',
+                    error: 'text-neon-red bg-neon-red/10 border-neon-red/30',
+                    info: 'text-neon-blue bg-neon-blue/10 border-neon-blue/30',
+                    default: 'text-gray-400 bg-gray-800 border-gray-700'
+                };
+                return `<span class="text-[10px] font-bold px-2 py-1 rounded border ${styles[type] || styles.default}">${text}</span>`;
+            },
+
+            /**
+             * Button component
+             * @param {string} text - Button text
+             * @param {string} onclick - onclick handler
+             * @param {string} [type='primary'] - 'primary', 'secondary', 'danger', 'ghost'
+             * @param {string} [icon=''] - FontAwesome icon class (e.g., 'fa-plus')
+             * @param {string} [extra=''] - Additional classes
+             */
+            btn: (text, onclick, type = 'primary', icon = '', extra = '') => {
+                const styles = {
+                    primary: 'bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black',
+                    secondary: 'bg-gray-800 hover:bg-gray-700 text-gray-300',
+                    danger: 'bg-neon-red/20 hover:bg-neon-red text-neon-red hover:text-white',
+                    ghost: 'bg-transparent hover:bg-gray-800 text-gray-400',
+                    blue: 'bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black'
+                };
+                const iconHtml = icon ? `<i class="fas ${icon} mr-2"></i>` : '';
+                return `<button onclick="${onclick}" class="${styles[type] || styles.primary} px-4 py-2 rounded-lg font-bold text-sm transition-all ${extra}">${iconHtml}${text}</button>`;
+            },
+
+            /**
+             * Icon button (square)
+             * @param {string} icon - FontAwesome icon
+             * @param {string} onclick - onclick handler
+             * @param {string} [type='primary'] - Button type
+             * @param {string} [size='w-12 h-12'] - Size classes
+             */
+            iconBtn: (icon, onclick, type = 'primary', size = 'w-12 h-12') => {
+                const styles = {
+                    primary: 'bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black',
+                    secondary: 'bg-gray-800 hover:bg-gray-700 text-gray-400',
+                    success: 'bg-neon-green text-black',
+                    danger: 'bg-neon-red/20 hover:bg-neon-red text-neon-red hover:text-white'
+                };
+                return `<button onclick="${onclick}" class="${styles[type] || styles.primary} ${size} rounded-xl flex items-center justify-center text-lg transition-all">
+                    <i class="fas ${icon}"></i>
+                </button>`;
+            },
+
+            /**
+             * Set input row for weighted exercises
+             * @param {string} tid - Task ID
+             * @param {number} idx - Set index
+             * @param {Object} log - Set log data
+             * @param {boolean} isSetDone - Completion status
+             * @param {string} [hint=''] - Intensity hint
+             */
+            weightedSetRow: (tid, idx, log, isSetDone, hint = '') => `
+                <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
+                    <div class="flex flex-col items-center justify-center w-16 h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
+                        <div>SET ${idx + 1}</div>
+                        ${hint ? `<div class="text-[8px] ${isSetDone ? 'text-black/70' : 'text-neon-blue'} font-bold">${hint}</div>` : ''}
+                    </div>
+                    <div class="flex-1 flex items-center gap-2">
+                        <div class="flex-1">
+                            <label class="text-[9px] text-gray-500 block mb-1">AĞIRLIK</label>
+                            <input type="number" placeholder="0" value="${log.weight || ''}" id="w-${tid}-${idx}" 
+                                class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                                onchange="Actions.saveSet('${tid}', ${idx}, false)">
+                        </div>
+                        <div class="text-gray-600 text-lg font-bold">×</div>
+                        <div class="flex-1">
+                            <label class="text-[9px] text-gray-500 block mb-1">TEKRAR</label>
+                            <input type="number" placeholder="0" value="${log.reps || ''}" id="r-${tid}-${idx}" 
+                                class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                                onchange="Actions.saveSet('${tid}', ${idx}, false)">
+                        </div>
+                    </div>
+                    <button onclick="Actions.saveSet('${tid}', ${idx}, true)" 
+                        class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
+                        <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                    </button>
+                </div>`,
+
+            /**
+             * Set input row for timed exercises
+             * @param {string} tid - Task ID
+             * @param {number} idx - Set index
+             * @param {Object} log - Set log data
+             * @param {boolean} isSetDone - Completion status
+             */
+            timedSetRow: (tid, idx, log, isSetDone) => `
+                <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
+                    <div class="flex items-center justify-center w-14 h-10 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
+                        SET ${idx + 1}
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-[9px] text-gray-500 block mb-1">SÜRE (saniye)</label>
+                        <input type="number" placeholder="0" value="${log.duration || ''}" id="d-${tid}-${idx}" 
+                            class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
+                    </div>
+                    <button onclick="Actions.saveTimedSet('${tid}', ${idx})" 
+                        class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
+                        <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                    </button>
+                </div>`,
+
+            /**
+             * Simple task toggle button (activity/duration/task types)
+             * @param {string} tid - Task ID
+             * @param {boolean} isDone - Completion status
+             */
+            simpleTaskBtn: (tid, isDone) => `
+                <button onclick="Actions.toggleSimpleTask('${tid}')" 
+                    class="w-full py-4 rounded-xl font-bold text-lg transition-all ${isDone ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green border-2 border-gray-600'}">
+                    <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
+                    ${isDone ? 'TAMAMLANDI ✓' : 'TAMAMLA'}
+                </button>`,
+
+            /**
+             * Status indicator dot
+             * @param {boolean} active - Active state
+             */
+            statusDot: (active) => `
+                <div class="w-3 h-3 rounded-full ${active ? 'bg-neon-green shadow-[0_0_8px_rgba(0,255,65,0.5)]' : 'bg-gray-600'} transition-all"></div>`
         };
 
         const DB = {
@@ -2105,75 +2313,24 @@
                     let setsHtml = '';
                     let completedSets = 0;
 
-                    // Different UI based on trackingType
+                    // Different UI based on trackingType - NOW USING COMPONENTS
                     if (trackingType === 'weighted') {
-                        // WEIGHTED: Set boxes with weight × reps + intensity hints
                         for (let i = 0; i < targetSets; i++) {
                             const log = logs[i] || {};
                             const isSetDone = !!log.completed;
                             if (isSetDone) completedSets++;
-                            const hint = intensityHints[i] || '';
-                            setsHtml += `
-                                <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
-                                    <div class="flex flex-col items-center justify-center w-16 h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
-                                        <div>SET ${i + 1}</div>
-                                        ${hint ? `<div class="text-[8px] ${isSetDone ? 'text-black/70' : 'text-neon-blue'} font-bold">${hint}</div>` : ''}
-                                    </div>
-                                    <div class="flex-1 flex items-center gap-2">
-                                        <div class="flex-1">
-                                            <label class="text-[9px] text-gray-500 block mb-1">AĞIRLIK</label>
-                                            <input type="number" placeholder="0" value="${log.weight || ''}" id="w-${tid}-${i}" 
-                                                class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
-                                                onchange="Actions.saveSet('${tid}', ${i}, false)">
-                                        </div>
-                                        <div class="text-gray-600 text-lg font-bold">×</div>
-                                        <div class="flex-1">
-                                            <label class="text-[9px] text-gray-500 block mb-1">TEKRAR</label>
-                                            <input type="number" placeholder="0" value="${log.reps || ''}" id="r-${tid}-${i}" 
-                                                class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
-                                                onchange="Actions.saveSet('${tid}', ${i}, false)">
-                                        </div>
-                                    </div>
-                                    <button onclick="Actions.saveSet('${tid}', ${i}, true)" 
-                                        class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
-                                        <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
-                                    </button>
-                                </div>
-                            `;
+                            setsHtml += Components.weightedSetRow(tid, i, log, isSetDone, intensityHints[i] || '');
                         }
                     } else if (trackingType === 'timed') {
-                        // TIMED: Set boxes with duration only
                         for (let i = 0; i < targetSets; i++) {
                             const log = logs[i] || {};
                             const isSetDone = !!log.completed;
                             if (isSetDone) completedSets++;
-                            setsHtml += `
-                                <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
-                                    <div class="flex items-center justify-center w-14 h-10 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
-                                        SET ${i + 1}
-                                    </div>
-                                    <div class="flex-1">
-                                        <label class="text-[9px] text-gray-500 block mb-1">SÜRE (saniye)</label>
-                                        <input type="number" placeholder="0" value="${log.duration || ''}" id="d-${tid}-${i}" 
-                                            class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
-                                    </div>
-                                    <button onclick="Actions.saveTimedSet('${tid}', ${i})" 
-                                        class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
-                                        <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
-                                    </button>
-                                </div>
-                            `;
+                            setsHtml += Components.timedSetRow(tid, i, log, isSetDone);
                         }
                     } else {
-                        // DURATION / ACTIVITY / TASK: Simple single button
                         completedSets = isDone ? 1 : 0;
-                        setsHtml = `
-                            <button onclick="Actions.toggleSimpleTask('${tid}')" 
-                                class="w-full py-4 rounded-xl font-bold text-lg transition-all ${isDone ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green border-2 border-gray-600'}">
-                                <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
-                                ${isDone ? 'TAMAMLANDI ✓' : 'TAMAMLA'}
-                            </button>
-                        `;
+                        setsHtml = Components.simpleTaskBtn(tid, isDone);
                     }
 
                     // Calculate progress
@@ -2217,7 +2374,8 @@
                                     </div>
                                 </div>
                             </div>`;
-                }).join('')}
+                }).join('')
+                    }
                     </div>
                 </div>`;
             },
@@ -2333,7 +2491,7 @@
                     }).join('')}
                             </div>
                         </div>
-            `;
+                    `;
                 } else {
                     weightBars = '<div class="text-gray-600 text-xs w-full text-center self-center flex flex-col items-center justify-center h-full"><i class="fas fa-weight text-3xl mb-2 opacity-30"></i><span>Veri yok</span><span class="text-[10px] text-gray-700 mt-1">Dashboard\'dan kilo girin</span></div>';
                 }
@@ -2421,11 +2579,11 @@
                                 `).join('')}
                             </div>
                         </div>
-            `;
+                    `;
                 }
 
                 return `
-                <div class="space-y-6 animate-slide-up">
+                    <div class="space-y-6 animate-slide-up">
                     <!-- SUMMARY ROW -->
                     <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
                         <div class="${THEME.card} text-center py-3">
@@ -2454,7 +2612,7 @@
                         </div>
                     </div>
 
-                    <!--VOLUME ANALYSIS-- >
+                    <!-- VOLUME ANALYSIS -->
                     <div class="${THEME.card}">
                         <div class="flex justify-between items-center mb-4">
                             <div>
@@ -2565,13 +2723,11 @@
 
                     return `
                         <div class="group relative bg-gradient-to-br ${isToday ? 'from-purple-900/40 to-gray-900' : 'from-gray-900 to-gray-800'} 
-                            border-2 ${isToday ? 'border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.2)]' : isCompleted ? 'border-neon-green/50' : 'border-gray-700'} 
+                            border-2 ${isToday ? 'border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.2)]' : isCompleted ? 'border-neon-green/50' : 'border-gray-700'}
                             rounded-2xl p-5 transition-all hover:border-neon-purple/80 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] cursor-pointer"
                             onclick="Actions.showPhase(${p.id})">
-                            
                             ${isToday ? '<div class="absolute -top-2 -right-2 bg-neon-purple text-black text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">BUGÜN</div>' : ''}
                             ${isCompleted ? '<div class="absolute top-3 right-3 text-neon-green text-lg">✓</div>' : ''}
-                            
                             <div class="flex items-start gap-4">
                                 <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 border border-purple-500/30 
                                     flex items-center justify-center text-3xl ${isToday ? 'animate-pulse' : ''} 
@@ -2584,7 +2740,6 @@
                                     <div class="text-xs text-gray-400 mt-2 leading-relaxed">${p.desc}</div>
                                 </div>
                             </div>
-                            
                             <div class="mt-4 pt-4 border-t border-gray-700/50 flex justify-between items-center">
                                 <div class="text-[10px] text-gray-500">
                                     <i class="fas fa-list-check mr-1"></i>${p.strategy.length} Strateji • ${p.practice.length} Pratik
@@ -2733,7 +2888,7 @@
                 const current = await Store.getWater(Utils.dateStr());
                 const newVal = Math.max(0, current + cups);
                 await Utils.storage.set(CONFIG.KEYS.WATER + Utils.dateStr(), newVal);
-                if (cups > 0) UI.showToast(`+${cups} bardak 💧`);
+                if (cups > 0) UI.showToast(`+ ${cups} bardak 💧`);
                 this.switchTab('dashboard');
             },
 
@@ -2846,7 +3001,7 @@
             openMealModal() {
                 const foods = Store.getAllFoods();
                 UI.modal.open("YAKIT EKLE", `
-            <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
+                    <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
                         <button onclick="document.getElementById('tab-exist').style.display='block';document.getElementById('tab-new').style.display='none'" class="text-xs text-neon-green font-bold hover:underline">LİSTEDEN SEÇ</button>
                         <button onclick="document.getElementById('tab-exist').style.display='none';document.getElementById('tab-new').style.display='block'" class="text-xs text-gray-500 font-bold hover:text-white hover:underline">YENİ TANIMLA</button>
                     </div>
@@ -3569,8 +3724,8 @@
              * Süreli set kaydet (plank, vacuum vb.).
              * @async
              * @param {string} taskId - Egzersiz ID
-             * @param {number} setIdx - Set indeksi
-             */
+                                * @param {number} setIdx - Set indeksi
+                                */
             async saveTimedSet(taskId, setIdx) {
                 const dInput = document.getElementById(`d-${taskId}-${setIdx}`);
                 const duration = dInput ? parseFloat(dInput.value) || 0 : 0;
@@ -3609,7 +3764,7 @@
              * Basit görev toggle (duration/activity/task tipleri).
              * @async
              * @param {string} taskId - Görev ID
-             */
+                                */
             async toggleSimpleTask(taskId) {
                 const date = Utils.dateStr();
                 const done = await Store.getWorkout(date);
