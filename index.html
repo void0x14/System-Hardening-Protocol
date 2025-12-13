@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v6.2.0</title>
+    <title>PROJECT: MONK MODE | v6.3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -627,7 +627,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '6.2.0',
+            VERSION: '6.3.0',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -1783,6 +1783,65 @@
                 return current + cups;
             },
 
+            // --- v6.3.0: SLEEP & WATER STATISTICS ---
+            async getSleepStats() {
+                const today = Utils.dateStr();
+                const todayVal = await this.getSleep(today);
+                const history = [];
+                let weekTotal = 0, weekDays = 0;
+                let monthTotal = 0, monthDays = 0;
+
+                // Son 30 gün
+                for (let i = 0; i < 30; i++) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const dateStr = d.toISOString().split('T')[0];
+                    const val = await this.getSleep(dateStr);
+                    if (val > 0) {
+                        if (i < 7) { weekTotal += val; weekDays++; }
+                        monthTotal += val;
+                        monthDays++;
+                    }
+                    if (i < 7) history.push({ date: dateStr, value: val });
+                }
+
+                return {
+                    today: todayVal,
+                    weekAvg: weekDays > 0 ? (weekTotal / weekDays).toFixed(1) : 0,
+                    monthAvg: monthDays > 0 ? (monthTotal / monthDays).toFixed(1) : 0,
+                    weekDays,
+                    monthDays,
+                    history: history.reverse()
+                };
+            },
+
+            async getWaterStats() {
+                const today = Utils.dateStr();
+                const todayVal = await this.getWater(today);
+                const history = [];
+                let weekTotal = 0;
+                let monthTotal = 0;
+
+                // Son 30 gün
+                for (let i = 0; i < 30; i++) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const dateStr = d.toISOString().split('T')[0];
+                    const val = await this.getWater(dateStr);
+                    if (i < 7) { weekTotal += val; history.push({ date: dateStr, value: val }); }
+                    monthTotal += val;
+                }
+
+                return {
+                    today: todayVal,
+                    weekTotal,
+                    monthTotal,
+                    weekAvg: (weekTotal / 7).toFixed(1),
+                    monthAvg: (monthTotal / 30).toFixed(1),
+                    history: history.reverse()
+                };
+            },
+
             // --- v5.8.0: MILESTONE CHECK ---
             getNextMilestone() {
                 const w = this.state.weight;
@@ -2138,6 +2197,8 @@
                 const progress = await Store.getTodayProgress();
                 const todaySleep = await Store.getSleep(Utils.dateStr());
                 const todayWater = await Store.getWater(Utils.dateStr());
+                const sleepStats = await Store.getSleepStats();
+                const waterStats = await Store.getWaterStats();
                 const nextMilestone = Store.getNextMilestone();
                 const completedMilestones = Store.getCompletedMilestones();
 
@@ -2238,7 +2299,7 @@
                             </div>
                         </div>
                         
-                        <!-- SLEEP TRACKING (NEW) -->
+                        <!-- SLEEP TRACKING -->
                         <div class="${THEME.card}">
                             <div class="${THEME.label}">😴 UYKU TAKİBİ</div>
                             <div class="flex items-center justify-between mt-3">
@@ -2252,9 +2313,22 @@
                                     <button onclick="Actions.saveSleep()" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black px-3 py-1 rounded text-xs font-bold transition">KAYDET</button>
                                 </div>
                             </div>
+                            <!-- Weekly Stats -->
+                            <div class="mt-4 pt-3 border-t border-gray-800">
+                                <div class="grid grid-cols-2 gap-3 text-center text-xs">
+                                    <div class="bg-surface-raised p-2 rounded-lg">
+                                        <div class="text-gray-500">Haftalık Ort.</div>
+                                        <div class="text-neon-blue font-bold text-lg">${sleepStats.weekAvg} <span class="text-[10px] text-gray-500">saat</span></div>
+                                    </div>
+                                    <div class="bg-surface-raised p-2 rounded-lg">
+                                        <div class="text-gray-500">Aylık Ort.</div>
+                                        <div class="text-neon-blue font-bold text-lg">${sleepStats.monthAvg} <span class="text-[10px] text-gray-500">saat</span></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
-                        <!-- WATER TRACKING (NEW) -->
+                        <!-- WATER TRACKING -->
                         <div class="${THEME.card}">
                             <div class="${THEME.label}">💧 SU TAKİBİ</div>
                             <div class="flex items-center justify-between mt-3">
@@ -2267,6 +2341,19 @@
                                 <div class="flex gap-2">
                                     <button onclick="Actions.addWater(1)" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black w-12 h-12 rounded-lg text-xl font-bold transition">+1</button>
                                     <button onclick="Actions.addWater(-1)" class="bg-gray-800 hover:bg-gray-700 text-gray-400 w-12 h-12 rounded-lg text-xl font-bold transition">-1</button>
+                                </div>
+                            </div>
+                            <!-- Weekly Stats -->
+                            <div class="mt-4 pt-3 border-t border-gray-800">
+                                <div class="grid grid-cols-2 gap-3 text-center text-xs">
+                                    <div class="bg-surface-raised p-2 rounded-lg">
+                                        <div class="text-gray-500">Haftalık Top.</div>
+                                        <div class="text-neon-blue font-bold text-lg">${waterStats.weekTotal} <span class="text-[10px] text-gray-500">bardak</span></div>
+                                    </div>
+                                    <div class="bg-surface-raised p-2 rounded-lg">
+                                        <div class="text-gray-500">Aylık Top.</div>
+                                        <div class="text-neon-blue font-bold text-lg">${waterStats.monthTotal} <span class="text-[10px] text-gray-500">bardak</span></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2440,6 +2527,10 @@
                 // v5.8.0: Weekly Summary
                 const weeklySummary = await Store.getWeeklySummary();
 
+                // v6.3.0: Sleep & Water Stats
+                const sleepStats = await Store.getSleepStats();
+                const waterStats = await Store.getWaterStats();
+
                 // Turkish month names
                 const months = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
 
@@ -2609,6 +2700,26 @@
                         <div class="${THEME.card} text-center py-3">
                             <div class="text-[9px] text-gray-500 font-bold">HEDEF</div>
                             <div class="text-xl font-bold text-neon-green mt-1">${CONFIG.TARGETS.GOAL} <span class="text-[10px]">kg</span></div>
+                        </div>
+                    </div>
+
+                    <!-- SLEEP & WATER STATS (v6.3.0) -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="${THEME.card} text-center py-3 border-purple-500/30">
+                            <div class="text-[9px] text-purple-400 font-bold">😴 HAFTALIK UYKU</div>
+                            <div class="text-xl font-bold text-white mt-1">${sleepStats.weekAvg} <span class="text-[10px] text-gray-500">saat/gün</span></div>
+                        </div>
+                        <div class="${THEME.card} text-center py-3 border-purple-500/30">
+                            <div class="text-[9px] text-purple-400 font-bold">😴 AYLIK UYKU</div>
+                            <div class="text-xl font-bold text-white mt-1">${sleepStats.monthAvg} <span class="text-[10px] text-gray-500">saat/gün</span></div>
+                        </div>
+                        <div class="${THEME.card} text-center py-3 border-neon-blue/30">
+                            <div class="text-[9px] text-neon-blue font-bold">💧 HAFTALIK SU</div>
+                            <div class="text-xl font-bold text-white mt-1">${waterStats.weekTotal} <span class="text-[10px] text-gray-500">bardak</span></div>
+                        </div>
+                        <div class="${THEME.card} text-center py-3 border-neon-blue/30">
+                            <div class="text-[9px] text-neon-blue font-bold">💧 AYLIK SU</div>
+                            <div class="text-xl font-bold text-white mt-1">${waterStats.monthTotal} <span class="text-[10px] text-gray-500">bardak</span></div>
                         </div>
                     </div>
 

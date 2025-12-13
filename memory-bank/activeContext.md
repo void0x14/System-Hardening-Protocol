@@ -1,26 +1,21 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**v6.2.0 - Component Factory Pattern + HTML Düzeltme** - TAMAMLANDI ✅
+**v6.3.0 - Uyku/Su İstatistikleri** - TAMAMLANDI ✅
 
 ### Son Güncelleme (13 Aralık 2025)
 
-#### Components Factory (12 fonksiyon)
-- `card`, `progressBar`, `progressRow` - Layout
-- `statCard`, `statMini`, `badge` - Veri gösterimi
-- `btn`, `iconBtn` - Butonlar
-- `weightedSetRow`, `timedSetRow`, `simpleTaskBtn` - Set input
-- `statusDot` - Durum göstergesi
+#### Yeni Store Fonksiyonları
+- `getSleepStats()` - Haftalık/aylık uyku ortalaması
+- `getWaterStats()` - Haftalık/aylık su toplamı
 
-#### Refactored Renderers
-- `training()` - Components kullanımına geçti (~70 satır azaldı)
+#### Dashboard Güncellemeleri
+- Uyku kartı: Haftalık + Aylık ortalama
+- Su kartı: Haftalık + Aylık toplam
 
-#### HTML Regression Fix
-42 bozuk HTML tag düzeltildi:
-- `< div class=` → `<div class=`
-- `</div >` → `</div>`
-- `border - 2` → `border-2`
-- `onclick = ` → `onclick=`
+#### Progress Güncellemeleri
+- 4 yeni istatistik kartı (uyku/su haftalık/aylık)
 
-#### trackingType Sistemi (v6.1.0)
-- `weighted`, `timed`, `duration`, `activity`, `task`
+#### Önceki: Components Factory (v6.2.0)
+- 12 reusable component fonksiyonu
+- `training()` renderer refactored
