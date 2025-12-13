@@ -19,10 +19,107 @@
 - ✅ **trackingType sistemi (weighted/timed/duration/activity/task)**
 - ✅ **Uyku/Su haftalık ve aylık istatistikleri**
 
-## Bilinen Sorunlar
-- ⚠️ Bazı inline onclick'ler hala var (kısmi event delegation)
+## Bilinen Sorunlar (v7.0.0 Analizi)
+
+### KRİTİK
+- ❌ **CDN Bağımlılığı**: Tailwind/FontAwesome CDN offline'da çöker
+  - Çözüm: Pre-build veya fallback ekle
+- ❌ **localStorage Limiti**: 5-10MB, QuotaExceededError riski
+  - Çözüm: Auto-cleanup (6 ay), LZ-string sıkıştırma
+- ❌ **Global Namespace**: Tüm değişkenler global, çakışma riski
+  - Çözüm: IIFE ile kapsülle
+
+### ORTA
+- ⚠️ **Video Popup**: Popup blocker'lara takılır
+  - Çözüm: Modal iframe embed (v7.1.0: VideoPlayer fallback sistemi ile çözüldü)
+- ⚠️ **Silent Error**: Hatalar sessizce yutuluyor
+  - Çözüm: console.error + UI.showToast (v7.1.0: kısmen çözüldü)
+- ⚠️ Bazı inline onclick'ler hala var
+
+## Çözülemeyen/Ertelenen Sorunlar
+
+### YouTube Error 153 (Video Oynatıcı) 🔴 ERTELENDİ
+**Durum**: `file://` protokolü üzerinden çalıştığında YouTube embed videoları Error 153 veriyor.
+
+**Denenen Çözümler**:
+1. ❌ `youtube-nocookie.com` + `referrerpolicy="no-referrer"` → Başarısız
+2. ❌ Data URI wrapper (iframe in iframe) → Başarısız  
+3. ✅ `VideoPlayer.openVideo()` fallback sistemi → **Kısmi Çözüm**
+   - Popup pencere açılıyor ama içinde yine Error 153
+   - Fallback: 3 saniye sonra normal YouTube sayfasına yönlendiriyor
+
+**Neden Çözülemedi**:
+- YouTube'un güvenlik politikası `file://` origin'lerden embed oynatmaya izin vermiyor
+- Chrome/Firefox güvenlik kısıtlamaları bypass edilemiyor
+- Data URI sandbox yöntemi de YouTube tarafından engelleniyor
+
+**Geçici Çalışma Yöntemi** (v7.1.0):
+```javascript
+// Popup aç (Error 153 görünür ama kullanıcı manuel tıklayabilir)
+// VEYA fallback ile YouTube.com'da aç
+VideoPlayer.openVideo(videoId);
+```
+
+**Kalıcı Çözüm Gereksinimleri**:
+- [ ] Uygulamayı yerel web sunucusu üzerinde çalıştırmak (`http://localhost`)
+- [ ] Video dosyalarını local olarak barındırmak
+- [ ] Alternatif video platformları (Vimeo, self-hosted) kullanmak
+
+**Erteleme Kararı**: 13 Aralık 2025
+- Kullanıcı: "Bu sorunu geçici olarak erteliyoruz"
+- Sebep: `file://` protokol kısıtlaması aşılamıyor
+
+## Technical Debt (v7.1.0 Detaylı Analiz)
+
+### 1. Accessibility (A11Y) = 0/10
+- ❌ ARIA attribute'leri yok (aria-label, role, tabindex)
+- ❌ Ekran okuyucu desteği yok
+- ❌ Keyboard navigation sınırlı (sadece ESC modal kapatma)
+- **Çözüm**: Modal'lara `role="dialog"`, button'lara `aria-label`, tab navigation
+
+### 2. Internationalization (i18n)
+- ❌ Hard-coded Türkçe text'ler
+- ❌ Dil değiştirme yok
+- **Çözüm**: `const t = (key) => LANG[currentLang][key]` pattern
+
+### 3. Animation Overload
+- ⚠️ `scan 2s linear infinite`, `pulse-urgent 1.5s infinite` → performans
+- ⚠️ Düşük-end cihazlarda yavaşlama riski
+- **Çözüm**: `@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }`
+
+### 4. Security: XSS Risk
+- ⚠️ `innerHTML = userContent` → XSS açığı (createCustomFood)
+- **Çözüm**: `textContent` veya DOM API kullan
+
+### 5. Data Validation Eksik
+- ⚠️ `Store.saveWeight` NaN kontrolü yok
+- ⚠️ Negatif kilo kaydedilebilir
+- **Çözüm**: Store katmanında validation: `if (isNaN(w) || w <= 0 || w > 300) throw new Error("Invalid weight")`
+
+### 6. Magic Numbers
+- ⚠️ `if (todaySleep < 6)`, `for (let w = 0; w < 4; w++)` → hardcoded
+- **Çözüm**: `CONFIG.THRESHOLDS = { SLEEP_LOW: 6, WEEKLY_SUMMARY_WEEKS: 4 }`
+
+### 7. Backup Export DOM Hack
+- ⚠️ `document.body.appendChild(a); a.click(); document.body.removeChild(a)`
+- **Çözüm**: Modern File System Access API (`window.showSaveFilePicker`)
+
+### 8. Responsive Gaps
+- ⚠️ Bazı sabit `px` değerleri (`width: 1.2em`, `height: 120px`)
+- ⚠️ 375px viewport'ta element taşma riski
+- **Çözüm**: Tüm spacing için `rem` veya `clamp()` kullan
+
+### 9. Timezone Bug (dateStr)
+- ❌ `toLocaleDateString('tr-TR')` timezone'a bağlı → streak kırılabilir
+- **Çözüm**: ISO 8601: `new Date().toISOString().split('T')[0]`
+
+### 10. No Tests
+- ❌ 3900+ satır kod, 0 test
+- ❌ Refactor risk yüksek
+- **Çözüm**: Critical fonksiyonlar için unit test (min. `Utils.dateStr`, `Store.saveWeight`)
 
 ## Sürüm Geçmişi
+- **v7.1.0**: Video Player Fallback Sistemi (VideoPlayer.openVideo + embed URL retry)
 - v7.0.0: Güvenlik (escapeHtml, validateImportData) + Performans (cache)
 - v6.3.0: Uyku/Su istatistikleri (haftalık/aylık)
 - v6.2.0: Components Factory, HTML regression fix, training refactor

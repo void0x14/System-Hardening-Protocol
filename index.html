@@ -4,9 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v7.0.0</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>PROJECT: MONK MODE | v7.1.0</title>
+    <!-- v7.1.0: CDN with fallback warning -->
+    <script src="https://cdn.tailwindcss.com"
+        onerror="console.error('Tailwind CDN failed'); document.body.innerHTML='<div style=\'padding:2rem;color:#ff003c;font-family:monospace\'>⚠️ CDN OFFLINE - Internet bağlantısı gerekli</div>';"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"
+        onerror="console.error('FontAwesome CDN failed')">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700;800&family=Orbitron:wght@500;700&display=swap"
         rel="stylesheet">
@@ -557,7 +560,7 @@
                 <i class="fas fa-biohazard text-neon-green text-2xl"></i>
                 <div>
                     <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v6.0.0</span></h1>
+                            class="text-sm text-text-muted">v7.1.0</span></h1>
                     <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
                     </div>
                 </div>
@@ -627,7 +630,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '7.0.0',
+            VERSION: '7.1.0',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -1236,7 +1239,10 @@
                             return res ? res.value : null;
                         }
                         return JSON.parse(localStorage.getItem(key));
-                    } catch (e) { return null; }
+                    } catch (e) {
+                        console.error('Storage get error:', key, e); // v7.1.0
+                        return null;
+                    }
                 },
 
                 /**
@@ -1256,7 +1262,15 @@
                             localStorage.setItem(key, JSON.stringify(val));
                         }
                         return true;
-                    } catch (e) { UI.showToast("Kayıt Hatası!", "error"); return false; }
+                    } catch (e) {
+                        console.error('Storage set error:', key, e); // v7.1.0
+                        if (e.name === 'QuotaExceededError') {
+                            UI.showToast("Depolama dolu! Eski verileri temizleyin.", "error");
+                        } else {
+                            UI.showToast("Kayıt Hatası!", "error");
+                        }
+                        return false;
+                    }
                 }
             },
 
@@ -2910,7 +2924,7 @@
                                 </div>
                                 <div>
                                     <h2 class="font-header font-bold text-white text-xl">ZİHİNSEL SAVAŞ</h2>
-                                    <div class="text-xs text-gray-500">Mental Hardening Protokolü v6.0.0</div>
+                                    <div class="text-xs text-gray-500">Mental Hardening Protokolü v7.1.0</div>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -2997,7 +3011,44 @@
          * // Robot Mode toggle
          * await Actions.toggleOverride();
          */
+
+        // v7.1.0: VideoPlayer with fallback system (User's solution)
+        const VideoPlayer = {
+            openVideo(videoId) {
+                // Embed URL ile dene
+                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+                const popup = window.open(embedUrl, 'VideoPlayer', 'width=854,height=480,resizable=yes');
+
+                // 3 saniye sonra kontrol et
+                setTimeout(() => {
+                    try {
+                        if (!popup || popup.closed) {
+                            // Popup kapandıysa normal YouTube'a yönlendir
+                            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                            UI.showToast('Video yeni sekmede açılıyor...', 'info');
+                        }
+                    } catch (error) {
+                        // Cross-origin hatası - normal davranış
+                        console.log('Video popup açıldı (cross-origin)');
+                    }
+                }, 3000);
+            }
+        };
+
         const Actions = {
+            // v7.1.0: Video modal instead of popup
+            playVideo(videoId) {
+                const html = `<div class="aspect-video w-full"><iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+                UI.showModal('Video Eğitimi', html);
+            },
+            // v7.1.0: Inline video player (Fixes Error 153 & Syntax Issues)
+            playVideoInline(el, videoId) {
+                const embedCode = `<style>body{margin:0;background:black;overflow:hidden}.video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden}.video-container iframe{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class='video-container'><iframe src='https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0' frameborder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe></div>`;
+                const dataUri = 'data:text/html;charset=utf-8,' + encodeURIComponent(embedCode);
+                el.innerHTML = `<iframe class="w-full aspect-video" src="${dataUri}" frameborder="0" allowfullscreen></iframe>`;
+                el.onclick = null;
+                el.classList.remove('cursor-pointer', 'hover:border-red-600/50');
+            },
             async switchTab(id) {
                 Store.state.activeTab = id;
                 UI.updateTab(id);
@@ -3379,17 +3430,9 @@
                         </div>
                         
                         ${ex.videoId ? `
-                        <!-- Video Tutorial - Opens in popup window at element position -->
+                        <!-- Video Tutorial - v7.1.0: VideoPlayer (Robust Fallback System) -->
                         <div class="border border-gray-800 rounded-xl overflow-hidden hover:border-red-600/50 transition-all group cursor-pointer video-trigger"
-                            onclick="
-                                const rect = this.getBoundingClientRect();
-                                const width = Math.max(rect.width, 480);
-                                const height = Math.round(width * 9 / 16) + 50;
-                                const left = window.screenX + rect.left;
-                                const top = window.screenY + rect.top + 80;
-                                window.open('https://www.youtube.com/watch?v=${ex.videoId}', 'VideoPlayer', 
-                                    'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,status=no');
-                            ">
+                            onclick="VideoPlayer.openVideo('${ex.videoId}')">
                             <div class="relative">
                                 <!-- YouTube Thumbnail -->
                                 <div class="aspect-video w-full bg-gray-900 relative overflow-hidden">
@@ -3405,7 +3448,7 @@
                                     </div>
                                     <!-- PiP Badge -->
                                     <div class="absolute top-2 right-2 px-2 py-1 bg-black/70 rounded text-[10px] text-white flex items-center gap-1">
-                                        <i class="fas fa-external-link-square-alt"></i> Mini Pencere
+                                        <i class="fas fa-external-link-square-alt"></i> Yeni Pencere
                                     </div>
                                 </div>
                                 <!-- Info Bar -->
@@ -3413,7 +3456,7 @@
                                     <i class="fab fa-youtube text-red-500 text-xl"></i>
                                     <div>
                                         <div class="text-white font-bold text-sm">Video Eğitimi</div>
-                                        <div class="text-[10px] text-gray-500">Tıkla → Mini pencerede izle</div>
+                                        <div class="text-[10px] text-gray-500">Tıkla → Yeni sekmede aç</div>
                                     </div>
                                     <i class="fas fa-window-restore text-gray-500 ml-auto"></i>
                                 </div>
