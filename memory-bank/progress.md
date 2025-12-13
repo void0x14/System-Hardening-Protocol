@@ -23,6 +23,7 @@
 - ⚠️ Bazı inline onclick'ler hala var (kısmi event delegation)
 
 ## Sürüm Geçmişi
+- v7.0.0: Güvenlik (escapeHtml, validateImportData) + Performans (cache)
 - v6.3.0: Uyku/Su istatistikleri (haftalık/aylık)
 - v6.2.0: Components Factory, HTML regression fix, training refactor
 - v6.1.0: trackingType sistemi, istatistik UI'ı
