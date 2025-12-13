@@ -251,6 +251,32 @@ Detaylı roadmap için: [`future_roadmap.md`](file:///C:/Users/uzgunpalyaco/.gem
 **Estimated Effort**: 300-400 saat  
 **Target Version**: v8.0+
 
+---
+
+## Modularization Strategy
+
+📋 **Build-time Bundling Approach** (Monolithic → Maintainable)
+
+Detaylı strateji için: [`modularization_strategy.md`](file:///C:/Users/uzgunpalyaco/.gemini/antigravity/brain/c86f8f2c-f53d-4a09-af48-d74cac6b9919/modularization_strategy.md)
+
+**Yaklaşım**:
+- Modüler `src/` yapısı (CSS, JS dosyaları ayrı)
+- Build script ile tek `dist/index.html`'e birleştirme
+- Deployment: Hala single-file (no change)
+- Development: Kolay bakım, Git-friendly
+
+**7-Phase Plan**:
+1. Hazırlık (1-2 gün): Build script setup
+2. CSS Extraction (1 gün): base, components, animations, overrides
+3. Config/DB (1 gün): CONFIG, DB.EXERCISES, MEAL_PLAN_DB
+4. Core Utils (2 gün): Utils, Store, UI, Components
+5. Renderers (2 gün): dashboard, training, nutrition, progress, anatomy, mental
+6. Actions/App (1 gün): Event handlers, bootstrap
+7. Bug Fixes (1 gün): Timezone, validation, XSS
+
+**Timeline**: 7-10 gün  
+**Output**: Maintainable codebase, same single-file deployment
+
 ## Sürüm Geçmişi
 - **v7.1.0**: Video Player Fallback Sistemi (VideoPlayer.openVideo + embed URL retry)
 - v7.0.0: Güvenlik (escapeHtml, validateImportData) + Performans (cache)
