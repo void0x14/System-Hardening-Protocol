@@ -118,6 +118,139 @@ VideoPlayer.openVideo(videoId);
 - ❌ Refactor risk yüksek
 - **Çözüm**: Critical fonksiyonlar için unit test (min. `Utils.dateStr`, `Store.saveWeight`)
 
+> **NOT**: Yukarıdaki 10 madde **SADECE DOKÜMANTE EDİLDİ**, uygulanmadı. Her biri ayrı refactoring task gerektirir.
+
+## Future Enhancement Ideas (Brutal Suggestions)
+
+### 1. Data Encryption 🔐
+**Amaç**: LocalStorage verilerini şifrele (gizlilik/güvenlik)
+
+```javascript
+// CryptoJS inline ekle (10KB)
+const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), 'passphrase').toString();
+localStorage.setItem('monk_data', encrypted);
+```
+
+**Faydalar**:
+- Hassas veriler (kilo, alışkanlıklar) şifreli
+- Tarayıcı developer tools'da plain-text görünmez
+
+**Trade-off**: +10KB bundle size, encryption/decryption overhead
+
+---
+
+### 2. PWA (Progressive Web App) 📱
+**Amaç**: Uygulama offline çalışsın, home screen'e eklenebilsin
+
+```html
+<link rel="manifest" href="manifest.json">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+```
+
+**Faydalar**:
+- ✅ Tam offline (CDN dependency kalkar)
+- ✅ Home screen icon (native app gibi)
+- ✅ Push notifications (streak reminder)
+- ✅ Faster load (cache-first strategy)
+
+**Gereksinim**: `manifest.json` + `sw.js` (service worker)
+
+---
+
+### 3. Cloud Sync (Optional) ☁️
+**Amaç**: Cihazlar arası data sync + cloud backup
+
+```javascript
+// Supabase/Firebase ile basit cloud backup
+async function syncToCloud() {
+  const data = await Store.exportData();
+  await fetch('https://api.supabase.com/...', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ...' },
+    body: JSON.stringify(data)
+  });
+}
+```
+
+**Faydalar**:
+- Multi-device sync (telefon ↔ PC)
+- Automatic backups
+- Data portability
+
+**Trade-off**: Backend dependency, privacy concerns
+
+---
+
+### 4. Aggressive Robot Mode 🤖
+**Amaç**: Görev tamamlanana kadar tarayıcı kapatılmasın
+
+```javascript
+// Ekran kilidi: Görev bitmeden kapatamaz
+window.onbeforeunload = () => 
+  Store.state.overrideState?.active 
+    ? "🚨 Robot Mode aktif! Emin misin?" 
+    : null;
+```
+
+**Faydalar**:
+- Disiplin enforcement (kaçış yok)
+- Accidental close prevention
+
+**Risk**: Kullanıcı deneyimi agresif (bazıları rahatsız olabilir)
+
+---
+
+### 5. Gamification++ 🎮
+**Amaç**: Achievements, leaderboard, boss battles
+
+**Özellikler**:
+1. **Badges**: "10 gün streak 🔥", "PR kırdın 5 kere 💪", "Meal prep master 🍱"
+2. **Ghost Leaderboard**: Kendi geçmiş PR'larınla yarış
+   ```javascript
+   const ghostPR = await Store.getPersonalBest('squat', -7); // 1 hafta önceki
+   if (currentVolume > ghostPR.volume) {
+     UI.showToast('👻 Ghost yenildi! +50 XP');
+   }
+   ```
+3. **Boss Battles**: "Bu hafta 5000 kalori üstü her gün ye = Boss yenildi 🐉"
+4. **Level System**: XP kazanıp level atla (streak, PR, meal consistency)
+
+**Implementation**: 
+- `Store.achievements` array
+- XP calculation logic
+- Achievement unlock animations
+
+---
+
+> **Durum**: Yukarıdaki 5 öneri **SADECE FİKİR AŞAMASINDA**. Henüz uygulanmadı.
+
+---
+
+## Advanced Features Roadmap (v8.0+)
+
+📋 **Kapsamlı 9-Phase Gelişmiş Özellikler Yol Haritası**
+
+Detaylı roadmap için: [`future_roadmap.md`](file:///C:/Users/uzgunpalyaco/.gemini/antigravity/brain/c86f8f2c-f53d-4a09-af48-d74cac6b9919/future_roadmap.md)
+
+**Highlights**:
+1. **Core Stability** (2 hafta): Auto-backup, crash recovery
+2. **Psychology Engine** (2 hafta): Habit formation, motivation AI
+3. **Predictive Analytics** (2 hafta): Performance forecasting, plateau detection
+4. **Gamification 2.0** (2 hafta): RPG stats, achievement system
+5. **Scientific Tracking** (2 hafta): Biorhythm, body composition
+6. **Social/Community** (1 hafta): Anonymous sharing
+7. **Mobile UX** (1 hafta): PWA, touch gestures
+8. **Advanced UI** (1 hafta): Adaptive theming, micro-interactions
+9. **Dev Tools** (1 hafta): Debug console, Konami code
+
+**Total Timeline**: 12 hafta (3 ay)  
+**Estimated Effort**: 300-400 saat  
+**Target Version**: v8.0+
+
 ## Sürüm Geçmişi
 - **v7.1.0**: Video Player Fallback Sistemi (VideoPlayer.openVideo + embed URL retry)
 - v7.0.0: Güvenlik (escapeHtml, validateImportData) + Performans (cache)

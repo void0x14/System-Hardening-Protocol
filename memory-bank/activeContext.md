@@ -24,4 +24,7 @@
 #### Sonraki Adımlar
 - Technical debt'i önceliklendirme (A11Y, timezone bug, XSS)
 - Test suite eklemek (minimal: Utils, Store critical funcs)
+- **Advanced features roadmap** (v8.0+): 9-phase, 12-week plan
+  - See: [`future_roadmap.md`](file:///C:/Users/uzgunpalyaco/.gemini/antigravity/brain/c86f8f2c-f53d-4a09-af48-d74cac6b9919/future_roadmap.md)
+  - Highlights: Psychology engine, predictive analytics, PWA, biorhythm
 - future_refactoring_prompt.md dosyasına bak (Phase 3-5)
