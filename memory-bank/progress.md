@@ -15,26 +15,17 @@
 - ✅ Anatomi Lab
 - ✅ Gelişim
 - ✅ Veri yedekleme/geri yükleme
-- ✅ Emotion Override (Robot Mode)
 
-## Son Güncelleme (12 Aralık 2025)
+## Bilinen Sorunlar - v6.1.0'da Düzeltilecek
+- ❌ Ağırlık gerektirmeyen hareketler (vacuum, yürüyüş) set/tekrar zorluyor
+- ❌ Set onaylandığında yeşil gösterge yanmıyor
+- ❌ Günlük/haftalık/aylık istatistik UI'ı yok
 
-### v6.0.0 - Majör Sürüm
-- Modal ESC/backdrop kapatma
-- Versiyon standardizasyonu
-- JSDoc kod dokümantasyonu (~140 satır)
-- **Egzersiz video eğitimi**
-  - 11 egzersiz için YouTube videoId
-  - Collapsed toggle UI
-  - Premium kırmızı gradient tasarım
+## Sürüm Geçmişi
+- v6.1.0: (Planla) Egzersiz tipi sistemi, istatistik UI'ı, bug fixes
+- v6.0.0: Modal kapatma, versiyon, JSDoc, video eğitimi
+- v5.9.x: Zihinsel yenileme, epik overlay, premium UI
 
 ## Video Eklenen Egzersizler
 squat, goblet_squat, pushup, one_arm_row, plank, 
 farmers_walk, hammer_curl, mountain_climber, lying_leg_raise, superman
-
-## Bilinen Sorunlar
-- Tüm bildirilen sorunlar çözüldü ✅
-
-## Sürüm Geçmişi
-- v6.0.0: Modal kapatma, versiyon, JSDoc, video eğitimi
-- v5.9.x: Zihinsel yenileme, epik overlay, premium UI

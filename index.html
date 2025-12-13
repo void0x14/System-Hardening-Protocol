@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v6.0.0</title>
+    <title>PROJECT: MONK MODE | v6.1.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -627,7 +627,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '6.0.0',
+            VERSION: '6.1.0',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -1502,18 +1502,34 @@
 
             async getVolumeStats() {
                 const today = new Date();
-                const stats = { weekly: 0, daily: {} };
-                for (let i = 0; i < 7; i++) {
+                const stats = { weekly: 0, monthly: 0, daily: {}, totalSets: 0, weeklyDays: 0 };
+
+                // Son 30 gün (aylık)
+                for (let i = 0; i < 30; i++) {
                     const d = new Date(today);
                     d.setDate(d.getDate() - i);
                     const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
                     const data = await this.getWorkoutData(dateStr);
                     let vol = 0;
-                    Object.values(data).forEach(sets => {
-                        sets.forEach(s => { if (s && s.completed) vol += (s.weight * s.reps); });
+                    let sets = 0;
+                    Object.values(data).forEach(setArray => {
+                        setArray.forEach(s => {
+                            if (s && s.completed) {
+                                vol += ((s.weight || 0) * (s.reps || 0));
+                                sets++;
+                            }
+                        });
                     });
-                    stats.daily[dateStr] = vol;
-                    stats.weekly += vol;
+
+                    stats.monthly += vol;
+                    stats.totalSets += sets;
+
+                    if (i < 7) {
+                        // Haftalık (son 7 gün)
+                        stats.daily[dateStr] = vol;
+                        stats.weekly += vol;
+                        if (vol > 0) stats.weeklyDays++;
+                    }
                 }
                 return stats;
             },
@@ -2081,46 +2097,95 @@
                     const isDone = done.includes(tid);
                     const logs = workoutData[tid] || [];
 
-                    // Parse Target Sets from description
-                    const targetMatch = ex.desc.match(/(\d+)\s*Set/i);
-                    const targetSets = targetMatch ? parseInt(targetMatch[1]) : 3;
+                    // Use trackingType system instead of parsing description
+                    const trackingType = ex.trackingType || 'weighted';
+                    const targetSets = ex.sets || 3;
+                    const intensityHints = ex.intensityHints || [];
 
                     let setsHtml = '';
                     let completedSets = 0;
-                    for (let i = 0; i < targetSets; i++) {
-                        const log = logs[i] || {};
-                        const isSetDone = !!log.completed;
-                        if (isSetDone) completedSets++;
-                        setsHtml += `
-                            <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
-                                <div class="flex items-center justify-center w-12 h-10 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
-                                    SET ${i + 1}
-                                </div>
-                                <div class="flex-1 flex items-center gap-2">
-                                    <div class="flex-1">
-                                        <label class="text-[9px] text-gray-500 block mb-1">AĞIRLIK</label>
-                                        <input type="number" placeholder="0" value="${log.weight || ''}" id="w-${tid}-${i}" 
-                                            class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
-                                            onchange="Actions.saveSet('${tid}', ${i}, false)">
+
+                    // Different UI based on trackingType
+                    if (trackingType === 'weighted') {
+                        // WEIGHTED: Set boxes with weight × reps + intensity hints
+                        for (let i = 0; i < targetSets; i++) {
+                            const log = logs[i] || {};
+                            const isSetDone = !!log.completed;
+                            if (isSetDone) completedSets++;
+                            const hint = intensityHints[i] || '';
+                            setsHtml += `
+                                <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
+                                    <div class="flex flex-col items-center justify-center w-16 h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
+                                        <div>SET ${i + 1}</div>
+                                        ${hint ? `<div class="text-[8px] ${isSetDone ? 'text-black/70' : 'text-neon-blue'} font-bold">${hint}</div>` : ''}
                                     </div>
-                                    <div class="text-gray-600 text-lg font-bold">×</div>
-                                    <div class="flex-1">
-                                        <label class="text-[9px] text-gray-500 block mb-1">TEKRAR</label>
-                                        <input type="number" placeholder="0" value="${log.reps || ''}" id="r-${tid}-${i}" 
-                                            class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
-                                            onchange="Actions.saveSet('${tid}', ${i}, false)">
+                                    <div class="flex-1 flex items-center gap-2">
+                                        <div class="flex-1">
+                                            <label class="text-[9px] text-gray-500 block mb-1">AĞIRLIK</label>
+                                            <input type="number" placeholder="0" value="${log.weight || ''}" id="w-${tid}-${i}" 
+                                                class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                                                onchange="Actions.saveSet('${tid}', ${i}, false)">
+                                        </div>
+                                        <div class="text-gray-600 text-lg font-bold">×</div>
+                                        <div class="flex-1">
+                                            <label class="text-[9px] text-gray-500 block mb-1">TEKRAR</label>
+                                            <input type="number" placeholder="0" value="${log.reps || ''}" id="r-${tid}-${i}" 
+                                                class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                                                onchange="Actions.saveSet('${tid}', ${i}, false)">
+                                        </div>
                                     </div>
+                                    <button onclick="Actions.saveSet('${tid}', ${i}, true)" 
+                                        class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
+                                        <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                                    </button>
                                 </div>
-                                <button onclick="Actions.saveSet('${tid}', ${i}, true)" 
-                                    class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green'} border-2 border-transparent transition-all">
-                                    <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
-                                </button>
-                            </div>
+                            `;
+                        }
+                    } else if (trackingType === 'timed') {
+                        // TIMED: Set boxes with duration only
+                        for (let i = 0; i < targetSets; i++) {
+                            const log = logs[i] || {};
+                            const isSetDone = !!log.completed;
+                            if (isSetDone) completedSets++;
+                            setsHtml += `
+                                <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
+                                    <div class="flex items-center justify-center w-14 h-10 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
+                                        SET ${i + 1}
+                                    </div>
+                                    <div class="flex-1">
+                                        <label class="text-[9px] text-gray-500 block mb-1">SÜRE (saniye)</label>
+                                        <input type="number" placeholder="0" value="${log.duration || ''}" id="d-${tid}-${i}" 
+                                            class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
+                                    </div>
+                                    <button onclick="Actions.saveTimedSet('${tid}', ${i})" 
+                                        class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
+                                        <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        // DURATION / ACTIVITY / TASK: Simple single button
+                        completedSets = isDone ? 1 : 0;
+                        setsHtml = `
+                            <button onclick="Actions.toggleSimpleTask('${tid}')" 
+                                class="w-full py-4 rounded-xl font-bold text-lg transition-all ${isDone ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green border-2 border-gray-600'}">
+                                <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
+                                ${isDone ? 'TAMAMLANDI ✓' : 'TAMAMLA'}
+                            </button>
                         `;
                     }
 
-                    // İlerleme yüzdesini hesapla
-                    const progressPercent = targetSets > 0 ? Math.round((completedSets / targetSets) * 100) : 0;
+                    // Calculate progress
+                    const totalForProgress = (trackingType === 'duration' || trackingType === 'activity' || trackingType === 'task') ? 1 : targetSets;
+                    const progressPercent = totalForProgress > 0 ? Math.round((completedSets / totalForProgress) * 100) : 0;
+
+                    // Type label for display
+                    const typeLabel = trackingType === 'weighted' ? `${targetSets} Set` :
+                        trackingType === 'timed' ? `${targetSets} Set` :
+                            trackingType === 'duration' ? 'Süre' :
+                                trackingType === 'activity' ? 'Aktivite' : 'Görev';
+
 
                     return `
                             <div class="bg-gray-900 border-2 ${isDone ? 'border-neon-green shadow-[0_0_15px_rgba(0,255,65,0.15)]' : 'border-gray-700'} rounded-xl overflow-hidden transition-all">
@@ -2131,7 +2196,7 @@
                                             <div class="font-bold text-white text-base">${ex.title}</div>
                                             <div class="text-xs text-gray-500 mt-0.5">
                                                 <span class="${progressPercent === 100 ? 'text-neon-green' : progressPercent > 0 ? 'text-neon-blue' : ''}">%${progressPercent}</span> | 
-                                                ${targetSets} Set | ${ex.tags.join(', ')}
+                                                ${typeLabel} | ${ex.tags.join(', ')}
                                             </div>
                                         </div>
                                     </div>
@@ -2362,22 +2427,30 @@
                 return `
                 <div class="space-y-6 animate-slide-up">
                     <!-- SUMMARY ROW -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="${THEME.card} text-center py-4">
-                            <div class="text-[10px] text-gray-500 font-bold">MEVCUT KİLO</div>
-                            <div class="text-2xl font-bold text-white mt-1">${Store.state.weight} <span class="text-sm text-neon-green">kg</span></div>
+                    <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+                        <div class="${THEME.card} text-center py-3">
+                            <div class="text-[9px] text-gray-500 font-bold">MEVCUT</div>
+                            <div class="text-xl font-bold text-white mt-1">${Store.state.weight} <span class="text-[10px] text-neon-green">kg</span></div>
                         </div>
-                        <div class="${THEME.card} text-center py-4 border-neon-blue/30">
-                            <div class="text-[10px] text-neon-blue font-bold">HAFTALIK HACİM</div>
-                            <div class="text-2xl font-bold text-white mt-1">${(volStats.weekly / 1000).toFixed(1)} <span class="text-sm text-gray-500">ton</span></div>
+                        <div class="${THEME.card} text-center py-3 border-neon-green/30">
+                            <div class="text-[9px] text-neon-green font-bold">BUGÜN</div>
+                            <div class="text-xl font-bold text-white mt-1">${Math.round(volStats.daily[Utils.dateStr()] || 0)} <span class="text-[10px] text-gray-500">kg</span></div>
                         </div>
-                        <div class="${THEME.card} text-center py-4">
-                            <div class="text-[10px] text-gray-500 font-bold">HEDEF</div>
-                            <div class="text-2xl font-bold text-neon-green mt-1">${CONFIG.TARGETS.GOAL} <span class="text-sm">kg</span></div>
+                        <div class="${THEME.card} text-center py-3 border-neon-blue/30">
+                            <div class="text-[9px] text-neon-blue font-bold">HAFTALIK</div>
+                            <div class="text-xl font-bold text-white mt-1">${(volStats.weekly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div>
                         </div>
-                        <div class="${THEME.card} text-center py-4">
-                            <div class="text-[10px] text-gray-500 font-bold">BUGÜN TONAJ</div>
-                            <div class="text-2xl font-bold text-neon-blue mt-1">${Math.round(volStats.daily[Utils.dateStr()] || 0)} <span class="text-sm text-gray-500">kg</span></div>
+                        <div class="${THEME.card} text-center py-3 border-accent-orange/30">
+                            <div class="text-[9px] text-accent-orange font-bold">AYLIK</div>
+                            <div class="text-xl font-bold text-white mt-1">${(volStats.monthly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div>
+                        </div>
+                        <div class="${THEME.card} text-center py-3">
+                            <div class="text-[9px] text-gray-500 font-bold">TOPLAM SET</div>
+                            <div class="text-xl font-bold text-neon-blue mt-1">${volStats.totalSets}</div>
+                        </div>
+                        <div class="${THEME.card} text-center py-3">
+                            <div class="text-[9px] text-gray-500 font-bold">HEDEF</div>
+                            <div class="text-xl font-bold text-neon-green mt-1">${CONFIG.TARGETS.GOAL} <span class="text-[10px]">kg</span></div>
                         </div>
                     </div>
 
@@ -3490,6 +3563,66 @@
                         UI.showToast(`Set ${setIdx + 1} ✓ | ${newVolume} volume`, "success");
                     }
                 }
+            },
+
+            /**
+             * Süreli set kaydet (plank, vacuum vb.).
+             * @async
+             * @param {string} taskId - Egzersiz ID
+             * @param {number} setIdx - Set indeksi
+             */
+            async saveTimedSet(taskId, setIdx) {
+                const dInput = document.getElementById(`d-${taskId}-${setIdx}`);
+                const duration = dInput ? parseFloat(dInput.value) || 0 : 0;
+
+                const date = Utils.dateStr();
+                const key = 'monk_workout_data_' + date;
+                const data = await Utils.storage.get(key) || {};
+                if (!data[taskId]) data[taskId] = [];
+
+                data[taskId][setIdx] = {
+                    duration: duration,
+                    timestamp: new Date().toISOString(),
+                    completed: true
+                };
+                await Utils.storage.set(key, data);
+
+                // Mark as done if at least one set completed
+                await Store.setTaskDone(taskId, true);
+
+                // UI feedback
+                if (dInput) {
+                    dInput.classList.replace('border-gray-600', 'border-neon-green');
+                    dInput.classList.add('text-neon-green');
+                }
+                const btn = event.currentTarget || event.target.closest('button');
+                if (btn) {
+                    btn.classList.remove('bg-gray-700', 'text-gray-400');
+                    btn.classList.add('bg-neon-green', 'text-black');
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                }
+
+                UI.showToast(`Set ${setIdx + 1} ✓ | ${duration} saniye`, "success");
+            },
+
+            /**
+             * Basit görev toggle (duration/activity/task tipleri).
+             * @async
+             * @param {string} taskId - Görev ID
+             */
+            async toggleSimpleTask(taskId) {
+                const date = Utils.dateStr();
+                const done = await Store.getWorkout(date);
+                const isDone = done.includes(taskId);
+
+                await Store.setTaskDone(taskId, !isDone);
+
+                if (!isDone) {
+                    UI.showToast(`${DB.EXERCISES[taskId]?.title || taskId} ✓ Tamamlandı!`, "success");
+                }
+
+                // Re-render training tab to update UI
+                await Actions.switchTab('training');
             }
         };
 
