@@ -622,10 +622,21 @@
             }
         }
 
-        /* Larger touch-friendly inputs */
+        /* ============================================
+           MACRO RING ANIMATIONS v8.2
+           ============================================ */
+        .macro-ring-svg {
+            filter: drop-shadow(0 0 4px currentColor);
+        }
+
+        .macro-ring-progress {
+            transition: stroke-dashoffset 0.8s ease-out;
+        }
+
+        /* Touch-friendly inputs */
         .touch-input {
-            min-height: 56px;
-            font-size: 1.5rem;
+            min-height: 48px;
+            font-size: 16px;
             padding: 1rem;
         }
     </style>
