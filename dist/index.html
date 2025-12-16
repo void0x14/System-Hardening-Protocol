@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v8.0.0</title>
-    <!-- v8.0.0: Modular Build -->
+    <title>PROJECT: MONK MODE | v8.1.0</title>
+    <!-- v8.1.0: Training Tab UI/UX Redesign -->
     <script src="https://cdn.tailwindcss.com"
         onerror="console.error('Tailwind CDN failed'); document.body.innerHTML='<div style=\'padding:2rem;color:#ff003c;font-family:monospace\'>⚠️ CDN OFFLINE - Internet bağlantısı gerekli</div>';"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"
@@ -57,6 +57,28 @@
     </script>
 
     <style>
+        /* SANITIZE MODE - Privacy Protection */
+        body.sanitize-mode .sensitive-content {
+            display: none !important;
+        }
+
+        body.sanitize-mode .sensitive-blur {
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+        body.sanitize-mode #override-panel {
+            display: none !important;
+        }
+
+        body.sanitize-mode #btn-override {
+            display: none !important;
+        }
+
+        body.sanitize-mode .sensitive-tag {
+            display: none !important;
+        }
+
         body {
             background-color: #0a0a0f;
             color: #e5e7eb;
@@ -548,6 +570,64 @@
         .custom-scrollbar {
             scroll-behavior: smooth;
         }
+
+        /* ============================================
+           SET COMPLETION ANIMATION v8.1
+           ============================================ */
+        .set-complete-animation {
+            animation: setCompleteGlow 0.5s ease-out;
+        }
+
+        @keyframes setCompleteGlow {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(0, 255, 65, 0);
+            }
+
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 0 40px rgba(0, 255, 65, 0.4), 0 0 80px rgba(0, 255, 65, 0.2);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+            }
+        }
+
+        /* Set row hover state */
+        .set-row {
+            transition: all 0.3s ease;
+        }
+
+        .set-row:hover:not(.set-complete-animation) {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        /* Exercise body slide down */
+        .animate-slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Larger touch-friendly inputs */
+        .touch-input {
+            min-height: 56px;
+            font-size: 1.5rem;
+            padding: 1rem;
+        }
     </style>
 </head>
 
@@ -560,7 +640,7 @@
                 <i class="fas fa-biohazard text-neon-green text-2xl"></i>
                 <div>
                     <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v8.0.0</span></h1>
+                            class="text-sm text-text-muted">v8.1.0</span></h1>
                     <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
                     </div>
                 </div>
@@ -636,7 +716,7 @@
 
 // Global scope assignments
 const CONFIG = window.CONFIG = {
-    VERSION: '8.0.0',
+    VERSION: '8.1.0',
     KEYS: {
         WEIGHT: 'monk_weight',
         FUEL: 'monk_fuel_date',
@@ -786,6 +866,81 @@ DB.EXERCISES = {
         desc: "Yüzüstü yat. Kollarını ve bacaklarını aynı anda kaldır. 2-3 saniye tepede tut.<br><br><strong>HEDEF:</strong> 3 Set x 12 Tekrar.",
         steps: ["Yüzüstü yat.", "Kol ve bacakları kaldır.", "Tepede tut."],
         videoId: "z6PJMT2y8GQ"
+    },
+    "neck_curl": {
+        title: "Lying Neck Curls (Network Hardening)",
+        tags: ["Boyun", "Stabilizasyon"],
+        desc: "<strong>SYSTEM GOAL:</strong> Kalın boyun inşası - \"System Choke\" riskini minimize eder ve \"Server\" (Beyin) ünitesini fiziksel travmaya karşı korur.<br><br><strong>PROTOKOL:</strong> Sırt üstü yat, başın yatak/banktan sarkık. Alna havlu veya ağırlık yerleştir. Çeneyi göğse doğru kontrollü kıvır.<br><br><strong>HEDEF:</strong> 3 Set x 15-20 Tekrar (High Volume Traffic).",
+        steps: ["Başı aşağı sarkıt.", "Ağırlığı alna koy.", "Çeneyi kıvır."],
+        trackingType: "weighted",
+        sets: 3
+    },
+    "wrist_curl": {
+        title: "Wrist Curls (I/O Controller Upgrade)",
+        tags: ["Ön Kol", "Kavrama"],
+        desc: "<strong>SYSTEM GOAL:</strong> Vaskülarite (Front-end Estetik) ve Grip Strength (Hardware Input Control) artışı.<br><br><strong>PROTOKOL:</strong> Otur, ön kol uylukta, el dizden sarkık. 5L şişe tutarak sadece bileği yukarı kıvır.<br><br><strong>HEDEF:</strong> 3 Set x Failure (Stress Test).",
+        steps: ["Kol uylukta.", "El sarkık.", "Bileği kıvır."],
+        trackingType: "weighted",
+        sets: 3
+    },
+    "tibialis_raise": {
+        title: "Tibialis Raises (System Stability Patch)",
+        tags: ["Kaval Kemiği", "Denge"],
+        desc: "<strong>SYSTEM GOAL:</strong> \"Shin Splints\" (System Bugs) önleme, ayak bileği güçlendirme ve \"Glitchless\" hareket mekaniği sağlama.<br><br><strong>PROTOKOL:</strong> Duvara yaslan, bacaklar düz ve ileri. Topuklar yerde, parmak uçlarını baldırlara doğru kaldır.<br><br><strong>HEDEF:</strong> 3 Set x 25 Tekrar (Long-Term Support - LTS).",
+        steps: ["Duvara yaslan.", "Bacaklar düz.", "Parmakları kaldır."],
+        trackingType: "weighted",
+        sets: 3
+    },
+    // ===========================================
+    // LIFESTYLE & RECOVERY TASKS (Simple Toggle)
+    // ===========================================
+    "eat_bulk": {
+        title: "BULK YE (Kalori Yükleme)",
+        tags: ["Beslenme", "Yemek"],
+        desc: "Kalori al. Hedef kaloriye ulaşmak için yüksek kalorili yemekler ye. Dirty bulk modunda sınır yok.",
+        steps: ["Yemek ye.", "Kalori takip et.", "Hedefe ulaş."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "stretch": {
+        title: "ESNEME (System Recovery)",
+        tags: ["Recovery", "Esneklik"],
+        desc: "Kasları rahatla. 5-10 dakika esneme rutini yap. Özellikle çalışan kas gruplarına odaklan.",
+        steps: ["Rahatla.", "5-10 dk esne.", "Nefes al."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "weigh_in": {
+        title: "TARTI (Weight Check)",
+        tags: ["Ölçüm", "İzleme"],
+        desc: "Sabah aç karnına tartıl ve kiloyu sisteme kaydet. Progress takibi için kritik.",
+        steps: ["Tartıya çık.", "Kiloyu not et.", "Sisteme gir."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "prep_food": {
+        title: "YEMEK HAZIRLA (Meal Prep)",
+        tags: ["Beslenme", "Planlama"],
+        desc: "Haftanın yemeklerini hazırla. Tavuk haşla, pilav pişir, yumurta kaynat.",
+        steps: ["Malzemeleri al.", "Pişir.", "Porsiyonla."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "walk_outside": {
+        title: "DIŞARI ÇIK (Outdoor Walk)",
+        tags: ["Cardio", "Mental"],
+        desc: "En az 20 dakika dışarıda yürü. Güneş ışığı, temiz hava, zihin temizliği.",
+        steps: ["Dışarı çık.", "20+ dk yürü.", "Nefes al."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "cool_down": {
+        title: "SOĞUMA (Cool Down)",
+        tags: ["Recovery", "Esneklik"],
+        desc: "Antrenman sonrası soğuma. Nabzı düşür, hafif esneme yap.",
+        steps: ["Yavaş yürü.", "Nefes kontrol.", "Esne."],
+        trackingType: "simple",
+        sets: 1
     }
 };
 
@@ -1799,7 +1954,7 @@ const UI = window.UI = {
     },
 
     renderTabs() {
-        const tabs = [
+        let tabs = [
             { id: 'dashboard', l: 'DASHBOARD', i: 'fa-chart-line' },
             { id: 'training', l: 'ANTRENMAN', i: 'fa-dumbbell' },
             { id: 'nutrition', l: 'BESLENME', i: 'fa-utensils' },
@@ -1807,6 +1962,10 @@ const UI = window.UI = {
             { id: 'anatomy', l: 'ANATOMİ LAB', i: 'fa-dna' },
             { id: 'mental', l: 'ZİHİNSEL', i: 'fa-brain' }
         ];
+        // Sanitize modda Mental tab'ı gizle
+        if (typeof Stealth !== 'undefined' && Stealth.active) {
+            tabs = tabs.filter(t => t.id !== 'mental');
+        }
         document.getElementById('nav-tabs').innerHTML = tabs.map(t =>
             `<button onclick="Actions.switchTab('${t.id}')" id="btn-${t.id}" class="tab-btn flex-none px-6 py-3 font-bold text-xs md:text-sm whitespace-nowrap text-gray-500 hover:text-white transition-colors border-b-2 border-transparent relative">
                 <i class="fas ${t.i} mr-2"></i>${t.l}
@@ -1948,8 +2107,11 @@ const UI = window.UI = {
 
     /**
      * Epik tam ekran motivasyon overlay'i göster.
+     * Sanitize modda overlay gösterilmez.
      */
     showEpicOverlay(emoji, text, sub, color = '#00ff41') {
+        // Sanitize modda overlay gösterme
+        if (typeof Stealth !== 'undefined' && Stealth.active) return;
         const overlay = document.createElement('div');
         overlay.id = 'epic-overlay-' + Date.now();
         overlay.innerHTML = `
@@ -2143,51 +2305,61 @@ const Components = window.Components = {
     },
 
     /**
-     * Set input row for weighted exercises
+     * Set input row for weighted exercises - REDESIGNED v8.1.1
+     * Features: Compact inline layout, larger inputs, KAYDET button
      */
     weightedSetRow: (tid, idx, log, isSetDone, hint = '') => `
-        <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
-            <div class="flex flex-col items-center justify-center w-16 h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
-                <div>SET ${idx + 1}</div>
-                ${hint ? `<div class="text-[8px] ${isSetDone ? 'text-black/70' : 'text-neon-blue'} font-bold">${hint}</div>` : ''}
+        <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
+            <!-- Set Number Badge (Compact) -->
+            <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white'} font-black text-lg md:text-xl flex items-center justify-center">
+                ${idx + 1}
             </div>
+            
+            <!-- Inputs Row -->
             <div class="flex-1 flex items-center gap-2">
                 <div class="flex-1">
-                    <label class="text-[9px] text-gray-500 block mb-1">AĞIRLIK</label>
-                    <input type="number" placeholder="0" value="${log.weight || ''}" id="w-${tid}-${idx}" 
-                        class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                    <input type="number" placeholder="KG" value="${log.weight || ''}" id="w-${tid}-${idx}" 
+                        class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
                         onchange="Actions.saveSet('${tid}', ${idx}, false)">
                 </div>
-                <div class="text-gray-600 text-lg font-bold">×</div>
+                <span class="text-gray-500 text-xl font-bold">×</span>
                 <div class="flex-1">
-                    <label class="text-[9px] text-gray-500 block mb-1">TEKRAR</label>
-                    <input type="number" placeholder="0" value="${log.reps || ''}" id="r-${tid}-${idx}" 
-                        class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                    <input type="number" placeholder="REP" value="${log.reps || ''}" id="r-${tid}-${idx}" 
+                        class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
                         onchange="Actions.saveSet('${tid}', ${idx}, false)">
                 </div>
             </div>
+            
+            <!-- Save Button -->
             <button onclick="Actions.saveSet('${tid}', ${idx}, true)" 
-                class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
-                <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
+                <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
+                <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
             </button>
         </div>`,
 
     /**
-     * Set input row for timed exercises
+     * Set input row for timed exercises - REDESIGNED v8.1.1
+     * Features: Compact inline layout
      */
     timedSetRow: (tid, idx, log, isSetDone) => `
-        <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
-            <div class="flex items-center justify-center w-14 h-10 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
-                SET ${idx + 1}
+        <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
+            <!-- Set Number Badge (Compact) -->
+            <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white'} font-black text-lg md:text-xl flex items-center justify-center">
+                ${idx + 1}
             </div>
+            
+            <!-- Input -->
             <div class="flex-1">
-                <label class="text-[9px] text-gray-500 block mb-1">SÜRE (saniye)</label>
-                <input type="number" placeholder="0" value="${log.duration || ''}" id="d-${tid}-${idx}" 
-                    class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
+                <input type="number" placeholder="SANİYE" value="${log.duration || ''}" id="d-${tid}-${idx}" 
+                    class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
             </div>
+            
+            <!-- Save Button -->
             <button onclick="Actions.saveTimedSet('${tid}', ${idx})" 
-                class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
-                <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
+                <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
+                <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
             </button>
         </div>`,
 
@@ -2244,6 +2416,119 @@ console.log('[VideoPlayer] Video system loaded');
 
 
 // ============================================
+// stealth.js
+// ============================================
+// stealth.js - Sanitize Mode for Privacy Protection
+// Hides sensitive content while keeping app fully functional
+
+const Stealth = window.Stealth = {
+    active: false,
+
+    origTitle: 'PROJECT: MONK MODE | v8.0.0',
+    safeTitle: 'Fitness Tracker',
+
+    // Sensitive tags to sanitize
+    sensitiveTags: ['Cinsel Güç', 'Pelvis', 'Libido'],
+
+    init() {
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Shift+H - Türk klavyesi için uygun
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'h') {
+                e.preventDefault();
+                this.toggle();
+            }
+        });
+        console.log('[Stealth] Initialized. Press Ctrl+Shift+H to toggle sanitize mode.');
+    },
+
+    toggle() {
+        this.active ? this.deactivate() : this.activate();
+    },
+
+    activate() {
+        this.active = true;
+        document.body.classList.add('sanitize-mode');
+        document.title = this.safeTitle;
+
+        // Header değiştir
+        this.updateHeader(true);
+
+        // Tabları yeniden render et (Mental tab gizli)
+        UI.renderTabs();
+
+        // Şu anki view'ı yeniden render et
+        const currentTab = Store.state.activeTab;
+        if (currentTab === 'mental') {
+            Actions.switchTab('dashboard');
+        } else {
+            Actions.switchTab(currentTab);
+        }
+
+        console.log('[Stealth] Sanitize mode ACTIVATED');
+    },
+
+    deactivate() {
+        this.active = false;
+        document.body.classList.remove('sanitize-mode');
+        document.title = this.origTitle;
+
+        // Header geri al
+        this.updateHeader(false);
+
+        // Tabları normal render et
+        UI.renderTabs();
+
+        // View'ı yeniden render et
+        Actions.switchTab(Store.state.activeTab);
+
+        console.log('[Stealth] Sanitize mode DEACTIVATED');
+    },
+
+    updateHeader(sanitized) {
+        const header = document.querySelector('nav h1');
+        if (header) {
+            if (sanitized) {
+                header.innerHTML = `FT <span class="text-sm text-text-muted">v8.0</span>`;
+            } else {
+                header.innerHTML = `PROTOCOL <span class="text-sm text-text-muted">v8.0.0</span>`;
+            }
+        }
+
+        // Biohazard ikonunu değiştir
+        const icon = document.querySelector('nav .fa-biohazard, nav .fa-chart-line');
+        if (icon) {
+            if (sanitized) {
+                icon.classList.remove('fa-biohazard');
+                icon.classList.add('fa-chart-line');
+            } else {
+                icon.classList.remove('fa-chart-line');
+                icon.classList.add('fa-biohazard');
+            }
+        }
+
+        // Subtitle değiştir
+        const subtitle = document.querySelector('nav .tracking-\\[0\\.2em\\]');
+        if (subtitle) {
+            subtitle.textContent = sanitized ? 'PERSONAL TRACKER' : 'FIELD TEST APPROVED';
+        }
+    },
+
+    // Egzersiz tag'larını filtrele (sanitize modda hassas olanları gizle)
+    filterTags(tags) {
+        if (!this.active) return tags;
+        return tags.filter(t => !this.sensitiveTags.includes(t));
+    },
+
+    // Epic overlay'i engelle (sanitize modda)
+    shouldShowOverlay() {
+        return !this.active;
+    }
+};
+
+console.log('[Stealth] Module loaded');
+
+
+// ============================================
 // renderers/dashboard.js
 // ============================================
 // renderers/dashboard.js - Main Renderers Namespace
@@ -2284,7 +2569,7 @@ const Renderers = window.Renderers = {
         return `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
                 <!-- MILESTONE PROGRESS -->
-                <div class="${THEME.card} lg:col-span-3 relative overflow-hidden">
+                <div class="${THEME.card} lg:col-span-3 relative overflow-hidden sensitive-content">
                     <div class="absolute inset-0 bg-gradient-to-r from-neon-purple/5 via-transparent to-neon-green/5"></div>
                     <div class="relative">
                         <div class="${THEME.label}">🏆 MILESTONE YOLCULUĞU</div>
@@ -2336,7 +2621,7 @@ const Renderers = window.Renderers = {
                             <span class="text-text-muted text-lg">KG</span>
                         </div>
                     </div>
-                    <div class="mt-4">
+                    <div class="mt-4 sensitive-content">
                         <div class="flex justify-between text-sm mb-1">
                             <span class="text-text-muted">Hedefe</span>
                             <span class="text-neon-green font-bold">${Math.round(p)}%</span>
@@ -2485,7 +2770,7 @@ const Renderers = window.Renderers = {
                                         <div class="font-bold text-white text-base">${ex.title}</div>
                                         <div class="text-xs text-gray-500 mt-0.5">
                                             <span class="${progressPercent === 100 ? 'text-neon-green' : progressPercent > 0 ? 'text-neon-blue' : ''}">%${progressPercent}</span> | 
-                                            ${typeLabel} | ${ex.tags.join(', ')}
+                                            ${typeLabel} | ${(typeof Stealth !== 'undefined' && Stealth.active ? Stealth.filterTags(ex.tags) : ex.tags).join(', ')}
                                         </div>
                                     </div>
                                 </div>
@@ -2613,16 +2898,19 @@ const Renderers = window.Renderers = {
             </div>
         `).join('');
 
+        const isSanitized = typeof Stealth !== 'undefined' && Stealth.active;
+        const summaryGridClass = isSanitized ? 'flex flex-wrap justify-center gap-3' : 'grid grid-cols-3 md:grid-cols-6 gap-3';
+
         return `
             <div class="space-y-6 animate-slide-up">
             <!-- SUMMARY ROW -->
-            <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
-                <div class="${THEME.card} text-center py-3"><div class="text-[9px] text-gray-500 font-bold">MEVCUT</div><div class="text-xl font-bold text-white mt-1">${Store.state.weight} <span class="text-[10px] text-neon-green">kg</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-neon-green/30"><div class="text-[9px] text-neon-green font-bold">BUGÜN</div><div class="text-xl font-bold text-white mt-1">${Math.round(volStats.daily[Utils.dateStr()] || 0)} <span class="text-[10px] text-gray-500">kg</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-neon-blue/30"><div class="text-[9px] text-neon-blue font-bold">HAFTALIK</div><div class="text-xl font-bold text-white mt-1">${(volStats.weekly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-accent-orange/30"><div class="text-[9px] text-accent-orange font-bold">AYLIK</div><div class="text-xl font-bold text-white mt-1">${(volStats.monthly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div></div>
-                <div class="${THEME.card} text-center py-3"><div class="text-[9px] text-gray-500 font-bold">TOPLAM SET</div><div class="text-xl font-bold text-neon-blue mt-1">${volStats.totalSets}</div></div>
-                <div class="${THEME.card} text-center py-3"><div class="text-[9px] text-gray-500 font-bold">HEDEF</div><div class="text-xl font-bold text-neon-green mt-1">${CONFIG.TARGETS.GOAL} <span class="text-[10px]">kg</span></div></div>
+            <div class="${summaryGridClass}">
+                <div class="${THEME.card} text-center py-3 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-gray-500 font-bold">MEVCUT</div><div class="text-xl font-bold text-white mt-1">${Store.state.weight} <span class="text-[10px] text-neon-green">kg</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-neon-green/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-neon-green font-bold">BUGÜN</div><div class="text-xl font-bold text-white mt-1">${Math.round(volStats.daily[Utils.dateStr()] || 0)} <span class="text-[10px] text-gray-500">kg</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-neon-blue/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-neon-blue font-bold">HAFTALIK</div><div class="text-xl font-bold text-white mt-1">${(volStats.weekly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-accent-orange/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-accent-orange font-bold">AYLIK</div><div class="text-xl font-bold text-white mt-1">${(volStats.monthly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div></div>
+                <div class="${THEME.card} text-center py-3 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-gray-500 font-bold">TOPLAM SET</div><div class="text-xl font-bold text-neon-blue mt-1">${volStats.totalSets}</div></div>
+                <div class="${THEME.card} text-center py-3 sensitive-content"><div class="text-[9px] text-gray-500 font-bold">HEDEF</div><div class="text-xl font-bold text-neon-green mt-1">${CONFIG.TARGETS.GOAL} <span class="text-[10px]">kg</span></div></div>
             </div>
 
             <!-- SLEEP & WATER STATS -->
@@ -2693,12 +2981,39 @@ const Renderers = window.Renderers = {
 
     async anatomy() {
         const view = UI.activeView;
+        const isSanitized = typeof Stealth !== 'undefined' && Stealth.active;
+
+        // Pelvik üçgeni sanitize modda gizle
+        const pelvicPath = isSanitized ? '' : `<path d="M85,158 L115,158 L100,183 Z" fill="#ff003c" opacity="0.5" onclick="Actions.selectMuscle('pelvic')" class="cursor-pointer hover:opacity-100"></path>`;
+
         const paths = {
-            front: `<path d="M60,50 Q100,70 140,50 L135,90 Q100,100 65,90 Z" class="muscle-path" onclick="Actions.selectMuscle('chest')"></path><rect x="80" y="95" width="40" height="55" rx="5" class="muscle-path" onclick="Actions.selectMuscle('abs')"></rect><path d="M65,160 L90,160 L85,240 L60,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><path d="M110,160 L135,160 L140,240 L115,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><ellipse cx="45" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse><ellipse cx="155" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse><path d="M85,158 L115,158 L100,183 Z" fill="#ff003c" opacity="0.5" onclick="Actions.selectMuscle('pelvic')" class="cursor-pointer hover:opacity-100"></path>`,
+            front: `<path d="M60,50 Q100,70 140,50 L135,90 Q100,100 65,90 Z" class="muscle-path" onclick="Actions.selectMuscle('chest')"></path><rect x="80" y="95" width="40" height="55" rx="5" class="muscle-path" onclick="Actions.selectMuscle('abs')"></rect><path d="M65,160 L90,160 L85,240 L60,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><path d="M110,160 L135,160 L140,240 L115,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><ellipse cx="45" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse><ellipse cx="155" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse>${pelvicPath}`,
             back: `<path d="M70,40 L100,20 L130,40 L100,60 Z" class="muscle-path" onclick="Actions.selectMuscle('traps')"></path><path d="M60,60 L40,100 L100,125 L160,100 L140,60 L100,60 Z" class="muscle-path" onclick="Actions.selectMuscle('lats')"></path><rect x="85" y="128" width="30" height="22" class="muscle-path" onclick="Actions.selectMuscle('lowerback')"></rect><path d="M70,150 Q100,170 130,150 L130,190 Q100,210 70,190 Z" class="muscle-path" onclick="Actions.selectMuscle('glutes')"></path><rect x="75" y="200" width="20" height="60" class="muscle-path" onclick="Actions.selectMuscle('hamstrings')"></rect><rect x="105" y="200" width="20" height="60" class="muscle-path" onclick="Actions.selectMuscle('hamstrings')"></rect>`
         };
-        const sel = Store.state.selectedMuscle ? DB.ANATOMY_DB[Store.state.selectedMuscle] : null;
-        return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button onclick="Actions.setAnatomyView('front')" class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ÖN</button><button onclick="Actions.setAnatomyView('back')" class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${sel.system}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">GÖREV</div><div class="text-base text-gray-200">${sel.function}</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p></div>'}</div></div>`;
+
+        // Sanitize modda pelvik seçiliyse temizle
+        let selectedMuscle = Store.state.selectedMuscle;
+        if (isSanitized && selectedMuscle === 'pelvic') {
+            selectedMuscle = null;
+            Store.state.selectedMuscle = null;
+        }
+
+        const sel = selectedMuscle ? DB.ANATOMY_DB[selectedMuscle] : null;
+
+        // Hassas metinleri filtrele
+        let displayFunction = sel ? sel.function : '';
+        let displaySystem = sel ? sel.system : '';
+        if (isSanitized && sel) {
+            // Hassas kelimeleri kaldır
+            const sensitiveWords = ['cinsel', 'Cinsel', 'boşalma', 'Boşalma', 'üreme', 'Üreme', 'piston'];
+            sensitiveWords.forEach(word => {
+                displayFunction = displayFunction.replace(new RegExp(word + '[^,\\.]*[,\\.]?\\s*', 'gi'), '');
+            });
+            displayFunction = displayFunction.replace(/,\s*$/, '.').replace(/\s+/g, ' ').trim();
+            if (displaySystem.toLowerCase().includes('üreme')) displaySystem = 'Core Destek';
+        }
+
+        return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button onclick="Actions.setAnatomyView('front')" class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ÖN</button><button onclick="Actions.setAnatomyView('back')" class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${displaySystem}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">GÖREV</div><div class="text-base text-gray-200">${displayFunction || 'Güç ve stabilizasyon.'}</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p></div>'}</div></div>`;
     },
 
     async mental() {
@@ -3659,6 +3974,9 @@ console.log('[Actions] Event handlers loaded');
     console.log("SYSTEM BOOT...");
     await Store.init();
     await UI.init();
+
+    // v8.1.0: Stealth/Sanitize Mode
+    if (typeof Stealth !== 'undefined') Stealth.init();
 
     // --- v6.3.0: EVENT DELEGATION ---
     document.getElementById('view-container').addEventListener('click', async (e) => {

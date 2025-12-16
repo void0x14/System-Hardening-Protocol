@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v8.0.0</title>
-    <!-- v8.0.0: Modular Build -->
+    <title>PROJECT: MONK MODE | v8.1.0</title>
+    <!-- v8.1.0: Training Tab UI/UX Redesign -->
     <script src="https://cdn.tailwindcss.com"
         onerror="console.error('Tailwind CDN failed'); document.body.innerHTML='<div style=\'padding:2rem;color:#ff003c;font-family:monospace\'>⚠️ CDN OFFLINE - Internet bağlantısı gerekli</div>';"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"
@@ -57,6 +57,28 @@
     </script>
 
     <style>
+        /* SANITIZE MODE - Privacy Protection */
+        body.sanitize-mode .sensitive-content {
+            display: none !important;
+        }
+
+        body.sanitize-mode .sensitive-blur {
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+        body.sanitize-mode #override-panel {
+            display: none !important;
+        }
+
+        body.sanitize-mode #btn-override {
+            display: none !important;
+        }
+
+        body.sanitize-mode .sensitive-tag {
+            display: none !important;
+        }
+
         body {
             background-color: #0a0a0f;
             color: #e5e7eb;
@@ -548,6 +570,64 @@
         .custom-scrollbar {
             scroll-behavior: smooth;
         }
+
+        /* ============================================
+           SET COMPLETION ANIMATION v8.1
+           ============================================ */
+        .set-complete-animation {
+            animation: setCompleteGlow 0.5s ease-out;
+        }
+
+        @keyframes setCompleteGlow {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(0, 255, 65, 0);
+            }
+
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 0 40px rgba(0, 255, 65, 0.4), 0 0 80px rgba(0, 255, 65, 0.2);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+            }
+        }
+
+        /* Set row hover state */
+        .set-row {
+            transition: all 0.3s ease;
+        }
+
+        .set-row:hover:not(.set-complete-animation) {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        /* Exercise body slide down */
+        .animate-slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Larger touch-friendly inputs */
+        .touch-input {
+            min-height: 56px;
+            font-size: 1.5rem;
+            padding: 1rem;
+        }
     </style>
 </head>
 
@@ -560,7 +640,7 @@
                 <i class="fas fa-biohazard text-neon-green text-2xl"></i>
                 <div>
                     <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v8.0.0</span></h1>
+                            class="text-sm text-text-muted">v8.1.0</span></h1>
                     <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
                     </div>
                 </div>

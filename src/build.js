@@ -34,6 +34,7 @@ const jsFiles = [
     'ui',
     'components',
     'video-player',
+    'stealth',
 
     // Layer 5: Renderers (depends on store, ui, components)
     'renderers/dashboard',

@@ -100,6 +100,81 @@ DB.EXERCISES = {
         desc: "Yüzüstü yat. Kollarını ve bacaklarını aynı anda kaldır. 2-3 saniye tepede tut.<br><br><strong>HEDEF:</strong> 3 Set x 12 Tekrar.",
         steps: ["Yüzüstü yat.", "Kol ve bacakları kaldır.", "Tepede tut."],
         videoId: "z6PJMT2y8GQ"
+    },
+    "neck_curl": {
+        title: "Lying Neck Curls (Network Hardening)",
+        tags: ["Boyun", "Stabilizasyon"],
+        desc: "<strong>SYSTEM GOAL:</strong> Kalın boyun inşası - \"System Choke\" riskini minimize eder ve \"Server\" (Beyin) ünitesini fiziksel travmaya karşı korur.<br><br><strong>PROTOKOL:</strong> Sırt üstü yat, başın yatak/banktan sarkık. Alna havlu veya ağırlık yerleştir. Çeneyi göğse doğru kontrollü kıvır.<br><br><strong>HEDEF:</strong> 3 Set x 15-20 Tekrar (High Volume Traffic).",
+        steps: ["Başı aşağı sarkıt.", "Ağırlığı alna koy.", "Çeneyi kıvır."],
+        trackingType: "weighted",
+        sets: 3
+    },
+    "wrist_curl": {
+        title: "Wrist Curls (I/O Controller Upgrade)",
+        tags: ["Ön Kol", "Kavrama"],
+        desc: "<strong>SYSTEM GOAL:</strong> Vaskülarite (Front-end Estetik) ve Grip Strength (Hardware Input Control) artışı.<br><br><strong>PROTOKOL:</strong> Otur, ön kol uylukta, el dizden sarkık. 5L şişe tutarak sadece bileği yukarı kıvır.<br><br><strong>HEDEF:</strong> 3 Set x Failure (Stress Test).",
+        steps: ["Kol uylukta.", "El sarkık.", "Bileği kıvır."],
+        trackingType: "weighted",
+        sets: 3
+    },
+    "tibialis_raise": {
+        title: "Tibialis Raises (System Stability Patch)",
+        tags: ["Kaval Kemiği", "Denge"],
+        desc: "<strong>SYSTEM GOAL:</strong> \"Shin Splints\" (System Bugs) önleme, ayak bileği güçlendirme ve \"Glitchless\" hareket mekaniği sağlama.<br><br><strong>PROTOKOL:</strong> Duvara yaslan, bacaklar düz ve ileri. Topuklar yerde, parmak uçlarını baldırlara doğru kaldır.<br><br><strong>HEDEF:</strong> 3 Set x 25 Tekrar (Long-Term Support - LTS).",
+        steps: ["Duvara yaslan.", "Bacaklar düz.", "Parmakları kaldır."],
+        trackingType: "weighted",
+        sets: 3
+    },
+    // ===========================================
+    // LIFESTYLE & RECOVERY TASKS (Simple Toggle)
+    // ===========================================
+    "eat_bulk": {
+        title: "BULK YE (Kalori Yükleme)",
+        tags: ["Beslenme", "Yemek"],
+        desc: "Kalori al. Hedef kaloriye ulaşmak için yüksek kalorili yemekler ye. Dirty bulk modunda sınır yok.",
+        steps: ["Yemek ye.", "Kalori takip et.", "Hedefe ulaş."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "stretch": {
+        title: "ESNEME (System Recovery)",
+        tags: ["Recovery", "Esneklik"],
+        desc: "Kasları rahatla. 5-10 dakika esneme rutini yap. Özellikle çalışan kas gruplarına odaklan.",
+        steps: ["Rahatla.", "5-10 dk esne.", "Nefes al."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "weigh_in": {
+        title: "TARTI (Weight Check)",
+        tags: ["Ölçüm", "İzleme"],
+        desc: "Sabah aç karnına tartıl ve kiloyu sisteme kaydet. Progress takibi için kritik.",
+        steps: ["Tartıya çık.", "Kiloyu not et.", "Sisteme gir."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "prep_food": {
+        title: "YEMEK HAZIRLA (Meal Prep)",
+        tags: ["Beslenme", "Planlama"],
+        desc: "Haftanın yemeklerini hazırla. Tavuk haşla, pilav pişir, yumurta kaynat.",
+        steps: ["Malzemeleri al.", "Pişir.", "Porsiyonla."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "walk_outside": {
+        title: "DIŞARI ÇIK (Outdoor Walk)",
+        tags: ["Cardio", "Mental"],
+        desc: "En az 20 dakika dışarıda yürü. Güneş ışığı, temiz hava, zihin temizliği.",
+        steps: ["Dışarı çık.", "20+ dk yürü.", "Nefes al."],
+        trackingType: "simple",
+        sets: 1
+    },
+    "cool_down": {
+        title: "SOĞUMA (Cool Down)",
+        tags: ["Recovery", "Esneklik"],
+        desc: "Antrenman sonrası soğuma. Nabzı düşür, hafif esneme yap.",
+        steps: ["Yavaş yürü.", "Nefes kontrol.", "Esne."],
+        trackingType: "simple",
+        sets: 1
     }
 };
 
