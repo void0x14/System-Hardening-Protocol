@@ -1412,7 +1412,11 @@ const Store = window.Store = {
      * @returns {Promise<string[]>} Tamamlanan görev ID'leri
      */
     async getWorkout(date) {
-        return await Utils.storage.get(CONFIG.KEYS.WORKOUT + date) || [];
+        const cacheKey = 'workout_' + date;
+        if (this._cache[cacheKey]) return this._cache[cacheKey];
+        const res = await Utils.storage.get(CONFIG.KEYS.WORKOUT + date) || [];
+        this._cache[cacheKey] = res;
+        return res;
     },
 
     /**
@@ -1422,8 +1426,10 @@ const Store = window.Store = {
      */
     async toggleTask(id) {
         const date = Utils.dateStr();
+        const cacheKey = 'workout_' + date;
         let tasks = await this.getWorkout(date);
         tasks = tasks.includes(id) ? tasks.filter(t => t !== id) : [...tasks, id];
+        this._cache[cacheKey] = tasks; // Update Cache
         await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
         await this.updateStreak();
     },
@@ -1459,8 +1465,12 @@ const Store = window.Store = {
     async addMeal(meal) {
         const date = Utils.dateStr();
         const key = CONFIG.KEYS.MEAL + date;
-        let meals = await Utils.storage.get(key) || [];
+        const cacheKey = 'meal_' + date;
+
+        let meals = await this.getMeals(date);
         meals.push(meal);
+        // Cache is mutated by push, just ensure it's set if it wasn't there (getMeals handles set)
+
         await Utils.storage.set(key, meals);
     },
 
@@ -1469,7 +1479,11 @@ const Store = window.Store = {
      * @async
      */
     async getMeals(date) {
-        return await Utils.storage.get(CONFIG.KEYS.MEAL + date) || [];
+        const cacheKey = 'meal_' + date;
+        if (this._cache[cacheKey]) return this._cache[cacheKey];
+        const res = await Utils.storage.get(CONFIG.KEYS.MEAL + date) || [];
+        this._cache[cacheKey] = res;
+        return res;
     },
 
     /**
@@ -1479,7 +1493,7 @@ const Store = window.Store = {
     async deleteMeal(index) {
         const date = Utils.dateStr();
         const key = CONFIG.KEYS.MEAL + date;
-        let meals = await Utils.storage.get(key) || [];
+        let meals = await this.getMeals(date);
         if (index >= 0 && index < meals.length) {
             meals.splice(index, 1);
             await Utils.storage.set(key, meals);
@@ -1668,13 +1682,18 @@ const Store = window.Store = {
 
     // --- ACTIVE TRAINING ENGINE ---
     async getWorkoutData(date) {
-        return await Utils.storage.get('monk_workout_data_' + date) || {};
+        const cacheKey = 'wdata_' + date;
+        if (this._cache[cacheKey]) return this._cache[cacheKey];
+        const res = await Utils.storage.get('monk_workout_data_' + date) || {};
+        this._cache[cacheKey] = res;
+        return res;
     },
 
     async logSet(taskId, setIndex, weight, reps, isDone) {
         const date = Utils.dateStr();
         const key = 'monk_workout_data_' + date;
-        const data = await Utils.storage.get(key) || {};
+        const data = await this.getWorkoutData(date);
+
         if (!data[taskId]) data[taskId] = [];
         const w = parseFloat(weight) || 0;
         const r = parseFloat(reps) || 0;
@@ -1684,6 +1703,7 @@ const Store = window.Store = {
             timestamp: new Date().toISOString(),
             completed: isDone
         };
+        // Data in cache is mutated, save to storage
         await Utils.storage.set(key, data);
 
         if (isDone && w > 0 && r > 0) {
@@ -1734,18 +1754,23 @@ const Store = window.Store = {
 
     async setTaskDone(id, status) {
         const date = Utils.dateStr();
-        let tasks = await this.getWorkout(date);
+        const cacheKey = 'workout_' + date;
+        const tasks = await this.getWorkout(date);
+
+        let newTasks = [...tasks];
         if (status) {
-            if (!tasks.includes(id)) tasks.push(id);
+            if (!newTasks.includes(id)) newTasks.push(id);
         } else {
-            tasks = tasks.filter(t => t !== id);
+            newTasks = newTasks.filter(t => t !== id);
         }
-        await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
+
+        this._cache[cacheKey] = newTasks;
+        await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, newTasks);
         await this.updateStreak();
 
         const day = new Date().getDay();
         const plan = WEEKLY_PLAN[day];
-        if (tasks.length >= plan.tasks.length) {
+        if (newTasks.length >= plan.tasks.length) {
             const messages = [
                 { emoji: "🏆", text: "GÜN TAMAMLANDI!", sub: "Bugünü fethetttin. Yarın daha güçlü dön." },
                 { emoji: "👑", text: "KRAL GİBİ!", sub: "Disiplin = Özgürlük. Bunu kanıtladın." },
@@ -1813,25 +1838,37 @@ const Store = window.Store = {
 
     // --- SLEEP TRACKING ---
     async getSleep(date) {
-        return await Utils.storage.get(CONFIG.KEYS.SLEEP + date) || 0;
+        const cacheKey = 'sleep_' + date;
+        if (this._cache[cacheKey] !== undefined) return this._cache[cacheKey];
+        const res = await Utils.storage.get(CONFIG.KEYS.SLEEP + date) || 0;
+        this._cache[cacheKey] = res;
+        return res;
     },
     async setSleep(hours) {
         const date = Utils.dateStr();
-        await Utils.storage.set(CONFIG.KEYS.SLEEP + date, parseFloat(hours));
+        const val = parseFloat(hours);
+        this._cache['sleep_' + date] = val;
+        await Utils.storage.set(CONFIG.KEYS.SLEEP + date, val);
         this.clearCache('sleepStats');
         return true;
     },
 
     // --- WATER TRACKING ---
     async getWater(date) {
-        return await Utils.storage.get(CONFIG.KEYS.WATER + date) || 0;
+        const cacheKey = 'water_' + date;
+        if (this._cache[cacheKey] !== undefined) return this._cache[cacheKey];
+        const res = await Utils.storage.get(CONFIG.KEYS.WATER + date) || 0;
+        this._cache[cacheKey] = res;
+        return res;
     },
     async addWater(cups = 1) {
         const date = Utils.dateStr();
         const current = await this.getWater(date);
-        await Utils.storage.set(CONFIG.KEYS.WATER + date, current + cups);
+        const newVal = current + cups;
+        this._cache['water_' + date] = newVal;
+        await Utils.storage.set(CONFIG.KEYS.WATER + date, newVal);
         this.clearCache('waterStats');
-        return current + cups;
+        return newVal;
     },
 
     // --- SLEEP & WATER STATISTICS ---
@@ -2391,6 +2428,7 @@ const Components = window.Components = {
     /**
      * Set input row for weighted exercises - REDESIGNED v8.1.1
      * Features: Compact inline layout, larger inputs, KAYDET button
+     * BOLT v9.0.0: Event Delegation implemented
      */
     weightedSetRow: (tid, idx, log, isSetDone, hint = '') => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
@@ -2415,7 +2453,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveSet('${tid}', ${idx}, true)" 
+            <button data-action="saveSet" data-params='["${tid}", ${idx}, true]'
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -2425,6 +2463,7 @@ const Components = window.Components = {
     /**
      * Set input row for timed exercises - REDESIGNED v8.1.1
      * Features: Compact inline layout
+     * BOLT v9.0.0: Event Delegation implemented
      */
     timedSetRow: (tid, idx, log, isSetDone) => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
@@ -2440,7 +2479,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveTimedSet('${tid}', ${idx})" 
+            <button data-action="saveTimedSet" data-params='["${tid}", ${idx}]'
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -2449,9 +2488,10 @@ const Components = window.Components = {
 
     /**
      * Simple task toggle button
+     * BOLT v9.0.0: Event Delegation implemented
      */
     simpleTaskBtn: (tid, isDone) => `
-        <button onclick="Actions.toggleSimpleTask('${tid}')" 
+        <button data-action="toggleSimpleTask" data-params='["${tid}"]'
             class="w-full py-4 rounded-xl font-bold text-lg transition-all ${isDone ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green border-2 border-gray-600'}">
             <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
             ${isDone ? 'TAMAMLANDI ✓' : 'TAMAMLA'}
@@ -2803,25 +2843,38 @@ const Renderers = window.Renderers = {
     },
 
     async getHeatmapHTML() {
-        let html = '';
         const today = new Date();
-        // 28 days (4 rows of 7)
+        const dates = [];
+
+        // 1. Prepare Dates (28 days)
         for (let i = 27; i >= 0; i--) {
             const d = new Date(today);
             d.setDate(d.getDate() - i);
-            const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
-
-            const workout = await Store.getWorkout(dateStr);
-
-            let level = 0;
-            if (workout.length > 0) level = 2; // Simple: Workout = Green
-
-            // Checking if date is future
-            const isFuture = d > new Date();
-            const colorClass = isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${Math.min(3, level + 1)}`;
-
-            html += `<div class="heatmap-cell ${colorClass}" title="${dateStr}"></div>`;
+            dates.push(d);
         }
+
+        // 2. Parallel Fetch (Batching)
+        const promises = dates.map(d => {
+            const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+            return Store.getWorkout(dateStr).then(workout => ({
+                dateStr,
+                workout,
+                isFuture: d > new Date()
+            }));
+        });
+
+        const results = await Promise.all(promises);
+
+        // 3. Build HTML String (Single Pass)
+        let html = '';
+        for (const res of results) {
+            let level = 0;
+            if (res.workout.length > 0) level = 2;
+
+            const colorClass = res.isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${Math.min(3, level + 1)}`;
+            html += `<div class="heatmap-cell ${colorClass}" title="${res.dateStr}"></div>`;
+        }
+
         return html;
     },
 
@@ -2879,9 +2932,11 @@ const Renderers = window.Renderers = {
                     trackingType === 'duration' ? 'Süre' :
                         trackingType === 'activity' ? 'Aktivite' : 'Görev';
 
+            // EVENT DELEGATION: Replaced onclick with data-action
             return `
                         <div class="bg-gray-900 border-2 ${isDone ? 'border-neon-green shadow-[0_0_15px_rgba(0,255,65,0.15)]' : 'border-gray-700'} rounded-xl overflow-hidden transition-all">
-                            <div class="p-4 cursor-pointer hover:bg-gray-800/50 flex justify-between items-center" onclick="Actions.toggleExerciseBody('${tid}')">
+                            <div class="p-4 cursor-pointer hover:bg-gray-800/50 flex justify-between items-center"
+                                data-action="toggleExerciseBody" data-params='["${tid}"]'>
                                 <div class="flex items-center gap-3">
                                     <div class="w-3 h-3 rounded-full ${isDone ? 'bg-neon-green shadow-[0_0_8px_rgba(0,255,65,0.5)]' : 'bg-gray-600'} transition-all"></div>
                                     <div>

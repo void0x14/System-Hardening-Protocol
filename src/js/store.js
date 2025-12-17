@@ -69,7 +69,11 @@ const Store = window.Store = {
      * @returns {Promise<string[]>} Tamamlanan görev ID'leri
      */
     async getWorkout(date) {
-        return await Utils.storage.get(CONFIG.KEYS.WORKOUT + date) || [];
+        const cacheKey = 'workout_' + date;
+        if (this._cache[cacheKey]) return this._cache[cacheKey];
+        const res = await Utils.storage.get(CONFIG.KEYS.WORKOUT + date) || [];
+        this._cache[cacheKey] = res;
+        return res;
     },
 
     /**
@@ -79,8 +83,10 @@ const Store = window.Store = {
      */
     async toggleTask(id) {
         const date = Utils.dateStr();
+        const cacheKey = 'workout_' + date;
         let tasks = await this.getWorkout(date);
         tasks = tasks.includes(id) ? tasks.filter(t => t !== id) : [...tasks, id];
+        this._cache[cacheKey] = tasks; // Update Cache
         await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
         await this.updateStreak();
     },
@@ -116,8 +122,12 @@ const Store = window.Store = {
     async addMeal(meal) {
         const date = Utils.dateStr();
         const key = CONFIG.KEYS.MEAL + date;
-        let meals = await Utils.storage.get(key) || [];
+        const cacheKey = 'meal_' + date;
+
+        let meals = await this.getMeals(date);
         meals.push(meal);
+        // Cache is mutated by push, just ensure it's set if it wasn't there (getMeals handles set)
+
         await Utils.storage.set(key, meals);
     },
 
@@ -126,7 +136,11 @@ const Store = window.Store = {
      * @async
      */
     async getMeals(date) {
-        return await Utils.storage.get(CONFIG.KEYS.MEAL + date) || [];
+        const cacheKey = 'meal_' + date;
+        if (this._cache[cacheKey]) return this._cache[cacheKey];
+        const res = await Utils.storage.get(CONFIG.KEYS.MEAL + date) || [];
+        this._cache[cacheKey] = res;
+        return res;
     },
 
     /**
@@ -136,7 +150,7 @@ const Store = window.Store = {
     async deleteMeal(index) {
         const date = Utils.dateStr();
         const key = CONFIG.KEYS.MEAL + date;
-        let meals = await Utils.storage.get(key) || [];
+        let meals = await this.getMeals(date);
         if (index >= 0 && index < meals.length) {
             meals.splice(index, 1);
             await Utils.storage.set(key, meals);
@@ -325,13 +339,18 @@ const Store = window.Store = {
 
     // --- ACTIVE TRAINING ENGINE ---
     async getWorkoutData(date) {
-        return await Utils.storage.get('monk_workout_data_' + date) || {};
+        const cacheKey = 'wdata_' + date;
+        if (this._cache[cacheKey]) return this._cache[cacheKey];
+        const res = await Utils.storage.get('monk_workout_data_' + date) || {};
+        this._cache[cacheKey] = res;
+        return res;
     },
 
     async logSet(taskId, setIndex, weight, reps, isDone) {
         const date = Utils.dateStr();
         const key = 'monk_workout_data_' + date;
-        const data = await Utils.storage.get(key) || {};
+        const data = await this.getWorkoutData(date);
+
         if (!data[taskId]) data[taskId] = [];
         const w = parseFloat(weight) || 0;
         const r = parseFloat(reps) || 0;
@@ -341,6 +360,7 @@ const Store = window.Store = {
             timestamp: new Date().toISOString(),
             completed: isDone
         };
+        // Data in cache is mutated, save to storage
         await Utils.storage.set(key, data);
 
         if (isDone && w > 0 && r > 0) {
@@ -391,18 +411,23 @@ const Store = window.Store = {
 
     async setTaskDone(id, status) {
         const date = Utils.dateStr();
-        let tasks = await this.getWorkout(date);
+        const cacheKey = 'workout_' + date;
+        const tasks = await this.getWorkout(date);
+
+        let newTasks = [...tasks];
         if (status) {
-            if (!tasks.includes(id)) tasks.push(id);
+            if (!newTasks.includes(id)) newTasks.push(id);
         } else {
-            tasks = tasks.filter(t => t !== id);
+            newTasks = newTasks.filter(t => t !== id);
         }
-        await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
+
+        this._cache[cacheKey] = newTasks;
+        await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, newTasks);
         await this.updateStreak();
 
         const day = new Date().getDay();
         const plan = WEEKLY_PLAN[day];
-        if (tasks.length >= plan.tasks.length) {
+        if (newTasks.length >= plan.tasks.length) {
             const messages = [
                 { emoji: "🏆", text: "GÜN TAMAMLANDI!", sub: "Bugünü fethetttin. Yarın daha güçlü dön." },
                 { emoji: "👑", text: "KRAL GİBİ!", sub: "Disiplin = Özgürlük. Bunu kanıtladın." },
@@ -470,25 +495,37 @@ const Store = window.Store = {
 
     // --- SLEEP TRACKING ---
     async getSleep(date) {
-        return await Utils.storage.get(CONFIG.KEYS.SLEEP + date) || 0;
+        const cacheKey = 'sleep_' + date;
+        if (this._cache[cacheKey] !== undefined) return this._cache[cacheKey];
+        const res = await Utils.storage.get(CONFIG.KEYS.SLEEP + date) || 0;
+        this._cache[cacheKey] = res;
+        return res;
     },
     async setSleep(hours) {
         const date = Utils.dateStr();
-        await Utils.storage.set(CONFIG.KEYS.SLEEP + date, parseFloat(hours));
+        const val = parseFloat(hours);
+        this._cache['sleep_' + date] = val;
+        await Utils.storage.set(CONFIG.KEYS.SLEEP + date, val);
         this.clearCache('sleepStats');
         return true;
     },
 
     // --- WATER TRACKING ---
     async getWater(date) {
-        return await Utils.storage.get(CONFIG.KEYS.WATER + date) || 0;
+        const cacheKey = 'water_' + date;
+        if (this._cache[cacheKey] !== undefined) return this._cache[cacheKey];
+        const res = await Utils.storage.get(CONFIG.KEYS.WATER + date) || 0;
+        this._cache[cacheKey] = res;
+        return res;
     },
     async addWater(cups = 1) {
         const date = Utils.dateStr();
         const current = await this.getWater(date);
-        await Utils.storage.set(CONFIG.KEYS.WATER + date, current + cups);
+        const newVal = current + cups;
+        this._cache['water_' + date] = newVal;
+        await Utils.storage.set(CONFIG.KEYS.WATER + date, newVal);
         this.clearCache('waterStats');
-        return current + cups;
+        return newVal;
     },
 
     // --- SLEEP & WATER STATISTICS ---

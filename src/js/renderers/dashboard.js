@@ -186,25 +186,38 @@ const Renderers = window.Renderers = {
     },
 
     async getHeatmapHTML() {
-        let html = '';
         const today = new Date();
-        // 28 days (4 rows of 7)
+        const dates = [];
+
+        // 1. Prepare Dates (28 days)
         for (let i = 27; i >= 0; i--) {
             const d = new Date(today);
             d.setDate(d.getDate() - i);
-            const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
-
-            const workout = await Store.getWorkout(dateStr);
-
-            let level = 0;
-            if (workout.length > 0) level = 2; // Simple: Workout = Green
-
-            // Checking if date is future
-            const isFuture = d > new Date();
-            const colorClass = isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${Math.min(3, level + 1)}`;
-
-            html += `<div class="heatmap-cell ${colorClass}" title="${dateStr}"></div>`;
+            dates.push(d);
         }
+
+        // 2. Parallel Fetch (Batching)
+        const promises = dates.map(d => {
+            const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+            return Store.getWorkout(dateStr).then(workout => ({
+                dateStr,
+                workout,
+                isFuture: d > new Date()
+            }));
+        });
+
+        const results = await Promise.all(promises);
+
+        // 3. Build HTML String (Single Pass)
+        let html = '';
+        for (const res of results) {
+            let level = 0;
+            if (res.workout.length > 0) level = 2;
+
+            const colorClass = res.isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${Math.min(3, level + 1)}`;
+            html += `<div class="heatmap-cell ${colorClass}" title="${res.dateStr}"></div>`;
+        }
+
         return html;
     },
 
@@ -262,9 +275,11 @@ const Renderers = window.Renderers = {
                     trackingType === 'duration' ? 'Süre' :
                         trackingType === 'activity' ? 'Aktivite' : 'Görev';
 
+            // EVENT DELEGATION: Replaced onclick with data-action
             return `
                         <div class="bg-gray-900 border-2 ${isDone ? 'border-neon-green shadow-[0_0_15px_rgba(0,255,65,0.15)]' : 'border-gray-700'} rounded-xl overflow-hidden transition-all">
-                            <div class="p-4 cursor-pointer hover:bg-gray-800/50 flex justify-between items-center" onclick="Actions.toggleExerciseBody('${tid}')">
+                            <div class="p-4 cursor-pointer hover:bg-gray-800/50 flex justify-between items-center"
+                                data-action="toggleExerciseBody" data-params='["${tid}"]'>
                                 <div class="flex items-center gap-3">
                                     <div class="w-3 h-3 rounded-full ${isDone ? 'bg-neon-green shadow-[0_0_8px_rgba(0,255,65,0.5)]' : 'bg-gray-600'} transition-all"></div>
                                     <div>

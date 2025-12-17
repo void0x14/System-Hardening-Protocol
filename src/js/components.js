@@ -188,6 +188,7 @@ const Components = window.Components = {
     /**
      * Set input row for weighted exercises - REDESIGNED v8.1.1
      * Features: Compact inline layout, larger inputs, KAYDET button
+     * BOLT v9.0.0: Event Delegation implemented
      */
     weightedSetRow: (tid, idx, log, isSetDone, hint = '') => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
@@ -212,7 +213,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveSet('${tid}', ${idx}, true)" 
+            <button data-action="saveSet" data-params='["${tid}", ${idx}, true]'
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -222,6 +223,7 @@ const Components = window.Components = {
     /**
      * Set input row for timed exercises - REDESIGNED v8.1.1
      * Features: Compact inline layout
+     * BOLT v9.0.0: Event Delegation implemented
      */
     timedSetRow: (tid, idx, log, isSetDone) => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
@@ -237,7 +239,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveTimedSet('${tid}', ${idx})" 
+            <button data-action="saveTimedSet" data-params='["${tid}", ${idx}]'
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -246,9 +248,10 @@ const Components = window.Components = {
 
     /**
      * Simple task toggle button
+     * BOLT v9.0.0: Event Delegation implemented
      */
     simpleTaskBtn: (tid, isDone) => `
-        <button onclick="Actions.toggleSimpleTask('${tid}')" 
+        <button data-action="toggleSimpleTask" data-params='["${tid}"]'
             class="w-full py-4 rounded-xl font-bold text-lg transition-all ${isDone ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green border-2 border-gray-600'}">
             <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
             ${isDone ? 'TAMAMLANDI ✓' : 'TAMAMLA'}
