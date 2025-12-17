@@ -5,173 +5,153 @@
 // Using window. for global scope access
 const Renderers = window.Renderers = {
     async dashboard() {
-        const p = Math.min(100, Math.max(0, ((Store.state.weight - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 100));
-        const fuelDone = Store.state.fuelDate === Utils.dateStr();
+        const today = Utils.dateStr();
 
-        // Get data
-        const streak = await Store.getStreak();
-        const progress = await Store.getTodayProgress();
-        const todaySleep = await Store.getSleep(Utils.dateStr());
-        const todayWater = await Store.getWater(Utils.dateStr());
-        const sleepStats = await Store.getSleepStats();
-        const waterStats = await Store.getWaterStats();
-        const nextMilestone = Store.getNextMilestone();
-        const completedMilestones = Store.getCompletedMilestones();
+        // 1. DATA GATHERING
+        // Weight
+        const currentWeight = Store.state.weight;
+        const startWeight = CONFIG.TARGETS.START;
+        const goalWeight = CONFIG.TARGETS.GOAL;
+        const weightProgress = Math.min(100, Math.max(0, ((currentWeight - startWeight) / (goalWeight - startWeight)) * 100));
 
-        // Milestone progress calculation
-        const prevMilestone = completedMilestones.length > 0 ? completedMilestones[completedMilestones.length - 1] : { weight: CONFIG.TARGETS.START };
-        const milestoneProgress = nextMilestone ?
-            Math.min(100, Math.max(0, ((Store.state.weight - prevMilestone.weight) / (nextMilestone.weight - prevMilestone.weight)) * 100)) : 100;
+        // Protocol Status
+        const workoutData = await Store.getWorkout(today);
+        const mealsData = await Store.getMeals(today);
+        const sleepHours = await Store.getSleep(today);
 
-        // Sleep status
-        const sleepStatus = todaySleep === 0 ? { icon: '😴', text: 'Henüz girilmedi', color: 'text-gray-500' } :
-            todaySleep < 6 ? { icon: '😵', text: 'Yetersiz', color: 'text-neon-red' } :
-                todaySleep < 7 ? { icon: '😊', text: 'Kabul edilebilir', color: 'text-neon-yellow' } :
-                    todaySleep <= 8.5 ? { icon: '💪', text: 'Optimal', color: 'text-neon-green' } :
-                        { icon: '⚠️', text: 'Fazla uyku', color: 'text-neon-yellow' };
+        const dayIdx = new Date().getDay();
+        const dailyPlan = WEEKLY_PLAN[dayIdx];
+        const totalTasks = dailyPlan ? dailyPlan.tasks.length : 0;
+        const completedTasks = workoutData.length;
 
-        // Water status
-        const waterPercent = Math.min(100, (todayWater / CONFIG.TARGETS.WATER) * 100);
+        const totalProtein = mealsData.reduce((sum, m) => sum + m.prot, 0);
+        const targetProtein = CONFIG.TARGETS.PROT;
 
+        const isTrainingDone = totalTasks > 0 && completedTasks >= totalTasks;
+        const isProteinDone = totalProtein >= targetProtein;
+        const isSleepDone = sleepHours >= 7;
+
+        // Heatmap Data (Last 28 days)
+        const heatmapHTML = await this.getHeatmapHTML();
+
+        // 2. RENDER HTML
         return `
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
-                <!-- MILESTONE PROGRESS -->
-                <div class="${THEME.card} lg:col-span-3 relative overflow-hidden sensitive-content">
-                    <div class="absolute inset-0 bg-gradient-to-r from-neon-purple/5 via-transparent to-neon-green/5"></div>
-                    <div class="relative">
-                        <div class="${THEME.label}">🏆 MILESTONE YOLCULUĞU</div>
-                        <div class="flex items-center justify-between mt-4 mb-3">
-                            <div class="flex items-center gap-3">
-                                ${completedMilestones.map(m => `<span class="text-2xl" title="${m.title}">${m.icon}</span>`).join('')}
-                                ${completedMilestones.length === 0 ? '<span class="text-gray-500 text-sm">Henüz milestone yok</span>' : ''}
-                            </div>
-                            <div class="text-right">
-                                <div class="text-2xl font-bold text-white">${nextMilestone ? nextMilestone.icon : '🏆'} ${nextMilestone ? nextMilestone.title : 'TAMAMLANDI!'}</div>
-                                <div class="text-sm text-text-muted">${nextMilestone ? `${nextMilestone.weight} kg hedef` : ''}</div>
-                            </div>
-                        </div>
-                        <div class="w-full bg-surface-raised h-3 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-neon-purple to-neon-green transition-all duration-1000 rounded-full" style="width: ${milestoneProgress}%"></div>
-                        </div>
-                        <div class="flex justify-between text-[10px] text-gray-500 mt-1">
-                            <span>${prevMilestone.weight} kg</span>
-                            <span>${nextMilestone ? nextMilestone.weight : CONFIG.TARGETS.GOAL} kg</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- STREAK CARD -->
-                <div class="${THEME.card} text-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-neon-green/5 to-transparent"></div>
-                    <div class="relative">
-                        <div class="${THEME.label}">🔥 STREAK</div>
-                        <div class="text-6xl md:text-7xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-text-muted'} leading-none">${streak}</div>
-                        <div class="text-sm text-text-muted mt-3 uppercase tracking-wider">${streak > 0 ? 'Gün Üst Üste' : 'Seri Kırıldı'}</div>
-                    </div>
-                </div>
-                
-                <!-- TODAY'S PROGRESS -->
-                <div class="${THEME.card}">
-                    <div class="${THEME.label}">📊 BUGÜNKÜ DURUM</div>
-                    <div class="space-y-4 mt-3">
-                        ${Components.progressRow('Görevler', `${progress.tasksDone}/${progress.tasksTotal}`, progress.tasksPercent)}
-                        ${Components.progressRow('Kalori', `${progress.calories}/${progress.caloriesTarget}`, Math.min(100, progress.caloriesPercent), 'accent-orange')}
-                    </div>
-                </div>
-                
-                <!-- SYSTEM LOAD (WEIGHT) -->
-                <div class="${THEME.card} flex flex-col justify-between">
+            <div class="animate-slide-up space-y-6 max-w-4xl mx-auto">
+                <!-- HEADER -->
+                <div class="flex justify-between items-end border-b border-gray-800 pb-2">
                     <div>
-                        <div class="${THEME.label}">⚖️ SYSTEM LOAD</div>
-                        <div class="flex items-baseline gap-2 mt-3">
-                            <input type="number" value="${Store.state.weight}" class="bg-transparent text-5xl font-black text-white w-24 focus:text-neon-green outline-none" onchange="Actions.saveWeight(this.value)">
-                            <span class="text-text-muted text-lg">KG</span>
-                        </div>
+                        <div class="text-[10px] text-gray-500 tracking-[0.3em] font-bold">OPERATOR: MONK</div>
+                        <div class="text-xl font-bold text-white font-mono">SYSTEM INTEGRITY MONITOR</div>
                     </div>
-                    <div class="mt-4 sensitive-content">
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-text-muted">Hedefe</span>
-                            <span class="text-neon-green font-bold">${Math.round(p)}%</span>
-                        </div>
-                        <div class="w-full bg-surface-raised h-3 rounded-full overflow-hidden">
-                            <div class="h-full bg-neon-green progress-shimmer rounded-full" style="width: ${p}%"></div>
-                        </div>
+                    <div class="text-right">
+                        <div class="text-[10px] text-gray-500 tracking-[0.2em] font-bold">DATE</div>
+                        <div class="text-lg text-neon-green font-mono">${today}</div>
                     </div>
                 </div>
-                
-                <!-- SLEEP TRACKING -->
-                <div class="${THEME.card}">
-                    <div class="${THEME.label}">😴 UYKU TAKİBİ</div>
-                    <div class="flex items-center justify-between mt-3">
-                        <div>
-                            <div class="text-4xl font-bold ${sleepStatus.color}">${todaySleep > 0 ? todaySleep : '--'} <span class="text-lg text-text-muted">saat</span></div>
-                            <div class="text-sm ${sleepStatus.color} mt-1">${sleepStatus.icon} ${sleepStatus.text}</div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <!-- HERO: SYSTEM LOAD (Circular Progress) -->
+                    <div class="relative flex flex-col items-center justify-center py-6">
+                        <svg viewBox="0 0 36 36" class="circular-chart w-64 h-64">
+                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#1a1a22" />
+                            <path class="circle" stroke="${weightProgress >= 100 ? '#00ff41' : '#00f3ff'}" stroke-dasharray="${weightProgress}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <div class="text-[10px] text-gray-500 tracking-widest uppercase mb-1">System Mass</div>
+                            <div class="text-5xl font-black text-white font-mono tracking-tighter">${currentWeight}<span class="text-xl text-gray-500">kg</span></div>
+                            <div class="text-xs text-neon-blue mt-2 font-mono">TARGET: ${goalWeight}kg</div>
                         </div>
-                        <div class="flex flex-col gap-2">
-                            <input type="number" id="sleep-input" placeholder="Saat" step="0.5" min="0" max="14" 
-                                class="w-20 bg-surface-raised text-white text-center rounded-lg p-2 text-sm" value="${todaySleep || ''}">
-                            <button data-action="saveSleep" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black px-3 py-1 rounded text-xs font-bold transition">KAYDET</button>
-                        </div>
-                    </div>
-                    <!-- Weekly Stats -->
-                    <div class="mt-4 pt-3 border-t border-gray-800">
-                        <div class="grid grid-cols-2 gap-3 text-center text-xs">
-                            <div class="bg-surface-raised p-2 rounded-lg">
-                                <div class="text-gray-500">Haftalık Ort.</div>
-                                <div class="text-neon-blue font-bold text-lg">${sleepStats.weekAvg} <span class="text-[10px] text-gray-500">saat</span></div>
-                            </div>
-                            <div class="bg-surface-raised p-2 rounded-lg">
-                                <div class="text-gray-500">Aylık Ort.</div>
-                                <div class="text-neon-blue font-bold text-lg">${sleepStats.monthAvg} <span class="text-[10px] text-gray-500">saat</span></div>
-                            </div>
+
+                        <!-- Quick Weight Input -->
+                        <div class="mt-6 flex items-center gap-2">
+                            <button onclick="Actions.saveWeight(prompt('YENİ AĞIRLIK (KG):', '${currentWeight}'))" class="text-xs border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-3 py-1 rounded transition-colors uppercase tracking-wider">
+                                [ UPDATE SENSOR ]
+                            </button>
                         </div>
                     </div>
-                </div>
-                
-                <!-- WATER TRACKING -->
-                <div class="${THEME.card}">
-                    <div class="${THEME.label}">💧 SU TAKİBİ</div>
-                    <div class="flex items-center justify-between mt-3">
-                        <div>
-                            <div class="text-4xl font-bold ${todayWater >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">${todayWater} <span class="text-lg text-text-muted">/ ${CONFIG.TARGETS.WATER}</span></div>
-                            <div class="w-32 bg-surface-raised h-2 rounded-full overflow-hidden mt-2">
-                                <div class="h-full bg-neon-blue rounded-full transition-all" style="width: ${waterPercent}%"></div>
+
+                    <!-- STATUS PANEL & HEATMAP -->
+                    <div class="space-y-6">
+                        <!-- DAILY PROTOCOL -->
+                        <div class="sniper-panel rounded-lg p-5">
+                            <div class="text-[10px] text-gray-500 tracking-[0.2em] font-bold mb-4 border-b border-gray-800 pb-2">DAILY PROTOCOL</div>
+                            <div class="space-y-3 font-mono text-sm">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">PHYSICAL TRAINING</span>
+                                    ${isTrainingDone
+                                        ? '<span class="text-neon-green font-bold">[ COMPLETED ]</span>'
+                                        : `<span class="text-neon-red">[ PENDING ${completedTasks}/${totalTasks} ]</span>`}
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">PROTEIN INTAKE</span>
+                                    ${isProteinDone
+                                        ? '<span class="text-neon-green font-bold">[ COMPLETED ]</span>'
+                                        : `<span class="text-accent-orange">[ ${Math.round(totalProtein)}/${targetProtein}g ]</span>`}
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">SLEEP RECOVERY</span>
+                                    ${isSleepDone
+                                        ? '<span class="text-neon-green font-bold">[ OPTIMAL ]</span>'
+                                        : sleepHours > 0
+                                            ? `<span class="text-neon-yellow">[ ${sleepHours}h - LOW ]</span>`
+                                            : '<span class="text-gray-600">[ NO DATA ]</span>'}
+                                </div>
                             </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button data-action="addWater" data-params="[1]" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black w-12 h-12 rounded-lg text-xl font-bold transition">+1</button>
-                            <button data-action="addWater" data-params="[-1]" class="bg-gray-800 hover:bg-gray-700 text-gray-400 w-12 h-12 rounded-lg text-xl font-bold transition">-1</button>
-                        </div>
-                    </div>
-                    <!-- Weekly Stats -->
-                    <div class="mt-4 pt-3 border-t border-gray-800">
-                        <div class="grid grid-cols-2 gap-3 text-center text-xs">
-                            <div class="bg-surface-raised p-2 rounded-lg">
-                                <div class="text-gray-500">Haftalık Top.</div>
-                                <div class="text-neon-blue font-bold text-lg">${waterStats.weekTotal} <span class="text-[10px] text-gray-500">bardak</span></div>
+
+                        <!-- UPTIME HEATMAP -->
+                        <div class="sniper-panel rounded-lg p-5">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="text-[10px] text-gray-500 tracking-[0.2em] font-bold">UPTIME HISTORY</div>
+                                <div class="text-[9px] text-gray-600">LAST 28 DAYS</div>
                             </div>
-                            <div class="bg-surface-raised p-2 rounded-lg">
-                                <div class="text-gray-500">Aylık Top.</div>
-                                <div class="text-neon-blue font-bold text-lg">${waterStats.monthTotal} <span class="text-[10px] text-gray-500">bardak</span></div>
+                            <div class="heatmap-grid">
+                                ${heatmapHTML}
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- FUEL STATUS -->
-                <div class="${THEME.card} ${!fuelDone ? 'ring-2 ring-neon-red/50' : ''} relative">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="${THEME.label}">⛽ FUEL STATUS</div>
-                            <div class="text-xl font-bold text-white mt-2">GAINER SHAKE</div>
-                            <div class="text-text-muted text-sm mt-1">Süt + Yulaf + Fıstık + Muz</div>
-                        </div>
-                        <button onclick="Actions.injectFuel()" class="${fuelDone ? 'bg-neon-green text-gunmetal' : 'bg-neon-red text-white'} px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all hover:scale-105">
-                            ${fuelDone ? '✓ OK' : '⚠ BEKLİYOR'}
-                        </button>
-                    </div>
+
+                <!-- TACTICAL ACTIONS (Bottom Bar) -->
+                <div class="grid grid-cols-3 gap-4 pt-4 border-t border-gray-800/50">
+                    <button onclick="Actions.addWater(2)" class="sniper-btn bg-gray-900 hover:bg-neon-blue/10 text-neon-blue py-4 rounded-lg font-bold text-sm tracking-wider">
+                        <i class="fas fa-tint mb-1 block text-lg"></i>
+                        HYDRATE
+                    </button>
+                    <button onclick="Actions.injectFuel()" class="sniper-btn bg-gray-900 hover:bg-neon-red/10 text-neon-red py-4 rounded-lg font-bold text-sm tracking-wider">
+                        <i class="fas fa-gas-pump mb-1 block text-lg"></i>
+                        REFUEL
+                    </button>
+                    <button onclick="Actions.completeDailyMission()" class="sniper-btn bg-gray-900 hover:bg-neon-green/10 text-neon-green py-4 rounded-lg font-bold text-sm tracking-wider">
+                        <i class="fas fa-check-circle mb-1 block text-lg"></i>
+                        SYS CHECK
+                    </button>
                 </div>
-            </div>`;
+            </div>
+        `;
+    },
+
+    async getHeatmapHTML() {
+        let html = '';
+        const today = new Date();
+        // 28 days (4 rows of 7)
+        for (let i = 27; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+
+            const workout = await Store.getWorkout(dateStr);
+
+            let level = 0;
+            if (workout.length > 0) level = 2; // Simple: Workout = Green
+
+            // Checking if date is future
+            const isFuture = d > new Date();
+            const colorClass = isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${Math.min(3, level + 1)}`;
+
+            html += `<div class="heatmap-cell ${colorClass}" title="${dateStr}"></div>`;
+        }
+        return html;
     },
 
     async training() {
