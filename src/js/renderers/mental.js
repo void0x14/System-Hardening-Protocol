@@ -1,1 +1,133 @@
-// Empty - Renderers consolidated into dashboard.js
+(function(window) {
+    'use strict';
+
+    if (typeof window.Renderers === 'undefined') {
+        window.Renderers = {};
+    }
+
+    Renderers.mental = async function() {
+        const phaseIcons = ['🐆', '🎭', '🤖', '🔧', '⚡', '🎯', '🍀', '🔄'];
+        const mentalData = await Utils.storage.get(CONFIG.KEYS.MENTAL_PROGRESS) || { completedPhases: [], dailyPractice: {}, lastPracticeDate: null };
+        const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        const todayPhaseIndex = dayOfYear % 8;
+        const todayPhase = MENTAL_PHASES[todayPhaseIndex];
+        const completedCount = mentalData.completedPhases?.length || 0;
+        const progressPercent = Math.round((completedCount / 8) * 100);
+        const allPractices = MENTAL_PHASES.flatMap((p, idx) => p.practice.map(pr => ({ text: pr, phaseId: p.id, icon: phaseIcons[idx] })));
+        const dailyPractice = allPractices[dayOfYear % allPractices.length];
+        const practiceKey = Utils.dateStr();
+        const isPracticeDone = mentalData.dailyPractice?.[practiceKey] === true;
+
+        const phaseCards = MENTAL_PHASES.map((p, idx) => {
+            const icon = phaseIcons[idx];
+            const isCompleted = mentalData.completedPhases?.includes(p.id);
+            const isToday = idx === todayPhaseIndex;
+
+            return `
+                <div class="group relative bg-gradient-to-br ${isToday ? 'from-purple-900/40 to-gray-900' : 'from-gray-900 to-gray-800'}
+                    border-2 ${isToday ? 'border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.2)]' : isCompleted ? 'border-neon-green/50' : 'border-gray-700'}
+                    rounded-2xl p-5 transition-all hover:border-neon-purple/80 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] cursor-pointer"
+                    onclick="Actions.showPhase(${p.id})">
+                    ${isToday ? '<div class="absolute -top-2 -right-2 bg-neon-purple text-black text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">BUGÜN</div>' : ''}
+                    ${isCompleted ? '<div class="absolute top-3 right-3 text-neon-green text-lg">✓</div>' : ''}
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 border border-purple-500/30
+                            flex items-center justify-center text-3xl ${isToday ? 'animate-pulse' : ''}
+                            group-hover:scale-110 transition-transform">
+                            ${icon}
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-[10px] text-purple-400 font-mono mb-1">FAZ ${p.id}</div>
+                            <div class="font-bold text-white text-base group-hover:text-purple-200 transition">${p.title.replace(/FAZ \d+: /, '')}</div>
+                            <div class="text-xs text-gray-400 mt-2 leading-relaxed">${p.desc}</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-700/50 flex justify-between items-center">
+                        <div class="text-[10px] text-gray-500">
+                            <i class="fas fa-list-check mr-1"></i>${p.strategy.length} Strateji • ${p.practice.length} Pratik
+                        </div>
+                        <div class="text-neon-purple text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                            DETAY <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="animate-slide-up space-y-6">
+                <!-- Header -->
+                <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                            <i class="fas fa-brain text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-header font-bold text-white text-xl">ZİHİNSEL SAVAŞ</h2>
+                            <div class="text-xs text-gray-500">Mental Hardening Protokolü v8.0.0</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold ${progressPercent === 100 ? 'text-neon-green' : 'text-neon-purple'}">${progressPercent}%</div>
+                        <div class="text-[10px] text-gray-500">${completedCount}/8 Faz</div>
+                    </div>
+                </div>
+
+                <!-- Günün Fazı Spotlight -->
+                <div class="bg-gradient-to-r from-purple-900/30 via-gray-900 to-pink-900/30 rounded-2xl p-6 border border-purple-500/30 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
+                    <div class="relative z-10">
+                        <div class="text-[10px] text-purple-400 font-bold tracking-widest mb-3">
+                            <i class="fas fa-star mr-1"></i>GÜNÜN FAZI
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-5xl">${phaseIcons[todayPhaseIndex]}</div>
+                            <div>
+                                <div class="text-xl font-bold text-white">${todayPhase.title}</div>
+                                <div class="text-sm text-gray-400 mt-1">${todayPhase.desc}</div>
+                            </div>
+                        </div>
+                        <button onclick="Actions.showPhase(${todayPhase.id})"
+                            class="mt-4 px-4 py-2 bg-purple-600/20 border border-purple-500/50 rounded-lg text-purple-300 text-sm font-bold hover:bg-purple-600/40 transition">
+                            <i class="fas fa-book-open mr-2"></i>Fazı İncele
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Günlük Pratik -->
+                <div class="bg-gray-900 rounded-xl p-5 border ${isPracticeDone ? 'border-neon-green' : 'border-gray-700'}">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="text-[10px] text-gray-500 font-bold tracking-widest">
+                            <i class="fas fa-bolt text-neon-yellow mr-1"></i>GÜNLÜK PRATİK
+                        </div>
+                        ${isPracticeDone ? '<span class="text-neon-green text-xs font-bold">✓ TAMAMLANDI</span>' : ''}
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="text-2xl">${dailyPractice.icon}</div>
+                        <div class="flex-1">
+                            <div class="text-sm text-gray-300 leading-relaxed">${dailyPractice.text}</div>
+                            <div class="text-[10px] text-gray-600 mt-2">Faz ${dailyPractice.phaseId}</div>
+                        </div>
+                    </div>
+                    ${!isPracticeDone ? `
+                        <button onclick="Actions.completeDailyPractice()"
+                            class="mt-4 w-full py-3 bg-neon-green/10 border-2 border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black transition-all">
+                            <i class="fas fa-check mr-2"></i>Bunu Yaptım!
+                        </button>
+                    ` : ''}
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="bg-gray-800/50 rounded-full h-3 overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-purple-600 to-pink-500 transition-all duration-500"
+                        style="width: ${progressPercent}%"></div>
+                </div>
+
+                <!-- Faz Kartları Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${phaseCards}
+                </div>
+            </div>
+        `;
+    }
+})(window);

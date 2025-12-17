@@ -644,39 +644,39 @@
 
 <body class="text-base">
 
-    <!-- NAV -->
-    <nav class="fixed top-0 w-full bg-gunmetal/80 backdrop-blur-md z-40 border-b border-white/5 h-20">
-        <div class="container mx-auto h-full px-6 flex justify-between items-center max-w-7xl">
-            <div class="flex items-center gap-4">
-                <i class="fas fa-biohazard text-neon-green text-2xl"></i>
-                <div>
-                    <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v8.2.0</span></h1>
-                    <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
-                    </div>
-                </div>
-            </div>
-            <div class="flex items-center gap-6">
-                <div id="clock-display" class="hidden md:block font-mono text-text-muted font-bold text-sm">--:--:--
-                </div>
-                <button onclick="Actions.openSettings()" id="btn-settings"
-                    class="bg-gray-800 text-gray-400 px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition">
-                    <i class="fas fa-cog"></i>
-                </button>
-                <button onclick="Actions.toggleOverride()" id="btn-override"
-                    class="bg-neon-red/10 text-neon-red px-4 py-2 rounded-lg hover:bg-neon-red hover:text-white transition text-xs font-bold tracking-widest">
-                    <i class="fas fa-power-off mr-2"></i> OVERRIDE
-                </button>
-            </div>
-        </div>
-    </nav>
-
     <!-- MAIN -->
-    <main class="container mx-auto mt-24 px-6 pb-24 max-w-7xl">
-        <div class="flex justify-center overflow-x-auto mb-8 gap-3 border-b border-white/5 pb-2 scrollbar-hide"
-            id="nav-tabs"></div>
-        <div id="view-container" class="min-h-[60vh] animate-slide-up"></div>
+    <main class="container mx-auto pt-6 px-4 pb-24 max-w-7xl">
+        <div id="view-container" class="min-h-[calc(100vh-120px)]"></div>
     </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav id="nav-tabs" class="fixed bottom-0 left-0 w-full bg-surface-card border-t border-gray-800/50 flex justify-around items-center h-20">
+        <button onclick="App.renderTab('training')" id="tab-training" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-dumbbell text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">ANTRENMAN</span>
+        </button>
+        <button onclick="App.renderTab('nutrition')" id="tab-nutrition" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-utensils text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">BESLENME</span>
+        </button>
+        <button onclick="App.renderTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center justify-center text-white transition-colors w-full h-full scale-110">
+            <div class="w-16 h-16 rounded-full bg-neon-green flex items-center justify-center border-4 border-gunmetal shadow-[0_0_20px_rgba(0,255,65,0.4)]">
+                <i class="fas fa-shield-halved text-2xl text-black"></i>
+            </div>
+        </button>
+        <button onclick="App.renderTab('progress')" id="tab-progress" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-chart-line text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">GELİŞİM</span>
+        </button>
+        <button onclick="App.renderTab('anatomy')" id="tab-anatomy" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-dna text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">ANATOMİ LAB</span>
+        </button>
+        <button onclick="App.renderTab('mental')" id="tab-mental" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-brain text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">ZİHİNSEL</span>
+        </button>
+    </nav>
 
     <!-- MODAL -->
     <div id="universal-modal"
@@ -2615,27 +2615,44 @@ console.log('[Stealth] Module loaded');
 // ============================================
 // renderers/dashboard.js
 // ============================================
-// renderers/dashboard.js - Main Renderers Namespace
-// Contains: dashboard, training, nutrition, progress, anatomy, mental
-// Extracted from original index.html lines 2257-2993
+(function(window) {
+    'use strict';
 
-// Using window. for global scope access
-const Renderers = window.Renderers = {
-    async dashboard() {
+    if (typeof window.Renderers === 'undefined') {
+        window.Renderers = {};
+    }
+
+    function protocolItem(title, value, progress, icon, isDone) {
+        const colorClass = isDone ? 'text-neon-green' : 'text-gray-500';
+        const bgClass = isDone ? 'bg-neon-green' : 'bg-gray-700';
+        return `
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gray-900/50 flex items-center justify-center ${colorClass}">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-white">${title}</span>
+                        <span class="text-xs font-mono ${colorClass}">${value}</span>
+                    </div>
+                    <div class="w-full bg-gray-800 h-1 mt-1 rounded-full overflow-hidden">
+                        <div class="h-full ${bgClass} transition-all" style="width: ${progress}%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    Renderers.dashboard = async function() {
         const today = Utils.dateStr();
-
-        // 1. DATA GATHERING
         const currentWeight = Store.state.weight;
         const startWeight = CONFIG.TARGETS.START;
         const goalWeight = CONFIG.TARGETS.GOAL;
         const weightProgress = Math.min(100, Math.max(0, ((currentWeight - startWeight) / (goalWeight - startWeight)) * 100));
 
-        const streak = await Store.getStreak();
         const workoutData = await Store.getWorkout(today);
         const mealsData = await Store.getMeals(today);
         const sleepHours = await Store.getSleep(today);
-        const water = await Store.getWater(today);
-        const fuelDone = Store.state.fuelDate === today;
 
         const dayIdx = new Date().getDay();
         const dailyPlan = WEEKLY_PLAN[dayIdx];
@@ -2647,185 +2664,99 @@ const Renderers = window.Renderers = {
         const targetProtein = CONFIG.TARGETS.PROT;
         const targetCal = CONFIG.TARGETS.CAL;
 
+        const remainingCal = Math.max(0, targetCal - totalCal);
+        const remainingProt = Math.max(0, Math.round(targetProtein - totalProtein));
+
         const isTrainingDone = totalTasks > 0 && completedTasks >= totalTasks;
-        const isProteinDone = totalProtein >= targetProtein;
+        const isNutritionDone = totalCal >= targetCal;
         const isSleepDone = sleepHours >= 7;
 
-        const heatmapHTML = await this.getHeatmapHTML();
+        const trainingProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+        const nutritionProgress = targetCal > 0 ? (Math.min(totalCal, targetCal) / targetCal) * 100 : 0;
+        const sleepProgress = (Math.min(sleepHours, 7) / 7) * 100;
 
-        // 2. RENDER HTML (Hybrid Card Architecture)
         return `
-            <div class="animate-slide-up space-y-6">
-                <!-- TOP ROW: SYSTEM INTEGRITY & STREAK -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="animate-slide-up space-y-4 p-4" id="dashboard-content">
+            <div class="flex justify-between items-center px-2">
+                <h1 class="text-lg font-bold text-white font-header tracking-widest">SISTEM RAPORU</h1>
+                <button onclick="App.renderTab('dashboard')" class="text-gray-500 hover:text-white transition">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
 
-                    <!-- 1. SYSTEM INTEGRITY (Circular Progress) -->
-                    <div class="${THEME.card} relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
-                        <div class="absolute inset-0 bg-gradient-to-b from-neon-green/5 to-transparent"></div>
-                        <div class="${THEME.label} z-10 w-full text-center">SYSTEM INTEGRITY</div>
-
-                        <div class="relative z-10">
-                            <svg viewBox="0 0 36 36" class="circular-chart w-48 h-48">
-                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#1a1a22" />
-                                <path class="circle" stroke="${weightProgress >= 100 ? '#00ff41' : '#00f3ff'}" stroke-dasharray="${weightProgress}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <div class="text-4xl font-black text-white font-mono tracking-tighter">${currentWeight}<span class="text-lg text-gray-500">kg</span></div>
-                                <div class="text-[10px] text-neon-blue mt-1 font-mono">GOAL: ${goalWeight}</div>
-                            </div>
-                        </div>
-
-                        <button onclick="Actions.openWeightModal()" class="mt-6 z-10 text-[10px] border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-3 py-1 rounded transition-colors uppercase tracking-wider">
-                            [ UPDATE SENSOR ]
-                        </button>
-                    </div>
-
-                    <!-- 2. UPTIME HISTORY (Streak + Heatmap) -->
-                    <div class="${THEME.card} flex flex-col justify-between min-h-[200px]">
-                        <div>
-                            <div class="${THEME.label}">UPTIME STREAK</div>
-                            <div class="flex items-baseline gap-2 mb-4">
-                                <div class="text-5xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${streak}</div>
-                                <div class="text-xs text-text-muted uppercase tracking-wider">GÜN</div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-end">
-                                <div class="text-[9px] text-gray-500 font-bold">SON 28 GÜN</div>
-                                <div class="text-[9px] text-neon-green font-bold">CONSISTENCY</div>
-                            </div>
-                            <div class="heatmap-grid bg-black/20 p-2 rounded border border-gray-800">
-                                ${heatmapHTML}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. DAILY PROTOCOL STATUS -->
-                    <div class="${THEME.card}">
-                        <div class="${THEME.label}">DAILY PROTOCOL</div>
-                        <div class="space-y-4 mt-2">
-                            <!-- Training -->
-                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isTrainingDone ? 'border-neon-green' : 'border-neon-red'}">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs font-bold text-gray-300">ANTRENMAN</span>
-                                    ${isTrainingDone ? '<i class="fas fa-check text-neon-green"></i>' : '<i class="fas fa-times text-neon-red"></i>'}
-                                </div>
-                                <div class="text-[10px] text-gray-500 font-mono">${completedTasks}/${totalTasks} Görev</div>
-                            </div>
-
-                            <!-- Nutrition -->
-                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isProteinDone ? 'border-neon-green' : 'border-accent-orange'}">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs font-bold text-gray-300">PROTEİN</span>
-                                    ${isProteinDone ? '<i class="fas fa-check text-neon-green"></i>' : '<span class="text-accent-orange text-[10px] font-bold">EKSİK</span>'}
-                                </div>
-                                <div class="text-[10px] text-gray-500 font-mono">${Math.round(totalProtein)} / ${targetProtein}g</div>
-                            </div>
-
-                            <!-- Sleep -->
-                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'}">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs font-bold text-gray-300">UYKU</span>
-                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${sleepHours} Saat</span>
-                                </div>
-                            </div>
-                        </div>
+            <div class="bg-surface-card rounded-lg flex flex-col items-center justify-center p-6 border border-gray-800">
+                <div class="relative">
+                    <svg viewBox="0 0 36 36" class="circular-chart w-40 h-40">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#1a1a22" stroke-width="2.5" />
+                        <path class="circle" stroke="${weightProgress >= 100 ? '#00ff41' : '#00f3ff'}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="${weightProgress}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <div class="text-4xl font-black text-white font-mono tracking-tighter">${currentWeight}<span class="text-base text-gray-500">kg</span></div>
+                        <div class="text-[10px] text-neon-blue mt-1 font-mono">HEDEF: ${goalWeight}KG</div>
                     </div>
                 </div>
+                <button onclick="Actions.openWeightModal()" class="mt-4 text-xs border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-4 py-2 rounded-lg transition-colors uppercase tracking-wider">
+                    GÜNCELLE
+                </button>
+            </div>
 
-                <!-- MIDDLE ROW: RESTORED TRACKERS (Water & Fuel) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- HYDRATION MONITOR -->
-                    <div class="${THEME.card}">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="${THEME.label}">HYDRATION LEVEL</div>
-                            <i class="fas fa-tint text-neon-blue"></i>
-                        </div>
-                        <div class="flex items-end justify-between">
-                            <div>
-                                <div class="text-4xl font-bold ${water >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">
-                                    ${water} <span class="text-lg text-gray-500">/ ${CONFIG.TARGETS.WATER}</span>
-                                </div>
-                                <div class="w-32 bg-gray-800 h-1 mt-2 rounded-full overflow-hidden">
-                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (water/CONFIG.TARGETS.WATER)*100)}%"></div>
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="Actions.addWater(-1)" class="w-10 h-10 rounded border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition flex items-center justify-center font-bold text-lg">-</button>
-                                <button onclick="Actions.addWater(1)" class="w-10 h-10 rounded bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black transition flex items-center justify-center font-bold text-lg">+</button>
-                            </div>
-                        </div>
+            <div class="bg-surface-card rounded-lg p-4 border border-gray-800">
+                <h2 class="text-xs font-bold text-gray-500 mb-3 tracking-widest px-2">GÜNLÜK PROTOKOL</h2>
+                <div class="space-y-3">
+                    ${protocolItem('ANTRENMAN', `${completedTasks}/${totalTasks} GÖREV`, trainingProgress, 'fa-dumbbell', isTrainingDone)}
+                    ${protocolItem('BESLENME', `${Math.round(totalCal)}/${targetCal} KCAL`, nutritionProgress, 'fa-utensils', isNutritionDone)}
+                    ${protocolItem('UYKU', `${sleepHours} SAAT`, sleepProgress, 'fa-bed', isSleepDone)}
+                </div>
+            </div>
+
+            <div class="bg-surface-card rounded-lg p-4 border border-gray-800">
+                <h2 class="text-xs font-bold text-gray-500 mb-4 tracking-widest px-2">KALAN</h2>
+                <div class="flex justify-around">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold font-mono text-accent-orange">${remainingCal}</div>
+                        <div class="text-[10px] text-gray-500 mt-1">KCAL</div>
                     </div>
-
-                    <!-- FUEL & ENERGY -->
-                    <div class="${THEME.card} ${!fuelDone ? 'border-neon-red/30' : ''}">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="${THEME.label}">FUEL & ENERGY</div>
-                            <i class="fas fa-gas-pump ${!fuelDone ? 'text-neon-red animate-pulse' : 'text-neon-green'}"></i>
-                        </div>
-
-                        <!-- Calorie Tracker -->
-                        <div class="mb-4">
-                            <div class="flex justify-between items-end mb-1">
-                                <span class="text-xs text-gray-400 font-bold">ENERGY LEVEL</span>
-                                <span class="text-white font-bold text-sm font-mono">${totalCal} / ${targetCal} kcal</span>
-                            </div>
-                            <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                                <div class="h-full ${totalCal >= targetCal ? 'bg-neon-green' : 'bg-accent-orange'} transition-all" style="width: ${Math.min(100, (totalCal/targetCal)*100)}%"></div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="text-xl font-bold text-white">GAINER SHAKE</div>
-                                <div class="text-[10px] text-gray-500 mt-1">Süt + Yulaf + Fıstık + Muz</div>
-                            </div>
-                            <button onclick="Actions.injectFuel()" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all tracking-wider ${fuelDone ? 'bg-neon-green text-black' : 'bg-neon-red text-white hover:bg-red-600'}">
-                                ${fuelDone ? 'INJECTED' : 'INJECT NOW'}
-                            </button>
-                        </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold font-mono text-neon-blue">${remainingProt}</div>
+                        <div class="text-[10px] text-gray-500 mt-1">PROTEİN</div>
                     </div>
                 </div>
+            </div>
 
-                <!-- BOTTOM: SYSTEM CHECK -->
-                <div class="grid grid-cols-1">
-                    <button onclick="Actions.completeDailyMission()" class="${THEME.card} group hover:border-neon-green/50 flex items-center justify-center p-4 cursor-pointer transition-all hover:bg-neon-green/5">
-                        <i class="fas fa-check-circle text-2xl text-gray-600 group-hover:text-neon-green transition-colors mr-4"></i>
-                        <div class="text-center">
-                            <div class="text-white font-bold text-sm tracking-widest">SYSTEM CHECK: COMPLETE DAY</div>
-                            <div class="text-[10px] text-gray-500 font-mono">ALL TASKS DONE</div>
-                        </div>
+            <div class="bg-surface-card rounded-lg p-4 border border-gray-800">
+                 <h2 class="text-xs font-bold text-gray-500 mb-3 tracking-widest px-2">HIZLI EYLEMLER</h2>
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="Actions.addWater(1)" class="bg-gray-800 rounded-lg flex flex-col items-center justify-center p-3 space-y-2 hover:bg-gray-700 transition">
+                        <i class="fas fa-tint text-2xl text-neon-blue"></i>
+                        <span class="text-xs font-bold text-gray-300">SU İÇ</span>
+                    </button>
+                    <button onclick="Actions.openMealModal()" class="bg-gray-800 rounded-lg flex flex-col items-center justify-center p-3 space-y-2 hover:bg-gray-700 transition">
+                        <i class="fas fa-gas-pump text-2xl text-accent-orange"></i>
+                        <span class="text-xs font-bold text-gray-300">YAKIT İKMALİ</span>
+                    </button>
+                    <button onclick="Actions.completeDailyMission()" class="bg-gray-800 rounded-lg flex flex-col items-center justify-center p-3 space-y-2 hover:bg-gray-700 transition">
+                        <i class="fas fa-check-circle text-2xl text-neon-green"></i>
+                        <span class="text-xs font-bold text-gray-300">GÜNÜ BİTİR</span>
                     </button>
                 </div>
             </div>
+        </div>
         `;
-    },
+    };
+})(window);
 
-    async getHeatmapHTML() {
-        let html = '';
-        const today = new Date();
-        // 28 days (4 rows of 7)
-        for (let i = 27; i >= 0; i--) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i);
-            const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
 
-            const workout = await Store.getWorkout(dateStr);
+// ============================================
+// renderers/training.js
+// ============================================
+(function(window) {
+    'use strict';
 
-            let level = 0;
-            if (workout.length > 0) level = 2; // Simple: Workout = Green
+    if (typeof window.Renderers === 'undefined') {
+        window.Renderers = {};
+    }
 
-            // Checking if date is future
-            const isFuture = d > new Date();
-            const colorClass = isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${Math.min(3, level + 1)}`;
-
-            html += `<div class="heatmap-cell ${colorClass}" title="${dateStr}"></div>`;
-        }
-        return html;
-    },
-
-    async training() {
+    Renderers.training = async function() {
         const day = new Date().getDay();
         const plan = WEEKLY_PLAN[day];
         const done = await Store.getWorkout(Utils.dateStr());
@@ -2912,9 +2843,21 @@ const Renderers = window.Renderers = {
         }).join('')}
             </div>
         </div>`;
-    },
+    }
+})(window);
 
-    async nutrition() {
+
+// ============================================
+// renderers/nutrition.js
+// ============================================
+(function(window) {
+    'use strict';
+
+    if (typeof window.Renderers === 'undefined') {
+        window.Renderers = {};
+    }
+
+    Renderers.nutrition = async function() {
         const meals = await Store.getMeals(Utils.dateStr());
         let t = { c: 0, p: 0, carb: 0, f: 0 };
 
@@ -3045,9 +2988,21 @@ const Renderers = window.Renderers = {
                 </div>
             </div>
         </div>`;
-    },
+    }
+})(window);
 
-    async progress() {
+
+// ============================================
+// renderers/progress.js
+// ============================================
+(function(window) {
+    'use strict';
+
+    if (typeof window.Renderers === 'undefined') {
+        window.Renderers = {};
+    }
+
+    Renderers.progress = async function() {
         const hist = await Store.getHistory();
         const statsData = await Store.getStats();
         const volStats = await Store.getVolumeStats();
@@ -3180,9 +3135,21 @@ const Renderers = window.Renderers = {
                 </div>
             </div>
         </div>`;
-    },
+    }
+})(window);
 
-    async anatomy() {
+
+// ============================================
+// renderers/anatomy.js
+// ============================================
+(function(window) {
+    'use strict';
+
+    if (typeof window.Renderers === 'undefined') {
+        window.Renderers = {};
+    }
+
+    Renderers.anatomy = async function() {
         const view = UI.activeView;
         const isSanitized = typeof Stealth !== 'undefined' && Stealth.active;
 
@@ -3217,9 +3184,21 @@ const Renderers = window.Renderers = {
         }
 
         return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button onclick="Actions.setAnatomyView('front')" class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ÖN</button><button onclick="Actions.setAnatomyView('back')" class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${displaySystem}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">GÖREV</div><div class="text-base text-gray-200">${displayFunction || 'Güç ve stabilizasyon.'}</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p></div>'}</div></div>`;
-    },
+    }
+})(window);
 
-    async mental() {
+
+// ============================================
+// renderers/mental.js
+// ============================================
+(function(window) {
+    'use strict';
+
+    if (typeof window.Renderers === 'undefined') {
+        window.Renderers = {};
+    }
+
+    Renderers.mental = async function() {
         const phaseIcons = ['🐆', '🎭', '🤖', '🔧', '⚡', '🎯', '🍀', '🔄'];
         const mentalData = await Utils.storage.get(CONFIG.KEYS.MENTAL_PROGRESS) || { completedPhases: [], dailyPractice: {}, lastPracticeDate: null };
         const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
@@ -3344,39 +3323,7 @@ const Renderers = window.Renderers = {
             </div>
         `;
     }
-};
-
-console.log('[Renderers] All tab renderers loaded');
-
-
-// ============================================
-// renderers/training.js
-// ============================================
-// Empty - Renderers consolidated into dashboard.js
-
-
-// ============================================
-// renderers/nutrition.js
-// ============================================
-// Empty - Renderers consolidated into dashboard.js
-
-
-// ============================================
-// renderers/progress.js
-// ============================================
-// Empty - Renderers consolidated into dashboard.js
-
-
-// ============================================
-// renderers/anatomy.js
-// ============================================
-// Empty - Renderers consolidated into dashboard.js
-
-
-// ============================================
-// renderers/mental.js
-// ============================================
-// Empty - Renderers consolidated into dashboard.js
+})(window);
 
 
 // ============================================
@@ -4271,13 +4218,62 @@ console.log('[Actions] Event handlers loaded');
 // app.js - Application Bootstrap / Init
 // Extracted from original index.html lines 3976-4004
 
-(async function () {
-    console.log("SYSTEM BOOT...");
-    await Store.init();
-    await UI.init();
+// App Namespace
+const App = {
+    async init() {
+        console.log("SYSTEM BOOT...");
+        await Store.init();
 
-    // v8.1.0: Stealth/Sanitize Mode
-    if (typeof Stealth !== 'undefined') Stealth.init();
+        // Initial render
+        await this.renderTab(Store.state.activeTab || 'dashboard');
+
+        // v8.1.0: Stealth/Sanitize Mode
+        if (typeof Stealth !== 'undefined') Stealth.init();
+
+        // Auto Backup Reminder
+        const backupStatus = await Store.checkBackupStatus();
+        if (backupStatus !== 'OK') {
+            setTimeout(() => {
+                const msg = backupStatus === 'NEVER' ? "Verilerinizi yedeklemeniz önerilir." : "⚠️ Yedekleme zamanı geldi! (>7 Gün)";
+                const type = backupStatus === 'NEVER' ? "warning" : "error";
+                UI.showToast(msg, type);
+            }, 3000);
+        }
+    },
+
+    async renderTab(tabName, force = false) {
+        if (!force && Store.state.activeTab === tabName) {
+            console.log(`Tab ${tabName} is already active.`);
+            return;
+        }
+
+        Store.state.activeTab = tabName;
+        const view = document.getElementById('view-container');
+        view.innerHTML = '<div class="flex justify-center items-center h-full"><i class="fas fa-spinner fa-spin text-4xl text-neon-green"></i></div>';
+
+        // Update tab UI
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            const isDashboardButton = btn.id === 'tab-dashboard';
+            const isActive = btn.id === `tab-${tabName}`;
+
+            btn.classList.toggle('active-tab', isActive);
+
+            if (!isDashboardButton) {
+                btn.classList.toggle('text-neon-green', isActive);
+                btn.classList.toggle('text-gray-500', !isActive);
+            }
+        });
+
+        if (Renderers[tabName]) {
+            view.innerHTML = await Renderers[tabName]();
+        } else {
+            view.innerHTML = `<p class="text-neon-red">Error: Renderer for ${tabName} not found.</p>`;
+        }
+    }
+};
+
+(async function () {
+    await App.init();
 
     // --- v6.3.0: EVENT DELEGATION ---
     document.getElementById('view-container').addEventListener('click', async (e) => {

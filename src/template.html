@@ -644,39 +644,39 @@
 
 <body class="text-base">
 
-    <!-- NAV -->
-    <nav class="fixed top-0 w-full bg-gunmetal/80 backdrop-blur-md z-40 border-b border-white/5 h-20">
-        <div class="container mx-auto h-full px-6 flex justify-between items-center max-w-7xl">
-            <div class="flex items-center gap-4">
-                <i class="fas fa-biohazard text-neon-green text-2xl"></i>
-                <div>
-                    <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v8.2.0</span></h1>
-                    <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
-                    </div>
-                </div>
-            </div>
-            <div class="flex items-center gap-6">
-                <div id="clock-display" class="hidden md:block font-mono text-text-muted font-bold text-sm">--:--:--
-                </div>
-                <button onclick="Actions.openSettings()" id="btn-settings"
-                    class="bg-gray-800 text-gray-400 px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition">
-                    <i class="fas fa-cog"></i>
-                </button>
-                <button onclick="Actions.toggleOverride()" id="btn-override"
-                    class="bg-neon-red/10 text-neon-red px-4 py-2 rounded-lg hover:bg-neon-red hover:text-white transition text-xs font-bold tracking-widest">
-                    <i class="fas fa-power-off mr-2"></i> OVERRIDE
-                </button>
-            </div>
-        </div>
-    </nav>
-
     <!-- MAIN -->
-    <main class="container mx-auto mt-24 px-6 pb-24 max-w-7xl">
-        <div class="flex justify-center overflow-x-auto mb-8 gap-3 border-b border-white/5 pb-2 scrollbar-hide"
-            id="nav-tabs"></div>
-        <div id="view-container" class="min-h-[60vh] animate-slide-up"></div>
+    <main class="container mx-auto pt-6 px-4 pb-24 max-w-7xl">
+        <div id="view-container" class="min-h-[calc(100vh-120px)]"></div>
     </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav id="nav-tabs" class="fixed bottom-0 left-0 w-full bg-surface-card border-t border-gray-800/50 flex justify-around items-center h-20">
+        <button onclick="App.renderTab('training')" id="tab-training" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-dumbbell text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">ANTRENMAN</span>
+        </button>
+        <button onclick="App.renderTab('nutrition')" id="tab-nutrition" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-utensils text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">BESLENME</span>
+        </button>
+        <button onclick="App.renderTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center justify-center text-white transition-colors w-full h-full scale-110">
+            <div class="w-16 h-16 rounded-full bg-neon-green flex items-center justify-center border-4 border-gunmetal shadow-[0_0_20px_rgba(0,255,65,0.4)]">
+                <i class="fas fa-shield-halved text-2xl text-black"></i>
+            </div>
+        </button>
+        <button onclick="App.renderTab('progress')" id="tab-progress" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-chart-line text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">GELİŞİM</span>
+        </button>
+        <button onclick="App.renderTab('anatomy')" id="tab-anatomy" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-dna text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">ANATOMİ LAB</span>
+        </button>
+        <button onclick="App.renderTab('mental')" id="tab-mental" class="tab-btn flex flex-col items-center justify-center text-gray-500 hover:text-neon-green transition-colors w-full h-full">
+            <i class="fas fa-brain text-xl"></i>
+            <span class="text-[10px] font-bold mt-1">ZİHİNSEL</span>
+        </button>
+    </nav>
 
     <!-- MODAL -->
     <div id="universal-modal"
