@@ -17,6 +17,28 @@ const Store = window.Store = {
     _cache: {},
 
     /**
+     * Helper: Get value from cache or storage.
+     * @param {string} key - Storage key
+     * @param {any} [defaultValue=null] - Default value if not found
+     */
+    async _get(key, defaultValue = null) {
+        if (this._cache[key] !== undefined) return this._cache[key];
+        const val = await Utils.storage.get(key);
+        this._cache[key] = (val !== null && val !== undefined) ? val : defaultValue;
+        return this._cache[key];
+    },
+
+    /**
+     * Helper: Set value to cache and storage.
+     * @param {string} key - Storage key
+     * @param {any} val - Value to save
+     */
+    async _set(key, val) {
+        this._cache[key] = val;
+        await Utils.storage.set(key, val);
+    },
+
+    /**
      * v7.0.0: Cache'i temizle
      * @param {string} [key] - Belirli bir cache key, boşsa tümünü temizle
      */
@@ -30,13 +52,13 @@ const Store = window.Store = {
      * @async
      */
     async init() {
-        const w = await Utils.storage.get(CONFIG.KEYS.WEIGHT);
+        const w = await this._get(CONFIG.KEYS.WEIGHT);
         if (w) this.state.weight = parseFloat(w);
-        this.state.fuelDate = await Utils.storage.get(CONFIG.KEYS.FUEL);
-        this.state.customFoods = await Utils.storage.get(CONFIG.KEYS.CUSTOM_FOODS) || [];
+        this.state.fuelDate = await this._get(CONFIG.KEYS.FUEL);
+        this.state.customFoods = await this._get(CONFIG.KEYS.CUSTOM_FOODS, []);
 
         const today = Utils.dateStr();
-        const savedPlan = await Utils.storage.get(CONFIG.KEYS.DAILY_PLAN);
+        const savedPlan = await this._get(CONFIG.KEYS.DAILY_PLAN);
 
         if (savedPlan && savedPlan.date === today) {
             this.state.dailyPlan = savedPlan.plan;
@@ -59,7 +81,7 @@ const Store = window.Store = {
             night: Utils.getRandomMeal('night')
         };
         this.state.dailyPlan = plan;
-        await Utils.storage.set(CONFIG.KEYS.DAILY_PLAN, { date: Utils.dateStr(), plan: plan });
+        await this._set(CONFIG.KEYS.DAILY_PLAN, { date: Utils.dateStr(), plan: plan });
     },
 
     /**
@@ -69,7 +91,7 @@ const Store = window.Store = {
      * @returns {Promise<string[]>} Tamamlanan görev ID'leri
      */
     async getWorkout(date) {
-        return await Utils.storage.get(CONFIG.KEYS.WORKOUT + date) || [];
+        return await this._get(CONFIG.KEYS.WORKOUT + date, []);
     },
 
     /**
@@ -81,7 +103,7 @@ const Store = window.Store = {
         const date = Utils.dateStr();
         let tasks = await this.getWorkout(date);
         tasks = tasks.includes(id) ? tasks.filter(t => t !== id) : [...tasks, id];
-        await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
+        await this._set(CONFIG.KEYS.WORKOUT + date, tasks);
         await this.updateStreak();
     },
 
@@ -92,10 +114,10 @@ const Store = window.Store = {
      */
     async saveWeight(w) {
         this.state.weight = parseFloat(w);
-        await Utils.storage.set(CONFIG.KEYS.WEIGHT, this.state.weight);
-        let hist = await Utils.storage.get(CONFIG.KEYS.WEIGHT_HISTORY) || {};
+        await this._set(CONFIG.KEYS.WEIGHT, this.state.weight);
+        let hist = await this._get(CONFIG.KEYS.WEIGHT_HISTORY, {});
         hist[Utils.dateStr()] = this.state.weight;
-        await Utils.storage.set(CONFIG.KEYS.WEIGHT_HISTORY, hist);
+        await this._set(CONFIG.KEYS.WEIGHT_HISTORY, hist);
         return true;
     },
 
@@ -105,7 +127,7 @@ const Store = window.Store = {
      */
     async saveFuel() {
         this.state.fuelDate = Utils.dateStr();
-        await Utils.storage.set(CONFIG.KEYS.FUEL, this.state.fuelDate);
+        await this._set(CONFIG.KEYS.FUEL, this.state.fuelDate);
     },
 
     /**
@@ -116,9 +138,9 @@ const Store = window.Store = {
     async addMeal(meal) {
         const date = Utils.dateStr();
         const key = CONFIG.KEYS.MEAL + date;
-        let meals = await Utils.storage.get(key) || [];
+        let meals = await this._get(key, []);
         meals.push(meal);
-        await Utils.storage.set(key, meals);
+        await this._set(key, meals);
     },
 
     /**
@@ -126,7 +148,7 @@ const Store = window.Store = {
      * @async
      */
     async getMeals(date) {
-        return await Utils.storage.get(CONFIG.KEYS.MEAL + date) || [];
+        return await this._get(CONFIG.KEYS.MEAL + date, []);
     },
 
     /**
@@ -136,10 +158,10 @@ const Store = window.Store = {
     async deleteMeal(index) {
         const date = Utils.dateStr();
         const key = CONFIG.KEYS.MEAL + date;
-        let meals = await Utils.storage.get(key) || [];
+        let meals = await this._get(key, []);
         if (index >= 0 && index < meals.length) {
             meals.splice(index, 1);
-            await Utils.storage.set(key, meals);
+            await this._set(key, meals);
             return true;
         }
         return false;
@@ -151,7 +173,7 @@ const Store = window.Store = {
      */
     async addCustomFood(food) {
         this.state.customFoods.push(food);
-        await Utils.storage.set(CONFIG.KEYS.CUSTOM_FOODS, this.state.customFoods);
+        await this._set(CONFIG.KEYS.CUSTOM_FOODS, this.state.customFoods);
     },
 
     /**
@@ -171,7 +193,7 @@ const Store = window.Store = {
      * @async
      */
     async getStats() {
-        const data = await Utils.storage.get(CONFIG.KEYS.MEASURE);
+        const data = await this._get(CONFIG.KEYS.MEASURE);
         if (!data) return { current: {}, history: [] };
         if (!data.current && !data.history) {
             return { current: data, history: [] };
@@ -206,7 +228,7 @@ const Store = window.Store = {
 
         existing.current = { ...s, savedAt: today };
         existing.history = history.slice(-30);
-        await Utils.storage.set(CONFIG.KEYS.MEASURE, existing);
+        await this._set(CONFIG.KEYS.MEASURE, existing);
     },
 
     /**
@@ -214,7 +236,7 @@ const Store = window.Store = {
      * @async
      */
     async getHistory() {
-        return await Utils.storage.get(CONFIG.KEYS.WEIGHT_HISTORY) || {};
+        return await this._get(CONFIG.KEYS.WEIGHT_HISTORY, {});
     },
 
     /**
@@ -222,7 +244,7 @@ const Store = window.Store = {
      * @async
      */
     async getStreak() {
-        const streakData = await Utils.storage.get(CONFIG.KEYS.STREAK) || { count: 0, lastDate: null };
+        const streakData = await this._get(CONFIG.KEYS.STREAK, { count: 0, lastDate: null });
         const today = Utils.dateStr();
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
@@ -244,7 +266,7 @@ const Store = window.Store = {
         const plan = WEEKLY_PLAN[day];
 
         if (workout.length >= Math.ceil(plan.tasks.length / 2)) {
-            let streakData = await Utils.storage.get(CONFIG.KEYS.STREAK) || { count: 0, lastDate: null };
+            let streakData = await this._get(CONFIG.KEYS.STREAK, { count: 0, lastDate: null });
 
             if (streakData.lastDate !== today) {
                 const yesterday = new Date();
@@ -257,7 +279,7 @@ const Store = window.Store = {
                     streakData.count = 1;
                 }
                 streakData.lastDate = today;
-                await Utils.storage.set(CONFIG.KEYS.STREAK, streakData);
+                await this._set(CONFIG.KEYS.STREAK, streakData);
             }
         }
     },
@@ -288,7 +310,7 @@ const Store = window.Store = {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        await Utils.storage.set(CONFIG.KEYS.BACKUP, Utils.dateStr());
+        await this._set(CONFIG.KEYS.BACKUP, Utils.dateStr());
         return true;
     },
 
@@ -304,7 +326,7 @@ const Store = window.Store = {
             }
             keysToRemove.forEach(k => localStorage.removeItem(k));
             for (const key in data) {
-                if (key !== 'meta') await Utils.storage.set(key, data[key]);
+                if (key !== 'meta') await this._set(key, data[key]);
             }
             return { success: true, date: data.meta.date };
         } catch (e) {
@@ -314,7 +336,7 @@ const Store = window.Store = {
     },
 
     async checkBackupStatus() {
-        const lastBackup = await Utils.storage.get(CONFIG.KEYS.BACKUP);
+        const lastBackup = await this._get(CONFIG.KEYS.BACKUP);
         if (!lastBackup) return 'NEVER';
         const today = new Date();
         const last = new Date(lastBackup.split('.').reverse().join('-'));
@@ -325,13 +347,13 @@ const Store = window.Store = {
 
     // --- ACTIVE TRAINING ENGINE ---
     async getWorkoutData(date) {
-        return await Utils.storage.get('monk_workout_data_' + date) || {};
+        return await this._get('monk_workout_data_' + date, {});
     },
 
     async logSet(taskId, setIndex, weight, reps, isDone) {
         const date = Utils.dateStr();
         const key = 'monk_workout_data_' + date;
-        const data = await Utils.storage.get(key) || {};
+        const data = await this._get(key, {});
         if (!data[taskId]) data[taskId] = [];
         const w = parseFloat(weight) || 0;
         const r = parseFloat(reps) || 0;
@@ -341,7 +363,7 @@ const Store = window.Store = {
             timestamp: new Date().toISOString(),
             completed: isDone
         };
-        await Utils.storage.set(key, data);
+        await this._set(key, data);
 
         if (isDone && w > 0 && r > 0) {
             await this.saveToExerciseHistory(taskId, w, r);
@@ -354,7 +376,7 @@ const Store = window.Store = {
 
     // --- Egzersiz Geçmişi Takibi ---
     async saveToExerciseHistory(exerciseId, weight, reps) {
-        const history = await Utils.storage.get(CONFIG.KEYS.EXERCISE_HISTORY) || {};
+        const history = await this._get(CONFIG.KEYS.EXERCISE_HISTORY, {});
         if (!history[exerciseId]) history[exerciseId] = [];
         history[exerciseId].push({
             date: Utils.dateStr(),
@@ -366,11 +388,11 @@ const Store = window.Store = {
         if (history[exerciseId].length > 100) {
             history[exerciseId] = history[exerciseId].slice(-100);
         }
-        await Utils.storage.set(CONFIG.KEYS.EXERCISE_HISTORY, history);
+        await this._set(CONFIG.KEYS.EXERCISE_HISTORY, history);
     },
 
     async getExerciseHistory(exerciseId) {
-        const history = await Utils.storage.get(CONFIG.KEYS.EXERCISE_HISTORY) || {};
+        const history = await this._get(CONFIG.KEYS.EXERCISE_HISTORY, {});
         return history[exerciseId] || [];
     },
 
@@ -397,7 +419,7 @@ const Store = window.Store = {
         } else {
             tasks = tasks.filter(t => t !== id);
         }
-        await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
+        await this._set(CONFIG.KEYS.WORKOUT + date, tasks);
         await this.updateStreak();
 
         const day = new Date().getDay();
@@ -470,23 +492,23 @@ const Store = window.Store = {
 
     // --- SLEEP TRACKING ---
     async getSleep(date) {
-        return await Utils.storage.get(CONFIG.KEYS.SLEEP + date) || 0;
+        return await this._get(CONFIG.KEYS.SLEEP + date, 0);
     },
     async setSleep(hours) {
         const date = Utils.dateStr();
-        await Utils.storage.set(CONFIG.KEYS.SLEEP + date, parseFloat(hours));
+        await this._set(CONFIG.KEYS.SLEEP + date, parseFloat(hours));
         this.clearCache('sleepStats');
         return true;
     },
 
     // --- WATER TRACKING ---
     async getWater(date) {
-        return await Utils.storage.get(CONFIG.KEYS.WATER + date) || 0;
+        return await this._get(CONFIG.KEYS.WATER + date, 0);
     },
     async addWater(cups = 1) {
         const date = Utils.dateStr();
         const current = await this.getWater(date);
-        await Utils.storage.set(CONFIG.KEYS.WATER + date, current + cups);
+        await this._set(CONFIG.KEYS.WATER + date, current + cups);
         this.clearCache('waterStats');
         return current + cups;
     },
