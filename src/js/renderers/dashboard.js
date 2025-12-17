@@ -8,16 +8,17 @@ const Renderers = window.Renderers = {
         const today = Utils.dateStr();
 
         // 1. DATA GATHERING
-        // Weight
         const currentWeight = Store.state.weight;
         const startWeight = CONFIG.TARGETS.START;
         const goalWeight = CONFIG.TARGETS.GOAL;
         const weightProgress = Math.min(100, Math.max(0, ((currentWeight - startWeight) / (goalWeight - startWeight)) * 100));
 
-        // Protocol Status
+        const streak = await Store.getStreak();
         const workoutData = await Store.getWorkout(today);
         const mealsData = await Store.getMeals(today);
         const sleepHours = await Store.getSleep(today);
+        const water = await Store.getWater(today);
+        const fuelDone = Store.state.fuelDate === today;
 
         const dayIdx = new Date().getDay();
         const dailyPlan = WEEKLY_PLAN[dayIdx];
@@ -31,100 +32,128 @@ const Renderers = window.Renderers = {
         const isProteinDone = totalProtein >= targetProtein;
         const isSleepDone = sleepHours >= 7;
 
-        // Heatmap Data (Last 28 days)
         const heatmapHTML = await this.getHeatmapHTML();
 
-        // 2. RENDER HTML
+        // 2. RENDER HTML (Hybrid Card Architecture)
         return `
-            <div class="animate-slide-up space-y-6 max-w-4xl mx-auto">
-                <!-- HEADER -->
-                <div class="flex justify-between items-end border-b border-gray-800 pb-2">
-                    <div>
-                        <div class="text-[10px] text-gray-500 tracking-[0.3em] font-bold">OPERATOR: MONK</div>
-                        <div class="text-xl font-bold text-white font-mono">SYSTEM INTEGRITY MONITOR</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-[10px] text-gray-500 tracking-[0.2em] font-bold">DATE</div>
-                        <div class="text-lg text-neon-green font-mono">${today}</div>
-                    </div>
-                </div>
+            <div class="animate-slide-up space-y-6">
+                <!-- TOP ROW: SYSTEM INTEGRITY & STREAK -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                    <!-- HERO: SYSTEM LOAD (Circular Progress) -->
-                    <div class="relative flex flex-col items-center justify-center py-6">
-                        <svg viewBox="0 0 36 36" class="circular-chart w-64 h-64">
-                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#1a1a22" />
-                            <path class="circle" stroke="${weightProgress >= 100 ? '#00ff41' : '#00f3ff'}" stroke-dasharray="${weightProgress}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <div class="text-[10px] text-gray-500 tracking-widest uppercase mb-1">System Mass</div>
-                            <div class="text-5xl font-black text-white font-mono tracking-tighter">${currentWeight}<span class="text-xl text-gray-500">kg</span></div>
-                            <div class="text-xs text-neon-blue mt-2 font-mono">TARGET: ${goalWeight}kg</div>
-                        </div>
+                    <!-- 1. SYSTEM INTEGRITY (Circular Progress) -->
+                    <div class="${THEME.card} relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
+                        <div class="absolute inset-0 bg-gradient-to-b from-neon-green/5 to-transparent"></div>
+                        <div class="${THEME.label} z-10 w-full text-center">SYSTEM INTEGRITY</div>
 
-                        <!-- Quick Weight Input -->
-                        <div class="mt-6 flex items-center gap-2">
-                            <button onclick="Actions.saveWeight(prompt('YENİ AĞIRLIK (KG):', '${currentWeight}'))" class="text-xs border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-3 py-1 rounded transition-colors uppercase tracking-wider">
-                                [ UPDATE SENSOR ]
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- STATUS PANEL & HEATMAP -->
-                    <div class="space-y-6">
-                        <!-- DAILY PROTOCOL -->
-                        <div class="sniper-panel rounded-lg p-5">
-                            <div class="text-[10px] text-gray-500 tracking-[0.2em] font-bold mb-4 border-b border-gray-800 pb-2">DAILY PROTOCOL</div>
-                            <div class="space-y-3 font-mono text-sm">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-400">PHYSICAL TRAINING</span>
-                                    ${isTrainingDone
-                                        ? '<span class="text-neon-green font-bold">[ COMPLETED ]</span>'
-                                        : `<span class="text-neon-red">[ PENDING ${completedTasks}/${totalTasks} ]</span>`}
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-400">PROTEIN INTAKE</span>
-                                    ${isProteinDone
-                                        ? '<span class="text-neon-green font-bold">[ COMPLETED ]</span>'
-                                        : `<span class="text-accent-orange">[ ${Math.round(totalProtein)}/${targetProtein}g ]</span>`}
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-400">SLEEP RECOVERY</span>
-                                    ${isSleepDone
-                                        ? '<span class="text-neon-green font-bold">[ OPTIMAL ]</span>'
-                                        : sleepHours > 0
-                                            ? `<span class="text-neon-yellow">[ ${sleepHours}h - LOW ]</span>`
-                                            : '<span class="text-gray-600">[ NO DATA ]</span>'}
-                                </div>
+                        <div class="relative z-10">
+                            <svg viewBox="0 0 36 36" class="circular-chart w-48 h-48">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke="#1a1a22" />
+                                <path class="circle" stroke="${weightProgress >= 100 ? '#00ff41' : '#00f3ff'}" stroke-dasharray="${weightProgress}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <div class="text-4xl font-black text-white font-mono tracking-tighter">${currentWeight}<span class="text-lg text-gray-500">kg</span></div>
+                                <div class="text-[10px] text-neon-blue mt-1 font-mono">GOAL: ${goalWeight}</div>
                             </div>
                         </div>
 
-                        <!-- UPTIME HEATMAP -->
-                        <div class="sniper-panel rounded-lg p-5">
-                            <div class="flex justify-between items-center mb-3">
-                                <div class="text-[10px] text-gray-500 tracking-[0.2em] font-bold">UPTIME HISTORY</div>
-                                <div class="text-[9px] text-gray-600">LAST 28 DAYS</div>
+                        <button onclick="Actions.saveWeight(prompt('YENİ AĞIRLIK (KG):', '${currentWeight}'))" class="mt-6 z-10 text-[10px] border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-3 py-1 rounded transition-colors uppercase tracking-wider">
+                            [ UPDATE SENSOR ]
+                        </button>
+                    </div>
+
+                    <!-- 2. UPTIME HISTORY (Streak + Heatmap) -->
+                    <div class="${THEME.card} flex flex-col justify-between">
+                        <div>
+                            <div class="${THEME.label}">UPTIME STREAK</div>
+                            <div class="flex items-baseline gap-2 mb-4">
+                                <div class="text-5xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${streak}</div>
+                                <div class="text-xs text-text-muted uppercase tracking-wider">GÜN</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-end">
+                                <div class="text-[9px] text-gray-500 font-bold">SON 28 GÜN</div>
+                                <div class="text-[9px] text-neon-green font-bold">CONSISTENCY</div>
                             </div>
                             <div class="heatmap-grid">
                                 ${heatmapHTML}
                             </div>
                         </div>
                     </div>
+
+                    <!-- 3. DAILY PROTOCOL STATUS -->
+                    <div class="${THEME.card}">
+                        <div class="${THEME.label}">DAILY PROTOCOL</div>
+                        <div class="space-y-4 mt-2">
+                            <!-- Training -->
+                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isTrainingDone ? 'border-neon-green' : 'border-neon-red'}">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-gray-300">ANTRENMAN</span>
+                                    ${isTrainingDone ? '<i class="fas fa-check text-neon-green"></i>' : '<i class="fas fa-times text-neon-red"></i>'}
+                                </div>
+                                <div class="text-[10px] text-gray-500 font-mono">${completedTasks}/${totalTasks} Görev</div>
+                            </div>
+
+                            <!-- Nutrition -->
+                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isProteinDone ? 'border-neon-green' : 'border-accent-orange'}">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-gray-300">PROTEİN</span>
+                                    ${isProteinDone ? '<i class="fas fa-check text-neon-green"></i>' : '<span class="text-accent-orange text-[10px] font-bold">EKSİK</span>'}
+                                </div>
+                                <div class="text-[10px] text-gray-500 font-mono">${Math.round(totalProtein)} / ${targetProtein}g</div>
+                            </div>
+
+                            <!-- Sleep -->
+                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'}">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-gray-300">UYKU</span>
+                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${sleepHours} Saat</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- TACTICAL ACTIONS (Bottom Bar) -->
-                <div class="grid grid-cols-3 gap-4 pt-4 border-t border-gray-800/50">
-                    <button onclick="Actions.addWater(2)" class="sniper-btn bg-gray-900 hover:bg-neon-blue/10 text-neon-blue py-4 rounded-lg font-bold text-sm tracking-wider">
-                        <i class="fas fa-tint mb-1 block text-lg"></i>
-                        HYDRATE
+                <!-- BOTTOM ROW: TACTICAL ACTIONS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button onclick="Actions.addWater(2)" class="${THEME.card} group hover:border-neon-blue/50 flex items-center justify-between p-4 cursor-pointer transition-all hover:-translate-y-1">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-neon-blue/10 flex items-center justify-center text-neon-blue group-hover:scale-110 transition-transform">
+                                <i class="fas fa-tint text-xl"></i>
+                            </div>
+                            <div class="text-left">
+                                <div class="text-white font-bold text-sm">HIZLI HİDRASYON</div>
+                                <div class="text-[10px] text-gray-500 font-mono">+500ML SU (2 Bardak)</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-plus text-gray-600 group-hover:text-neon-blue transition-colors"></i>
                     </button>
-                    <button onclick="Actions.injectFuel()" class="sniper-btn bg-gray-900 hover:bg-neon-red/10 text-neon-red py-4 rounded-lg font-bold text-sm tracking-wider">
-                        <i class="fas fa-gas-pump mb-1 block text-lg"></i>
-                        REFUEL
+
+                    <button onclick="Actions.injectFuel()" class="${THEME.card} group hover:border-neon-red/50 flex items-center justify-between p-4 cursor-pointer transition-all hover:-translate-y-1">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-neon-red/10 flex items-center justify-center text-neon-red group-hover:scale-110 transition-transform">
+                                <i class="fas fa-gas-pump text-xl"></i>
+                            </div>
+                            <div class="text-left">
+                                <div class="text-white font-bold text-sm">ACİL YAKIT</div>
+                                <div class="text-[10px] text-gray-500 font-mono">GAINER SHAKE LOG</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-bolt text-gray-600 group-hover:text-neon-red transition-colors"></i>
                     </button>
-                    <button onclick="Actions.completeDailyMission()" class="sniper-btn bg-gray-900 hover:bg-neon-green/10 text-neon-green py-4 rounded-lg font-bold text-sm tracking-wider">
-                        <i class="fas fa-check-circle mb-1 block text-lg"></i>
-                        SYS CHECK
+
+                    <button onclick="Actions.completeDailyMission()" class="${THEME.card} group hover:border-neon-green/50 flex items-center justify-between p-4 cursor-pointer transition-all hover:-translate-y-1">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-neon-green/10 flex items-center justify-center text-neon-green group-hover:scale-110 transition-transform">
+                                <i class="fas fa-check-circle text-xl"></i>
+                            </div>
+                            <div class="text-left">
+                                <div class="text-white font-bold text-sm">SİSTEM CHECK</div>
+                                <div class="text-[10px] text-gray-500 font-mono">GÜNÜ TAMAMLA</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-power-off text-gray-600 group-hover:text-neon-green transition-colors"></i>
                     </button>
                 </div>
             </div>
