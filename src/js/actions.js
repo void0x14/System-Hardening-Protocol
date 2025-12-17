@@ -232,7 +232,7 @@ const Actions = window.Actions = {
                     <div>
                         <input type="text" id="food-search" placeholder="Besin Ara (örn: Döner, Pilav)" class="${THEME.input} mb-2 border-neon-blue/30 text-sm" onkeyup="UI.filterFoodList()">
                         <select id="m-food" class="${THEME.input} custom-scrollbar" onchange="UI.renderPortionInputs()" size="5">
-                            ${foods.map((f, i) => `<option value="${i}">${f.name}</option>`).join('')}
+                            ${foods.map((f, i) => `<option value="${i}">${Utils.escapeHtml(f.name)}</option>`).join('')}
                         </select>
                     </div>
                     <div id="portion-container">
