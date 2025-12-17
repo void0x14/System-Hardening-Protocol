@@ -823,8 +823,46 @@ const Actions = window.Actions = {
         await Actions.switchTab('training');
     },
 
-    async completeDailyMission() {
-        if (!confirm("TÜM GÜNLÜK GÖREVLER TAMAMLANDI OLARAK İŞARETLENECEK. ONAYLIYOR MUSUN?")) return;
+    openWeightModal() {
+        const current = Store.state.weight;
+        UI.modal.open("SENSÖR KALİBRASYONU", `
+            <div class="space-y-4">
+                <div class="text-center">
+                    <div class="text-[10px] text-gray-500 mb-2 tracking-widest">MEVCUT SİSTEM YÜKÜ</div>
+                    <input type="number" id="modal-weight-input" value="${current}" step="0.1" class="${THEME.input} text-center text-4xl font-black text-white h-20 border-2 border-neon-blue focus:border-neon-green bg-black/50">
+                </div>
+                <button onclick="Actions.saveWeightFromModal()" class="${THEME.btn} w-full bg-neon-green text-black hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(0,255,65,0.3)]">
+                    <i class="fas fa-save mr-2"></i>VERİYİ İŞLE
+                </button>
+            </div>
+        `);
+        setTimeout(() => document.getElementById('modal-weight-input')?.focus(), 100);
+    },
+
+    async saveWeightFromModal() {
+        const val = document.getElementById('modal-weight-input').value;
+        await this.saveWeight(val);
+        UI.modal.close();
+    },
+
+    completeDailyMission() {
+        UI.modal.open("SİSTEM KONTROLÜ", `
+            <div class="text-center space-y-4">
+                <i class="fas fa-exclamation-triangle text-5xl text-neon-green animate-pulse"></i>
+                <div>
+                    <h3 class="text-white font-bold text-lg">GÜNLÜK RAPOR ONAYI</h3>
+                    <p class="text-gray-400 text-xs mt-2">Tüm günlük görevler (Antrenman, Beslenme vb.) 'TAMAMLANDI' olarak işaretlenecek.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <button onclick="UI.modal.close()" class="py-3 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition text-xs font-bold">İPTAL</button>
+                    <button onclick="Actions.confirmDailyMission()" class="py-3 rounded-lg bg-neon-green text-black font-bold hover:bg-white transition text-xs shadow-[0_0_15px_rgba(0,255,65,0.3)]">ONAYLA</button>
+                </div>
+            </div>
+        `);
+    },
+
+    async confirmDailyMission() {
+        UI.modal.close();
 
         const day = new Date().getDay();
         const plan = WEEKLY_PLAN[day];

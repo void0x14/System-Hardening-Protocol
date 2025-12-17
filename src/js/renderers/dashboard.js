@@ -26,7 +26,9 @@ const Renderers = window.Renderers = {
         const completedTasks = workoutData.length;
 
         const totalProtein = mealsData.reduce((sum, m) => sum + m.prot, 0);
+        const totalCal = mealsData.reduce((sum, m) => sum + m.cal, 0);
         const targetProtein = CONFIG.TARGETS.PROT;
+        const targetCal = CONFIG.TARGETS.CAL;
 
         const isTrainingDone = totalTasks > 0 && completedTasks >= totalTasks;
         const isProteinDone = totalProtein >= targetProtein;
@@ -56,7 +58,7 @@ const Renderers = window.Renderers = {
                             </div>
                         </div>
 
-                        <button onclick="Actions.saveWeight(prompt('YENİ AĞIRLIK (KG):', '${currentWeight}'))" class="mt-6 z-10 text-[10px] border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-3 py-1 rounded transition-colors uppercase tracking-wider">
+                        <button onclick="Actions.openWeightModal()" class="mt-6 z-10 text-[10px] border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-3 py-1 rounded transition-colors uppercase tracking-wider">
                             [ UPDATE SENSOR ]
                         </button>
                     </div>
@@ -139,12 +141,24 @@ const Renderers = window.Renderers = {
                         </div>
                     </div>
 
-                    <!-- FUEL MONITOR -->
+                    <!-- FUEL & ENERGY -->
                     <div class="${THEME.card} ${!fuelDone ? 'border-neon-red/30' : ''}">
                         <div class="flex justify-between items-start mb-4">
-                            <div class="${THEME.label}">FUEL INJECTOR</div>
+                            <div class="${THEME.label}">FUEL & ENERGY</div>
                             <i class="fas fa-gas-pump ${!fuelDone ? 'text-neon-red animate-pulse' : 'text-neon-green'}"></i>
                         </div>
+
+                        <!-- Calorie Tracker -->
+                        <div class="mb-4">
+                            <div class="flex justify-between items-end mb-1">
+                                <span class="text-xs text-gray-400 font-bold">ENERGY LEVEL</span>
+                                <span class="text-white font-bold text-sm font-mono">${totalCal} / ${targetCal} kcal</span>
+                            </div>
+                            <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                <div class="h-full ${totalCal >= targetCal ? 'bg-neon-green' : 'bg-accent-orange'} transition-all" style="width: ${Math.min(100, (totalCal/targetCal)*100)}%"></div>
+                            </div>
+                        </div>
+
                         <div class="flex items-center justify-between">
                             <div>
                                 <div class="text-xl font-bold text-white">GAINER SHAKE</div>
