@@ -343,3 +343,8 @@ details summary {
     background-color: rgba(255, 255, 255, 0.05);
     letter-spacing: 0.05em;
 }
+
+/* Patch for Heatmap Visibility */
+.heatmap-cell {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
