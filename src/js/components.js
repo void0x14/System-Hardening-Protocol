@@ -113,51 +113,61 @@ const Components = window.Components = {
     },
 
     /**
-     * Set input row for weighted exercises
+     * Set input row for weighted exercises - REDESIGNED v8.1.1
+     * Features: Compact inline layout, larger inputs, KAYDET button
      */
     weightedSetRow: (tid, idx, log, isSetDone, hint = '') => `
-        <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
-            <div class="flex flex-col items-center justify-center w-16 h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
-                <div>SET ${idx + 1}</div>
-                ${hint ? `<div class="text-[8px] ${isSetDone ? 'text-black/70' : 'text-neon-blue'} font-bold">${hint}</div>` : ''}
+        <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
+            <!-- Set Number Badge (Compact) -->
+            <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white'} font-black text-lg md:text-xl flex items-center justify-center">
+                ${idx + 1}
             </div>
+            
+            <!-- Inputs Row -->
             <div class="flex-1 flex items-center gap-2">
                 <div class="flex-1">
-                    <label class="text-[9px] text-gray-500 block mb-1">AĞIRLIK</label>
-                    <input type="number" placeholder="0" value="${log.weight || ''}" id="w-${tid}-${idx}" 
-                        class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                    <input type="number" placeholder="KG" value="${log.weight || ''}" id="w-${tid}-${idx}" 
+                        class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
                         onchange="Actions.saveSet('${tid}', ${idx}, false)">
                 </div>
-                <div class="text-gray-600 text-lg font-bold">×</div>
+                <span class="text-gray-500 text-xl font-bold">×</span>
                 <div class="flex-1">
-                    <label class="text-[9px] text-gray-500 block mb-1">TEKRAR</label>
-                    <input type="number" placeholder="0" value="${log.reps || ''}" id="r-${tid}-${idx}" 
-                        class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                    <input type="number" placeholder="REP" value="${log.reps || ''}" id="r-${tid}-${idx}" 
+                        class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
                         onchange="Actions.saveSet('${tid}', ${idx}, false)">
                 </div>
             </div>
+            
+            <!-- Save Button -->
             <button onclick="Actions.saveSet('${tid}', ${idx}, true)" 
-                class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
-                <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
+                <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
+                <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
             </button>
         </div>`,
 
     /**
-     * Set input row for timed exercises
+     * Set input row for timed exercises - REDESIGNED v8.1.1
+     * Features: Compact inline layout
      */
     timedSetRow: (tid, idx, log, isSetDone) => `
-        <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
-            <div class="flex items-center justify-center w-14 h-10 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
-                SET ${idx + 1}
+        <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
+            <!-- Set Number Badge (Compact) -->
+            <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white'} font-black text-lg md:text-xl flex items-center justify-center">
+                ${idx + 1}
             </div>
+            
+            <!-- Input -->
             <div class="flex-1">
-                <label class="text-[9px] text-gray-500 block mb-1">SÜRE (saniye)</label>
-                <input type="number" placeholder="0" value="${log.duration || ''}" id="d-${tid}-${idx}" 
-                    class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
+                <input type="number" placeholder="SANİYE" value="${log.duration || ''}" id="d-${tid}-${idx}" 
+                    class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
             </div>
+            
+            <!-- Save Button -->
             <button onclick="Actions.saveTimedSet('${tid}', ${idx})" 
-                class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green'} border-2 border-transparent transition-all">
-                <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
+                <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
+                <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
             </button>
         </div>`,
 

@@ -6,6 +6,9 @@
     await Store.init();
     await UI.init();
 
+    // v8.1.0: Stealth/Sanitize Mode
+    if (typeof Stealth !== 'undefined') Stealth.init();
+
     // --- v6.3.0: EVENT DELEGATION ---
     document.getElementById('view-container').addEventListener('click', async (e) => {
         const actionEl = e.target.closest('[data-action]');

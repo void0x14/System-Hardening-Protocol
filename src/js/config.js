@@ -3,7 +3,7 @@
 
 // Global scope assignments
 const CONFIG = window.CONFIG = {
-    VERSION: '8.0.0',
+    VERSION: '8.1.0',
     KEYS: {
         WEIGHT: 'monk_weight',
         FUEL: 'monk_fuel_date',

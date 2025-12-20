@@ -13,7 +13,7 @@ const UI = window.UI = {
     },
 
     renderTabs() {
-        const tabs = [
+        let tabs = [
             { id: 'dashboard', l: 'DASHBOARD', i: 'fa-chart-line' },
             { id: 'training', l: 'ANTRENMAN', i: 'fa-dumbbell' },
             { id: 'nutrition', l: 'BESLENME', i: 'fa-utensils' },
@@ -21,6 +21,10 @@ const UI = window.UI = {
             { id: 'anatomy', l: 'ANATOMİ LAB', i: 'fa-dna' },
             { id: 'mental', l: 'ZİHİNSEL', i: 'fa-brain' }
         ];
+        // Sanitize modda Mental tab'ı gizle
+        if (typeof Stealth !== 'undefined' && Stealth.active) {
+            tabs = tabs.filter(t => t.id !== 'mental');
+        }
         document.getElementById('nav-tabs').innerHTML = tabs.map(t =>
             `<button onclick="Actions.switchTab('${t.id}')" id="btn-${t.id}" class="tab-btn flex-none px-6 py-3 font-bold text-xs md:text-sm whitespace-nowrap text-gray-500 hover:text-white transition-colors border-b-2 border-transparent relative">
                 <i class="fas ${t.i} mr-2"></i>${t.l}
@@ -162,8 +166,11 @@ const UI = window.UI = {
 
     /**
      * Epik tam ekran motivasyon overlay'i göster.
+     * Sanitize modda overlay gösterilmez.
      */
     showEpicOverlay(emoji, text, sub, color = '#00ff41') {
+        // Sanitize modda overlay gösterme
+        if (typeof Stealth !== 'undefined' && Stealth.active) return;
         const overlay = document.createElement('div');
         overlay.id = 'epic-overlay-' + Date.now();
         overlay.innerHTML = `
