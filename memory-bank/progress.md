@@ -1,6 +1,6 @@
 # İlerleme Durumu
 
-## Çalışan Özellikler - v6.3.0
+## Çalışan Özellikler - v8.1.1
 - ✅ Dashboard (streak, kilo, su, uyku takibi)
 - ✅ Antrenman sekmesi (premium set input, PR takibi)
 - ✅ Premium egzersiz bilgi modalı
@@ -234,7 +234,7 @@ window.onbeforeunload = () =>
 
 📋 **Kapsamlı 9-Phase Gelişmiş Özellikler Yol Haritası**
 
-Detaylı roadmap için: [`future_roadmap.md`](file:///C:/Users/uzgunpalyaco/.gemini/antigravity/brain/c86f8f2c-f53d-4a09-af48-d74cac6b9919/future_roadmap.md)
+Detaylı roadmap için: [`roadmap.md`](file:///c:/Users/uzgunpalyaco/Desktop/System-Hardening/memory-bank/roadmap.md)
 
 **Highlights**:
 1. **Core Stability** (2 hafta): Auto-backup, crash recovery
@@ -278,6 +278,9 @@ Detaylı strateji için: [`modularization_strategy.md`](file:///C:/Users/uzgunpa
 **Output**: Maintainable codebase, same single-file deployment
 
 ## Sürüm Geçmişi
+- **v8.1.1**: Training Tab UI/UX Redesign - Kompakt set row, simple toggle for lifestyle tasks
+- **v8.1.0**: Stealth Mode (Sanitize) - Gizlilik modu
+- **v8.0.0**: Modular Build - Monolithic → Modular architecture
 - **v7.1.0**: Video Player Fallback Sistemi (VideoPlayer.openVideo + embed URL retry)
 - v7.0.0: Güvenlik (escapeHtml, validateImportData) + Performans (cache)
 - v6.3.0: Uyku/Su istatistikleri (haftalık/aylık)
