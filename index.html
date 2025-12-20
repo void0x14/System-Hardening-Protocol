@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v5.6.2 (Optimized)</title>
+    <title>PROJECT: MONK MODE | v5.7.0 (Premium)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -16,15 +16,14 @@
             theme: {
                 extend: {
                     colors: {
-                        'cyber-black': '#050505',
-                        'cyber-dark': '#0a0a0a',
-                        'cyber-panel': 'rgba(16, 16, 16, 0.95)',
+                        'gunmetal': '#0a0a0f',
+                        'surface-card': '#111116',
+                        'surface-raised': '#1a1a22',
+                        'surface-hover': '#222230',
                         'neon-green': '#00ff41',
                         'neon-red': '#ff003c',
-                        'neon-blue': '#00f3ff',
-                        'neon-yellow': '#ffee00',
-                        'neon-purple': '#bc13fe',
-                        'neon-orange': '#ff9500',
+                        'accent-orange': '#ff6b35',
+                        'text-muted': '#6b7280',
                     },
                     fontFamily: {
                         mono: ['"JetBrains Mono"', 'monospace'],
@@ -56,9 +55,10 @@
 
     <style>
         body {
-            background-color: #050505;
-            color: #e0e0e0;
+            background-color: #0a0a0f;
+            color: #e5e7eb;
             overflow-x: hidden;
+            font-size: 15px;
         }
 
         ::-webkit-scrollbar {
@@ -548,59 +548,62 @@
     </style>
 </head>
 
-<body class="font-mono text-sm">
+<body class="text-base">
 
     <!-- NAV -->
-    <nav class="fixed top-0 w-full bg-cyber-black/95 backdrop-blur z-40 border-b border-gray-800 h-16">
-        <div class="container mx-auto h-full px-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-biohazard text-neon-green text-xl animate-pulse"></i>
+    <nav class="fixed top-0 w-full bg-gunmetal/80 backdrop-blur-md z-40 border-b border-white/5 h-20">
+        <div class="container mx-auto h-full px-6 flex justify-between items-center max-w-7xl">
+            <div class="flex items-center gap-4">
+                <i class="fas fa-biohazard text-neon-green text-2xl"></i>
                 <div>
-                    <h1 class="font-header font-bold text-white tracking-wider text-sm md:text-base">PROTOCOL <span
-                            class="text-xs text-gray-500">v5.6.2</span></h1>
-                    <div class="text-[9px] text-neon-green font-bold tracking-widest">FIELD TEST APPROVED</div>
+                    <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
+                            class="text-sm text-text-muted">v5.7.0</span></h1>
+                    <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <div id="clock-display" class="hidden md:block font-mono text-gray-500 font-bold text-xs">--:--:--</div>
+            <div class="flex items-center gap-6">
+                <div id="clock-display" class="hidden md:block font-mono text-text-muted font-bold text-sm">--:--:--
+                </div>
                 <button onclick="Actions.toggleOverride()" id="btn-override"
-                    class="border border-red-900 bg-red-900/10 text-red-500 px-3 py-1 rounded hover:bg-red-600 hover:text-white transition text-[10px] md:text-xs font-bold tracking-widest">
-                    <i class="fas fa-power-off mr-1"></i> EMOTION OVERRIDE
+                    class="bg-neon-red/10 text-neon-red px-4 py-2 rounded-lg hover:bg-neon-red hover:text-white transition text-xs font-bold tracking-widest">
+                    <i class="fas fa-power-off mr-2"></i> OVERRIDE
                 </button>
             </div>
         </div>
     </nav>
 
     <!-- MAIN -->
-    <main class="container mx-auto mt-20 px-4 pb-24 max-w-6xl">
-        <div class="flex overflow-x-auto mb-6 gap-2 border-b border-gray-800 pb-1 scrollbar-hide" id="nav-tabs"></div>
+    <main class="container mx-auto mt-24 px-6 pb-24 max-w-7xl">
+        <div class="flex justify-center overflow-x-auto mb-8 gap-3 border-b border-white/5 pb-2 scrollbar-hide"
+            id="nav-tabs"></div>
         <div id="view-container" class="min-h-[60vh] animate-slide-up"></div>
     </main>
 
     <!-- MODAL -->
     <div id="universal-modal"
-        class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        class="modal fixed inset-0 z-50 flex items-center justify-center p-6 bg-gunmetal/90 backdrop-blur-md">
         <div
-            class="modal-content bg-cyber-dark border border-gray-700 w-full max-w-2xl rounded-lg shadow-2xl relative max-h-[85vh] flex flex-col">
-            <div class="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-900/50">
-                <h3 id="modal-title" class="font-header text-lg font-bold text-neon-green">INFO</h3>
-                <button onclick="UI.modal.close()" class="text-gray-500 hover:text-white transition"><i
+            class="modal-content bg-surface-card w-full max-w-2xl rounded-2xl shadow-2xl relative max-h-[85vh] flex flex-col">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                <h3 id="modal-title" class="font-header text-xl font-bold text-neon-green">INFO</h3>
+                <button onclick="UI.modal.close()" class="text-text-muted hover:text-white transition p-2"><i
                         class="fas fa-times text-xl"></i></button>
             </div>
-            <div id="modal-body" class="p-6 overflow-y-auto custom-scrollbar"></div>
+            <div id="modal-body" class="p-8 overflow-y-auto custom-scrollbar"></div>
         </div>
     </div>
 
     <!-- ALERT MODAL -->
     <div id="alert-modal"
-        class="modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        class="modal fixed inset-0 z-[60] flex items-center justify-center p-6 bg-gunmetal/95 backdrop-blur-lg">
         <div
-            class="modal-content bg-cyber-black border-2 border-neon-red w-full max-w-md rounded-lg shadow-[0_0_50px_rgba(255,0,60,0.3)] relative p-6 text-center">
-            <i class="fas fa-exclamation-triangle text-5xl text-neon-red mb-4 animate-pulse"></i>
-            <h2 class="text-2xl font-header font-bold text-white mb-2">SİSTEM UYARISI</h2>
-            <p id="alert-message" class="text-gray-300 mb-6 font-mono text-sm leading-relaxed"></p>
+            class="modal-content bg-surface-card border border-neon-red/30 w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(255,0,60,0.2)] relative p-8 text-center">
+            <i class="fas fa-exclamation-triangle text-6xl text-neon-red mb-6"></i>
+            <h2 class="text-3xl font-header font-bold text-white mb-3">SİSTEM UYARISI</h2>
+            <p id="alert-message" class="text-gray-300 mb-8 text-base leading-relaxed"></p>
             <button onclick="UI.alert.close()"
-                class="bg-neon-red text-black font-bold py-3 px-8 rounded hover:bg-white hover:text-neon-red transition w-full">ANLAŞILDI
+                class="bg-neon-red text-white font-bold py-4 px-8 rounded-xl hover:bg-white hover:text-neon-red transition w-full text-lg">ANLAŞILDI
                 KOMUTANIM</button>
         </div>
     </div>
@@ -619,7 +622,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '5.6.2 Optimized',
+            VERSION: '5.7.0 Premium',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -635,9 +638,10 @@
         };
 
         const THEME = {
-            card: "bg-cyber-panel border border-gray-800 hover:border-gray-600 rounded-lg p-5 transition-all shadow-lg card-hover-lift",
-            btn: "bg-gray-800 hover:bg-neon-green hover:text-black text-white border border-gray-600 font-bold py-2 px-4 rounded transition flex items-center justify-center gap-2",
-            input: "bg-gray-900 border border-gray-700 text-white rounded p-2 focus:border-neon-green outline-none w-full transition-colors"
+            card: "bg-surface-card rounded-xl p-6 md:p-8 shadow-2xl transition-all card-hover-lift",
+            btn: "bg-surface-raised hover:bg-neon-green hover:text-gunmetal text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2",
+            input: "bg-surface-raised border-0 text-white rounded-lg p-3 focus:ring-2 focus:ring-neon-green/30 outline-none w-full transition-all",
+            label: "text-xs uppercase tracking-[0.2em] text-text-muted font-bold mb-3 block"
         };
 
         const DB = {
@@ -1220,62 +1224,81 @@
                 const progress = await Store.getTodayProgress();
 
                 return `
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-up">
-                        <!-- STREAK CARD -->
-                        <div class="${THEME.card} text-center border-l-4 ${streak > 0 ? 'border-l-neon-green' : 'border-l-gray-600'}">
-                            <div class="text-[10px] text-gray-500 font-bold tracking-widest mb-2">🔥 STREAK</div>
-                            <div class="text-5xl font-header font-bold ${streak > 0 ? 'text-neon-green' : 'text-gray-600'}">${streak}</div>
-                            <div class="text-[10px] text-gray-400 mt-1">${streak > 0 ? 'Gün Üst Üste' : 'Seri Kırıldı'}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
+                        <!-- STREAK CARD - Prominent -->
+                        <div class="${THEME.card} text-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-neon-green/5 to-transparent"></div>
+                            <div class="relative">
+                                <div class="${THEME.label}">🔥 STREAK</div>
+                                <div class="text-7xl md:text-8xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-text-muted'} leading-none">${streak}</div>
+                                <div class="text-sm text-text-muted mt-4 uppercase tracking-wider">${streak > 0 ? 'Gün Üst Üste' : 'Seri Kırıldı'}</div>
+                            </div>
                         </div>
                         
                         <!-- TODAY'S PROGRESS -->
                         <div class="${THEME.card}">
-                            <div class="text-[10px] text-gray-500 font-bold tracking-widest mb-3">📊 BUGÜNKÜ DURUM</div>
-                            <div class="space-y-3">
+                            <div class="${THEME.label}">📊 BUGÜNKÜ DURUM</div>
+                            <div class="space-y-5 mt-4">
                                 <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-gray-400">Görevler</span>
-                                        <span class="text-neon-blue font-bold">${progress.tasksDone}/${progress.tasksTotal}</span>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span class="text-text-muted uppercase tracking-wider">Görevler</span>
+                                        <span class="text-neon-green font-bold text-lg">${progress.tasksDone}/${progress.tasksTotal}</span>
                                     </div>
-                                    <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                                        <div class="h-full bg-neon-blue transition-all duration-500 progress-shimmer" style="width: ${progress.tasksPercent}%"></div>
+                                    <div class="w-full bg-surface-raised h-3 rounded-full overflow-hidden">
+                                        <div class="h-full bg-neon-green transition-all duration-500 progress-shimmer rounded-full" style="width: ${progress.tasksPercent}%"></div>
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-gray-400">Kalori</span>
-                                        <span class="text-neon-orange font-bold">${progress.calories}/${progress.caloriesTarget}</span>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span class="text-text-muted uppercase tracking-wider">Kalori</span>
+                                        <span class="text-accent-orange font-bold text-lg">${progress.calories}/${progress.caloriesTarget}</span>
                                     </div>
-                                    <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                                        <div class="h-full bg-neon-orange transition-all duration-500" style="width: ${Math.min(100, progress.caloriesPercent)}%"></div>
+                                    <div class="w-full bg-surface-raised h-3 rounded-full overflow-hidden">
+                                        <div class="h-full bg-accent-orange transition-all duration-500 rounded-full" style="width: ${Math.min(100, progress.caloriesPercent)}%"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- SYSTEM LOAD (WEIGHT) -->
-                        <div class="${THEME.card}">
-                            <span class="text-[10px] text-gray-500 font-bold tracking-widest">⚖️ SYSTEM LOAD</span>
-                            <div class="flex items-end gap-4 mb-4">
-                                <input type="number" value="${Store.state.weight}" class="bg-transparent border-b border-gray-600 text-4xl font-bold text-white w-24 focus:border-neon-green outline-none" onchange="Actions.saveWeight(this.value)">
-                                <span class="text-xs text-gray-500 mb-2">KG / ${CONFIG.TARGETS.GOAL}</span>
+                        <!-- SYSTEM LOAD (WEIGHT) - Hero Card -->
+                        <div class="${THEME.card} md:row-span-2 flex flex-col justify-between">
+                            <div>
+                                <div class="${THEME.label}">⚖️ SYSTEM LOAD</div>
+                                <div class="flex items-baseline gap-3 mt-4">
+                                    <input type="number" value="${Store.state.weight}" class="bg-transparent text-6xl md:text-7xl font-black text-white w-32 focus:text-neon-green outline-none transition-colors" onchange="Actions.saveWeight(this.value)">
+                                    <span class="text-text-muted text-xl">KG</span>
+                                </div>
+                                <div class="text-text-muted mt-2">Hedef: ${CONFIG.TARGETS.GOAL} KG</div>
                             </div>
-                            <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden"><div class="h-full bg-neon-green transition-all duration-1000 progress-shimmer" style="width: ${p}%"></div></div>
+                            <div class="mt-6">
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-text-muted">İlerleme</span>
+                                    <span class="text-neon-green font-bold">${Math.round(p)}%</span>
+                                </div>
+                                <div class="w-full bg-surface-raised h-4 rounded-full overflow-hidden">
+                                    <div class="h-full bg-neon-green transition-all duration-1000 progress-shimmer rounded-full" style="width: ${p}%"></div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- FUEL STATUS -->
-                        <div class="${THEME.card} ${fuelCardClass} relative lg:col-span-2">
-                            <span class="text-[10px] text-gray-500 font-bold tracking-widest">⛽ FUEL STATUS</span>
-                            <div class="flex justify-between items-center mt-2">
-                                <div><div class="text-xl font-bold text-white">GAINER SHAKE</div><div class="text-[10px] text-gray-400">Süt+Yulaf+Fıstık+Muz</div></div>
-                                <button onclick="Actions.injectFuel()" class="border px-4 py-2 rounded font-bold text-xs ${fuelDone ? 'bg-neon-yellow text-black' : 'text-red-500 border-red-500 hover:bg-red-500 hover:text-black'}">${fuelDone ? 'ENJEKTE EDİLDİ' : 'BEKLİYOR (ACİL)'}</button>
+                        <div class="${THEME.card} lg:col-span-2 ${!fuelDone ? 'ring-2 ring-neon-red/50' : ''} relative">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="${THEME.label}">⛽ FUEL STATUS</div>
+                                    <div class="text-2xl md:text-3xl font-bold text-white mt-2">GAINER SHAKE</div>
+                                    <div class="text-text-muted mt-1">Süt + Yulaf + Fıstık + Muz</div>
+                                </div>
+                                <button onclick="Actions.injectFuel()" class="${fuelDone ? 'bg-neon-green text-gunmetal' : 'bg-neon-red text-white'} px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-wider transition-all hover:scale-105">
+                                    ${fuelDone ? '✓ ENJEKTE EDİLDİ' : '⚠ BEKLİYOR'}
+                                </button>
                             </div>
-                            ${!fuelDone ? '<div class="absolute top-2 right-2 text-neon-red text-xs animate-pulse"><i class="fas fa-exclamation-circle"></i></div>' : ''}
+                            ${!fuelDone ? '<div class="absolute top-4 right-4 text-neon-red animate-pulse"><i class="fas fa-exclamation-circle text-xl"></i></div>' : ''}
                         </div>
                         
                         <!-- MOTIVATIONAL QUOTE -->
-                        <div class="${THEME.card} text-center py-6 bg-gray-900/50">
-                            <div class="text-lg font-bold text-white italic">"Aksak ayakla yürü, ama yürü."</div>
+                        <div class="${THEME.card} text-center flex items-center justify-center bg-surface-raised/50">
+                            <div class="text-xl md:text-2xl font-bold text-white/80 italic">"Aksak ayakla yürü, ama yürü."</div>
                         </div>
                     </div>`;
             },
