@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v5.7.0 (Premium)</title>
+    <title>PROJECT: MONK MODE | v5.7.1 (Premium)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -557,7 +557,7 @@
                 <i class="fas fa-biohazard text-neon-green text-2xl"></i>
                 <div>
                     <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v5.7.0</span></h1>
+                            class="text-sm text-text-muted">v5.7.1</span></h1>
                     <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
                     </div>
                 </div>
@@ -622,7 +622,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '5.7.0 Premium',
+            VERSION: '5.7.1 Premium',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -777,7 +777,9 @@
                 { id: 85, cat: "SNACK", name: "Yoğurt", type: "portion", vals: { cal: 65, prot: 4, carb: 5, fat: 3 }, options: [{ label: "1 Kase", ratio: 2 }, { label: "Büyük Kase", ratio: 3 }] },
                 { id: 86, cat: "SNACK", name: "Cips", type: "portion", vals: { cal: 530, prot: 6, carb: 50, fat: 35 }, options: [{ label: "1 Avuç", ratio: 0.2 }, { label: "Küçük Paket", ratio: 0.5 }, { label: "Büyük Paket", ratio: 1.5 }] },
                 { id: 87, cat: "SNACK", name: "Kakaolu Süt (Küçük)", type: "piece", vals: { cal: 150, prot: 6, carb: 20, fat: 4 }, unitName: "Kutu (200ml)" },
-                { id: 88, cat: "SNACK", name: "Indomie Noodle", type: "piece", vals: { cal: 350, prot: 8, carb: 45, fat: 15 }, unitName: "Paket" }
+                { id: 88, cat: "SNACK", name: "Indomie Noodle", type: "piece", vals: { cal: 350, prot: 8, carb: 45, fat: 15 }, unitName: "Paket" },
+                { id: 89, cat: "SNACK", name: "Kavrulmuş Fıstık (Tuzsuz)", type: "portion", vals: { cal: 170, prot: 7, carb: 6, fat: 14 }, options: [{ label: "1 Avuç (~30g)", ratio: 1 }, { label: "2 Avuç (~60g)", ratio: 2 }] },
+                { id: 90, cat: "SNACK", name: "Kuru Kayısı", type: "piece", vals: { cal: 25, prot: 0.3, carb: 6, fat: 0 }, unitName: "Adet" }
             ],
             MEAL_PLAN_DB: {
                 breakfast: [
@@ -787,8 +789,8 @@
                     { text: "Krep (2 Yumurta + 2 Bardak Süt + Un) + Fıstık Ezmesi", kcal: 700 }
                 ],
                 fuel: [
-                    { text: "GAINER SHAKE (500ml - Bizim Tarif)", kcal: 850 },
-                    { text: "GAINER SHAKE + 1 Muz (Ekstra)", kcal: 950 }
+                    { text: "GAINER SHAKE (Temel: Süt + Yulaf + Muz)", kcal: 700 },
+                    { text: "GAINER SHAKE + 1 Muz (Ekstra)", kcal: 800 }
                 ],
                 lunch: [
                     { text: "Tavuklu Pilav (1.5 Porsiyon / Bol Tavuklu)", kcal: 750 },
@@ -1388,11 +1390,11 @@
             async anatomy() {
                 const view = UI.activeView;
                 const paths = {
-                    front: `<path d="M60,50 Q100,70 140,50 L135,90 Q100,100 65,90 Z" class="muscle-path" onclick="Actions.selectMuscle('chest')"></path><rect x="80" y="95" width="40" height="60" rx="5" class="muscle-path" onclick="Actions.selectMuscle('abs')"></rect><path d="M65,160 L90,160 L85,240 L60,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><path d="M110,160 L135,160 L140,240 L115,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><ellipse cx="45" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse><ellipse cx="155" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse><path d="M85,155 L115,155 L100,180 Z" fill="#ff003c" opacity="0.5" onclick="Actions.selectMuscle('pelvic')" class="cursor-pointer hover:opacity-100"></path>`,
-                    back: `<path d="M70,40 L100,20 L130,40 L100,60 Z" class="muscle-path" onclick="Actions.selectMuscle('traps')"></path><path d="M60,60 L40,100 L100,130 L160,100 L140,60 L100,60 Z" class="muscle-path" onclick="Actions.selectMuscle('lats')"></path><rect x="85" y="130" width="30" height="20" class="muscle-path" onclick="Actions.selectMuscle('lowerback')"></rect><path d="M70,150 Q100,170 130,150 L130,190 Q100,210 70,190 Z" class="muscle-path" onclick="Actions.selectMuscle('glutes')"></path><rect x="75" y="200" width="20" height="60" class="muscle-path" onclick="Actions.selectMuscle('hamstrings')"></rect><rect x="105" y="200" width="20" height="60" class="muscle-path" onclick="Actions.selectMuscle('hamstrings')"></rect>`
+                    front: `<path d="M60,50 Q100,70 140,50 L135,90 Q100,100 65,90 Z" class="muscle-path" onclick="Actions.selectMuscle('chest')"></path><rect x="80" y="95" width="40" height="55" rx="5" class="muscle-path" onclick="Actions.selectMuscle('abs')"></rect><path d="M65,160 L90,160 L85,240 L60,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><path d="M110,160 L135,160 L140,240 L115,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><ellipse cx="45" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse><ellipse cx="155" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse><path d="M85,158 L115,158 L100,183 Z" fill="#ff003c" opacity="0.5" onclick="Actions.selectMuscle('pelvic')" class="cursor-pointer hover:opacity-100"></path>`,
+                    back: `<path d="M70,40 L100,20 L130,40 L100,60 Z" class="muscle-path" onclick="Actions.selectMuscle('traps')"></path><path d="M60,60 L40,100 L100,125 L160,100 L140,60 L100,60 Z" class="muscle-path" onclick="Actions.selectMuscle('lats')"></path><rect x="85" y="128" width="30" height="22" class="muscle-path" onclick="Actions.selectMuscle('lowerback')"></rect><path d="M70,150 Q100,170 130,150 L130,190 Q100,210 70,190 Z" class="muscle-path" onclick="Actions.selectMuscle('glutes')"></path><rect x="75" y="200" width="20" height="60" class="muscle-path" onclick="Actions.selectMuscle('hamstrings')"></rect><rect x="105" y="200" width="20" height="60" class="muscle-path" onclick="Actions.selectMuscle('hamstrings')"></rect>`
                 };
                 const sel = Store.state.selectedMuscle ? DB.ANATOMY_DB[Store.state.selectedMuscle] : null;
-                return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button onclick="Actions.setAnatomyView('front')" class="px-3 py-1 text-xs border ${view === 'front' ? 'border-neon-green text-neon-green' : 'border-gray-700 text-gray-500'} rounded">ÖN</button><button onclick="Actions.setAnatomyView('back')" class="px-3 py-1 text-xs border ${view === 'back' ? 'border-neon-green text-neon-green' : 'border-gray-700 text-gray-500'} rounded">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-neon-blue"></div><div class="text-[10px] text-neon-blue font-bold mb-4 tracking-widest">DIAGNOSTIC PANEL</div>${sel ? `<div><h2 class="text-2xl font-header font-bold text-white mb-1">${sel.name}</h2><div class="text-xs text-gray-400 mb-6 font-mono">// ${sel.system}</div><div class="space-y-4"><div class="bg-gray-900 p-3 rounded border-l-2 border-neon-green"><div class="text-[9px] text-gray-500 font-bold mb-1">GÖREV</div><div class="text-sm text-gray-200">${sel.function}</div></div><div class="bg-gray-900 p-3 rounded border-l-2 border-neon-orange"><div class="text-[9px] text-gray-500 font-bold mb-1">HARDENING</div><div class="text-sm text-neon-orange font-bold">${sel.action}</div></div><div class="bg-gray-900 p-2 rounded border border-gray-800"><div class="text-[9px] text-gray-500">RECOVERY</div><div class="text-neon-blue">${sel.recovery}</div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600 opacity-50"><i class="fas fa-fingerprint text-4xl mb-4"></i><p class="text-xs">SEÇİM BEKLENİYOR...</p></div>'}</div></div>`;
+                return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button onclick="Actions.setAnatomyView('front')" class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ÖN</button><button onclick="Actions.setAnatomyView('back')" class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${sel.system}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">GÖREV</div><div class="text-base text-gray-200">${sel.function}</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p></div>'}</div></div>`;
             },
             async mental() {
                 const phases = DB.MENTAL_PHASES.map(p => `
@@ -1409,7 +1411,7 @@
                         </div>
                     </details>
                 `).join('');
-                return `<div class="animate-slide-up"><div class="flex items-center gap-3 mb-4 border-b border-gray-800 pb-3"><i class="fas fa-brain text-neon-purple text-xl"></i><div><h2 class="font-header font-bold text-white">ZİHİNSEL SAVAŞ</h2><div class="text-[10px] text-gray-500 mt-1">Mental Hardening Protokolü v5.6.1</div></div></div>${phases}</div>`;
+                return `<div class="animate-slide-up"><div class="flex items-center gap-3 mb-4 border-b border-gray-800 pb-3"><i class="fas fa-brain text-neon-purple text-xl"></i><div><h2 class="font-header font-bold text-white">ZİHİNSEL SAVAŞ</h2><div class="text-[10px] text-gray-500 mt-1">Mental Hardening Protokolü v5.7.1</div></div></div>${phases}</div>`;
             }
         };
 
