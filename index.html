@@ -1723,41 +1723,68 @@
                     const targetSets = targetMatch ? parseInt(targetMatch[1]) : 3;
 
                     let setsHtml = '';
+                    let completedSets = 0;
                     for (let i = 0; i < targetSets; i++) {
                         const log = logs[i] || {};
                         const isSetDone = !!log.completed;
+                        if (isSetDone) completedSets++;
                         setsHtml += `
-                                    <div class="flex items-center gap-2 mb-2 text-xs">
-                                        <div class="text-gray-500 w-8 font-mono flex-shrink-0">SET ${i + 1}</div>
-                                        <input type="number" placeholder="KG" value="${log.weight || ''}" id="w-${tid}-${i}" class="bg-gray-800 text-white rounded p-1 w-16 text-center border ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none" onchange="Actions.saveSet('${tid}', ${i}, false)">
-                                        <input type="number" placeholder="Tekrar" value="${log.reps || ''}" id="r-${tid}-${i}" class="bg-gray-800 text-white rounded p-1 w-16 text-center border ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none" onchange="Actions.saveSet('${tid}', ${i}, false)">
-                                        <button onclick="Actions.saveSet('${tid}', ${i}, true)" class="w-8 h-8 rounded flex-shrink-0 flex items-center justify-center ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'} transition">
-                                            <i class="fas fa-check"></i>
-                                        </button>
+                            <div class="flex items-center gap-3 p-3 rounded-lg ${isSetDone ? 'bg-neon-green/10 border border-neon-green/30' : 'bg-gray-800/50 border border-gray-700'} transition-all">
+                                <div class="flex items-center justify-center w-12 h-10 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400'} font-bold text-xs">
+                                    SET ${i + 1}
+                                </div>
+                                <div class="flex-1 flex items-center gap-2">
+                                    <div class="flex-1">
+                                        <label class="text-[9px] text-gray-500 block mb-1">AĞIRLIK</label>
+                                        <input type="number" placeholder="0" value="${log.weight || ''}" id="w-${tid}-${i}" 
+                                            class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                                            onchange="Actions.saveSet('${tid}', ${i}, false)">
                                     </div>
-                                `;
+                                    <div class="text-gray-600 text-lg font-bold">×</div>
+                                    <div class="flex-1">
+                                        <label class="text-[9px] text-gray-500 block mb-1">TEKRAR</label>
+                                        <input type="number" placeholder="0" value="${log.reps || ''}" id="r-${tid}-${i}" 
+                                            class="w-full bg-gray-900 text-white rounded-lg p-2 text-center text-lg font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
+                                            onchange="Actions.saveSet('${tid}', ${i}, false)">
+                                    </div>
+                                </div>
+                                <button onclick="Actions.saveSet('${tid}', ${i}, true)" 
+                                    class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg ${isSetDone ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green hover:border-neon-green'} border-2 border-transparent transition-all">
+                                    <i class="fas ${isSetDone ? 'fa-check' : 'fa-arrow-right'}"></i>
+                                </button>
+                            </div>
+                        `;
                     }
 
+                    // İlerleme yüzdesini hesapla
+                    const progressPercent = targetSets > 0 ? Math.round((completedSets / targetSets) * 100) : 0;
+
                     return `
-                            <div class="bg-gray-900 border ${isDone ? 'border-neon-green shadow-[0_0_10px_rgba(0,255,65,0.1)]' : 'border-gray-700'} rounded-lg overflow-hidden transition-all">
+                            <div class="bg-gray-900 border-2 ${isDone ? 'border-neon-green shadow-[0_0_15px_rgba(0,255,65,0.15)]' : 'border-gray-700'} rounded-xl overflow-hidden transition-all">
                                 <div class="p-4 cursor-pointer hover:bg-gray-800/50 flex justify-between items-center" onclick="Actions.toggleExerciseBody('${tid}')">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full ${isDone ? 'bg-neon-green' : 'bg-gray-600'}"></div>
+                                        <div class="w-3 h-3 rounded-full ${isDone ? 'bg-neon-green shadow-[0_0_8px_rgba(0,255,65,0.5)]' : 'bg-gray-600'} transition-all"></div>
                                         <div>
-                                            <div class="font-bold text-white text-sm">${ex.title}</div>
-                                            <div class="text-[10px] text-gray-500">${targetSets} SET HEDEF | ${ex.tags.join(', ')}</div>
+                                            <div class="font-bold text-white text-base">${ex.title}</div>
+                                            <div class="text-xs text-gray-500 mt-0.5">
+                                                <span class="${progressPercent === 100 ? 'text-neon-green' : progressPercent > 0 ? 'text-neon-blue' : ''}">%${progressPercent}</span> | 
+                                                ${targetSets} Set | ${ex.tags.join(', ')}
+                                            </div>
                                         </div>
                                     </div>
-                                    <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300" id="icon-${tid}"></i>
+                                    <div class="flex items-center gap-3">
+                                        ${isDone ? '<span class="text-[10px] text-neon-green font-bold bg-neon-green/10 px-2 py-1 rounded">TAMAM</span>' : ''}
+                                        <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300" id="icon-${tid}"></i>
+                                    </div>
                                 </div>
-                                <div id="body-${tid}" class="hidden bg-black/20 p-4 border-t border-gray-800">
-                                    <div class="flex justify-between items-start mb-4">
-                                        <div class="text-[10px] text-gray-400 p-2 bg-gray-800/50 rounded italic border-l-2 border-neon-blue flex-1 mr-3">${ex.desc}</div>
-                                        <button onclick="event.stopPropagation(); Actions.showExercise('${tid}')" class="flex-shrink-0 w-10 h-10 rounded-lg bg-neon-blue/10 hover:bg-neon-blue/30 border border-neon-blue/50 text-neon-blue flex items-center justify-center transition" title="Detaylı Bilgi & PR">
-                                            <i class="fas fa-info-circle"></i>
+                                <div id="body-${tid}" class="hidden bg-black/30 p-5 border-t border-gray-800">
+                                    <div class="flex justify-between items-start mb-5">
+                                        <div class="text-sm text-gray-300 p-4 bg-gray-800/70 rounded-xl border-l-4 border-neon-blue flex-1 mr-4 leading-relaxed">${ex.desc}</div>
+                                        <button onclick="event.stopPropagation(); Actions.showExercise('${tid}')" class="flex-shrink-0 w-12 h-12 rounded-xl bg-neon-blue/10 hover:bg-neon-blue/30 border-2 border-neon-blue/50 text-neon-blue flex items-center justify-center transition-all hover:scale-105" title="Detaylı Bilgi & PR">
+                                            <i class="fas fa-info-circle text-lg"></i>
                                         </button>
                                     </div>
-                                    <div class="space-y-1">
+                                    <div class="space-y-3">
                                         ${setsHtml}
                                     </div>
                                 </div>
@@ -2495,47 +2522,70 @@
             openWarmup() {
                 const warmupRoutine = `
                     <div class="space-y-4 text-sm text-gray-300">
-                        <div class="bg-gray-900 p-3 rounded border border-neon-blue">
-                            <h4 class="text-neon-blue font-bold mb-2">SİSTEM BAŞLATILIYOR (ISINMA)</h4>
-                            <p class="text-xs text-gray-400 mb-3">Motor soğukken gazlama. Sakatlanmamak için bu 3 dakikalık rutini her antrenmandan önce yap.</p>
+                        <div class="bg-gray-900 p-4 rounded-xl border border-neon-blue">
+                            <h4 class="text-neon-blue font-bold mb-2 flex items-center gap-2">
+                                <i class="fas fa-fire animate-pulse"></i>
+                                SİSTEM BAŞLATILIYOR (ISINMA)
+                            </h4>
+                            <p class="text-sm text-gray-400 mb-4">Motor soğukken gazlama. Sakatlanmamak için bu 3 dakilkalık rutini her antrenmandan önce yap.</p>
                             
-                            <ul class="space-y-2">
-                                <li class="flex gap-3 items-center">
+                            <ul class="space-y-3">
+                                <li class="flex gap-3 items-center p-2 bg-gray-800/50 rounded-lg">
                                     <i class="fas fa-check-circle text-neon-blue"></i>
                                     <div>
                                         <span class="font-bold text-white">Boyun Çevirme</span>
-                                        <div class="text-[10px] text-gray-500">Sağa, sola, öne, arkaya yavaşça (30sn)</div>
+                                        <div class="text-xs text-gray-500">Sağa, sola, öne, arkaya yavaşça (30sn)</div>
                                     </div>
                                 </li>
-                                <li class="flex gap-3 items-center">
+                                <li class="flex gap-3 items-center p-2 bg-gray-800/50 rounded-lg">
                                     <i class="fas fa-check-circle text-neon-blue"></i>
                                     <div>
                                         <span class="font-bold text-white">Kol Çevirme</span>
-                                        <div class="text-[10px] text-gray-500">Kollarını pervane gibi öne ve arkaya çevir (30sn)</div>
+                                        <div class="text-xs text-gray-500">Kollarını pervane gibi öne ve arkaya çevir (30sn)</div>
                                     </div>
                                 </li>
-                                <li class="flex gap-3 items-center">
+                                <li class="flex gap-3 items-center p-2 bg-gray-800/50 rounded-lg">
                                     <i class="fas fa-check-circle text-neon-blue"></i>
                                     <div>
                                         <span class="font-bold text-white">Bel Dairesi</span>
-                                        <div class="text-[10px] text-gray-500">Eller belde, geniş daireler çiz (30sn)</div>
+                                        <div class="text-xs text-gray-500">Eller belde, geniş daireler çiz (30sn)</div>
                                     </div>
                                 </li>
-                                <li class="flex gap-3 items-center">
+                                <li class="flex gap-3 items-center p-2 bg-gray-800/50 rounded-lg">
                                     <i class="fas fa-check-circle text-neon-blue"></i>
                                     <div>
                                         <span class="font-bold text-white">Hafif Koşu</span>
-                                        <div class="text-[10px] text-gray-500">Olduğun yerde sekerek nabzını yükselt (1dk)</div>
+                                        <div class="text-xs text-gray-500">Olduğun yerde sekerek nabzını yükselt (1dk)</div>
                                     </div>
                                 </li>
                             </ul>
                         </div>
                         <div class="text-center">
-                            <button onclick="UI.modal.close()" class="${THEME.btn} w-full border-neon-green text-neon-green hover:bg-neon-green hover:text-black">HAZIRIM, BAŞLAT</button>
+                            <button onclick="Actions.startWorkout()" class="${THEME.btn} w-full bg-neon-green/20 border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-bold text-lg py-4 rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,255,65,0.3)]">
+                                <i class="fas fa-rocket mr-2"></i>HAZIRIM, BAŞLAT!
+                            </button>
                         </div>
                     </div>
                 `;
                 UI.modal.open("SYSTEM BOOT (ISINMA)", warmupRoutine);
+            },
+
+            startWorkout() {
+                // Motive edici mesajlar
+                const messages = [
+                    "🔥 YANMAYA HAZIR OL!",
+                    "💪 GÜÇ SENDİR!",
+                    "⚡ SİSTEM AKTİF!",
+                    "🎯 HEDEF KİLİTLİ!",
+                    "🚀 KALKIS BAŞARILI!"
+                ];
+                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+
+                // Modalı kapat
+                UI.modal.close();
+
+                // Motive edici toast göster
+                UI.showToast(randomMsg, "success");
             },
 
             // --- PHASE 1: SETTINGS & DATA ---
