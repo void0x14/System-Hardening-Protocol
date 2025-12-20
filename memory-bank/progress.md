@@ -1,6 +1,6 @@
 # İlerleme Durumu
 
-## Çalışan Özellikler
+## Çalışan Özellikler - v6.0.0
 - ✅ Dashboard (streak, kilo, su, uyku takibi)
 - ✅ Antrenman sekmesi (premium set input, PR takibi)
 - ✅ Premium egzersiz bilgi modalı
@@ -9,14 +9,10 @@
 - ✅ Epik overlay sistemi (showEpicOverlay)
 - ✅ System Boot epik başlangıç
 - ✅ Gainer Shake epik overlay
-- ✅ Günlük görevler tamamlandığında zafer overlay'i
+- ✅ Günlük görevler tamamlandığında zafer overlay
+- ✅ Zihinsel sekmesi (premium kartlar, günün fazı, pratik takibi)
+- ✅ **Modal ESC tuşu + backdrop tıklama kapatma**
 - ✅ Beslenme sekmesi (kalori/makro takibi)
-- ✅ **Zihinsel Savaş - TAMAMEN YENİLENDİ**
-  - Premium 2x4 grid faz kartları
-  - Günün fazı spotlight
-  - Günlük pratik bölümü
-  - Faz tamamlama takibi
-  - Premium modal tasarımı
 - ✅ Anatomi Lab (interaktif)
 - ✅ Gelişim (kilo grafiği, ölçüler, haftalık özet)
 - ✅ Veri yedekleme/geri yükleme
@@ -24,36 +20,29 @@
 
 ## Son Güncelleme (12 Aralık 2025)
 
-### v5.9.4 - Zihinsel Sekmesi Tam Yenileme
-- `mental()` renderer tamamen yeniden yazıldı
-- Premium faz kartları (gradient, glassmorphism, ikonlar)
-- Günün fazı spotlight bölümü
-- Günlük pratik bölümü + "Bunu Yaptım" butonu
-- İlerleme çubuğu (0% - 100%)
-- `showPhase()` premium modal tasarımı
-- "Bu Fazı Anladım" butonu ile faz tamamlama
-- `completeDailyPractice()` fonksiyonu
-- `markPhaseComplete()` fonksiyonu
-- Tüm fazlar tamamlandığında "MENTAL MASTER" overlay
-- `CONFIG.KEYS.MENTAL_PROGRESS` storage key
+### v6.0.0 - Majör Sürüm
+- Modal ESC tuşu ile kapatma
+- Modal backdrop tıklama ile kapatma
+- Versiyon numaraları standardize edildi (title, nav, CONFIG, mental)
 
-### v5.9.3 - Epik Overlay Sistemi
-- `UI.showEpicOverlay()` fonksiyonu
-- Gainer Shake turuncu overlay
-- Günlük görevler tamamlandığında zafer overlay
-
-### v5.9.2 - Antrenman UI Overhaul
+### Önceki Değişiklikler (Aynı Gün)
+- Zihinsel sekmesi tam yenileme
+- Epik overlay sistemi
 - Premium set input UI
-- startWorkout() epik overlay
-
-### v5.9.1 - Egzersiz Takip Sistemi
-- Premium egzersiz bilgi modalı
-- PR sistemi
+- Premium egzersiz modalı
 
 ## Bilinen Sorunlar
 - Tüm bildirilen sorunlar çözüldü ✅
 
+## Versiyon Güncelleme Rehberi
+Versiyon güncellerken şu yerleri değiştir:
+1. `<title>` (satır ~7)
+2. Nav `<span>` (satır ~560)
+3. `CONFIG.VERSION` (satır ~629)
+4. Mental renderer (satır ~2274)
+
 ## Sürüm Geçmişi
+- v6.0.0: Modal ESC/backdrop kapatma, versiyon standardizasyonu
 - v5.9.4: Zihinsel sekmesi tam yenileme
 - v5.9.3: Epik overlay sistemi
 - v5.9.2: Set input UI, epik motivasyon overlay
