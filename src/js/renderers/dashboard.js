@@ -266,49 +266,134 @@ const Renderers = window.Renderers = {
     async nutrition() {
         const meals = await Store.getMeals(Utils.dateStr());
         let t = { c: 0, p: 0, carb: 0, f: 0 };
+
+        // Calculate totals and build meal list using new component
         const list = meals.map((m, idx) => {
             t.c += m.cal; t.p += m.prot; t.carb += m.carb; t.f += m.fat;
-            let amountDisplay = "";
-            if (m.unit === 'portion') {
-                amountDisplay = `(${m.portionLabel})`;
-            } else {
-                amountDisplay = `(${m.amount} ${m.unit || 'Adet'})`;
-            }
-            return `<div class="meal-item flex justify-between items-center text-xs bg-gray-900 p-3 rounded mb-1 border border-gray-800 group"><div><span class="text-white font-bold">${Utils.escapeHtml(m.name)}</span> <span class="text-gray-500 text-[10px]">${amountDisplay}</span></div><div class="flex items-center gap-3"><span class="text-neon-green font-mono">${m.cal} kcal</span><button onclick="Actions.deleteMeal(${idx})" class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition" title="Sil"><i class="fas fa-trash-alt"></i></button></div></div>`;
-        }).join('') || '<div class="text-center text-gray-600 py-4 border-2 border-dashed border-gray-800 rounded">HENÜZ YAKIT GİRİLMEDİ<br><span class="text-[10px] text-neon-red">SİSTEM ZAYIFLIYOR!</span></div>';
+            return Components.mealCard(m, idx);
+        }).join('') || `
+            <div class="text-center text-gray-600 py-8 border-2 border-dashed border-gray-800 rounded-xl">
+                <i class="fas fa-utensils text-3xl mb-3 text-gray-700"></i>
+                <div class="font-bold">HENÜZ YAKIT GİRİLMEDİ</div>
+                <span class="text-[10px] text-neon-red">SİSTEM ZAYIFLIYOR!</span>
+            </div>`;
 
-        let feedbackBox = "";
+        // Status feedback
         const targetCal = CONFIG.TARGETS.CAL;
+        const calPercent = Math.round((t.c / targetCal) * 100);
 
-        if (t.c < targetCal) {
-            const threats = [
-                "UYARI: Yetersiz Yakıt. Testosteron üretimi durduruluyor.",
-                "KRİTİK: Kas Yıkımı (Katabolizma) Başladı.",
-                "HATA: Beyin Sisi Algılandı. Kodlama yeteneğin düşüyor."
-            ];
-            const randomThreat = threats[Math.floor(Math.random() * threats.length)];
-            feedbackBox = `<div class="mt-4 p-4 border-2 border-red-600 bg-red-900/20 rounded text-center animate-pulse-urgent"><div class="text-red-500 font-bold text-lg mb-1"><i class="fas fa-skull"></i> SİSTEM TEHLİKEDE</div><div class="text-gray-300 text-xs">${randomThreat}</div></div>`;
+        let statusBox = "";
+        if (t.c < targetCal * 0.5) {
+            statusBox = `<div class="p-3 border-2 border-red-600 bg-red-900/20 rounded-lg text-center">
+                <div class="text-red-500 font-bold"><i class="fas fa-skull mr-2"></i>KRİTİK: ${100 - calPercent}% eksik</div>
+            </div>`;
+        } else if (t.c < targetCal) {
+            statusBox = `<div class="p-3 border-2 border-yellow-600 bg-yellow-900/20 rounded-lg text-center">
+                <div class="text-yellow-500 font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>${targetCal - t.c} kcal daha lazım</div>
+            </div>`;
         } else {
-            feedbackBox = `<div class="mt-4 p-4 border-2 border-neon-green bg-green-900/20 rounded text-center"><div class="text-neon-green font-bold text-lg mb-1"><i class="fas fa-check-circle"></i> SİSTEM OPTİMUM</div><div class="text-gray-300 text-xs">Büyüme Hormonu (HGH) Aktif. İnşaat sürüyor.</div></div>`;
+            statusBox = `<div class="p-3 border-2 border-neon-green bg-green-900/20 rounded-lg text-center">
+                <div class="text-neon-green font-bold"><i class="fas fa-check-circle mr-2"></i>HEDEF TAMAMLANDI</div>
+            </div>`;
         }
 
+        // Quick add buttons (most common foods)
+        const quickFoods = [
+            { icon: 'fa-egg', name: 'Yumurta', id: 5 },
+            { icon: 'fa-drumstick-bite', name: 'Tavuk', id: 1 },
+            { icon: 'fa-bowl-rice', name: 'Pilav', id: 20 },
+            { icon: 'fa-bread-slice', name: 'Ekmek', id: 24 }
+        ];
+        const quickAddHtml = quickFoods.map(f => `
+            <button onclick="Actions.quickAddMeal(${f.id})" 
+                class="flex flex-col items-center gap-1 p-3 bg-gray-900 hover:bg-neon-green/20 rounded-lg transition-all group">
+                <i class="fas ${f.icon} text-lg text-gray-500 group-hover:text-neon-green"></i>
+                <span class="text-[10px] text-gray-500 group-hover:text-white">${f.name}</span>
+            </button>
+        `).join('');
+
+        // Daily plan
         const plan = Store.state.dailyPlan || {};
         let totalPlanCal = 0;
-        ['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'].forEach(k => { if (plan[k]) totalPlanCal += plan[k].kcal; });
+        ['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'].forEach(k => {
+            if (plan[k]) totalPlanCal += plan[k].kcal;
+        });
 
-        return `<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-slide-up"><div class="${THEME.card} h-fit"><span class="text-[10px] text-gray-500 font-bold">GÜNLÜK HEDEF</span><div class="text-4xl font-bold text-white mt-2">${t.c} <span class="text-sm text-gray-500">/ ${targetCal}</span></div><div class="h-2 w-full bg-gray-900 rounded-full mt-2 mb-4 overflow-hidden"><div class="h-full bg-neon-green" style="width:${Math.min(100, (t.c / targetCal) * 100)}%"></div></div>${feedbackBox}<div class="grid grid-cols-3 gap-2 text-center text-xs mb-4 mt-6"><div class="bg-gray-900 p-2 rounded"><div class="text-gray-500">PROT</div><div class="text-neon-blue font-bold">${t.p}/${CONFIG.TARGETS.PROT}</div></div><div class="bg-gray-900 p-2 rounded"><div class="text-gray-500">CARB</div><div class="text-neon-orange font-bold">${t.carb}/${CONFIG.TARGETS.CARB}</div></div><div class="bg-gray-900 p-2 rounded"><div class="text-gray-500">FAT</div><div class="text-neon-yellow font-bold">${t.f}/${CONFIG.TARGETS.FAT}</div></div></div><button onclick="Actions.openMealModal()" class="${THEME.btn} w-full">ÖĞÜN EKLE</button></div><div class="col-span-2 ${THEME.card} flex flex-col"><div class="flex justify-between mb-4 items-center"><span class="text-[10px] text-gray-500 font-bold">GÜNLÜK PLAN (${totalPlanCal} kcal)</span><div class="flex gap-4 items-center"><button onclick="Actions.rerollPlan()" class="text-xs text-neon-blue hover:text-white font-bold"><i class="fas fa-sync-alt mr-1"></i>MENÜYÜ YENİLE</button><span class="text-[10px] text-gray-500">${Utils.dateStr()}</span></div></div>
-        <div class="mb-4 bg-gray-900/50 p-3 rounded border border-gray-700 text-xs text-gray-300">
-            <div class="font-bold text-neon-green mb-2">⚡ OPERASYONEL BESLENME PLANI</div>
-            <ul class="space-y-2">
-                <li class="flex gap-2"><span class="text-gray-500 w-10">08:00</span> <span class="text-white font-bold">${plan.breakfast ? plan.breakfast.text : '...'}</span></li>
-                <li class="flex gap-2"><span class="text-gray-500 w-10">11:00</span> <span class="text-neon-yellow font-bold">${plan.fuel ? plan.fuel.text : '...'}</span></li>
-                <li class="flex gap-2"><span class="text-gray-500 w-10">14:00</span> <span class="text-white">${plan.lunch ? plan.lunch.text : '...'}</span></li>
-                <li class="flex gap-2"><span class="text-gray-500 w-10">17:00</span> <span class="text-white">${plan.pre_workout ? plan.pre_workout.text : '...'}</span></li>
-                <li class="flex gap-2"><span class="text-gray-500 w-10">19:00</span> <span class="text-white">${plan.dinner ? plan.dinner.text : '...'}</span></li>
-                <li class="flex gap-2"><span class="text-gray-500 w-10">23:00</span> <span class="text-white">${plan.night ? plan.night.text : '...'}</span></li>
-            </ul>
-        </div>
-        <div class="overflow-y-auto flex-1 h-[200px] custom-scrollbar">${list}</div></div></div>`;
+        return `
+        <div class="animate-slide-up space-y-6">
+            <!-- Macro Rings Row -->
+            <div class="${THEME.card}">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[10px] text-gray-500 font-bold">GÜNLÜK MAKS TAKIP</span>
+                    <span class="text-[10px] text-gray-500">${Utils.dateStr()}</span>
+                </div>
+                <div class="flex justify-around items-center py-4">
+                    ${Components.macroRing('KALORİ', t.c, targetCal, '', '#00ff41', '90')}
+                    ${Components.macroRing('PROTEİN', t.p, CONFIG.TARGETS.PROT, 'g', '#00f3ff', '70')}
+                    ${Components.macroRing('KARB', t.carb, CONFIG.TARGETS.CARB, 'g', '#ff6b35', '70')}
+                    ${Components.macroRing('YAĞ', t.f, CONFIG.TARGETS.FAT, 'g', '#ffed4a', '70')}
+                </div>
+                ${statusBox}
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left Column: Quick Add + Meal List -->
+                <div class="space-y-4">
+                    <!-- Quick Add Section -->
+                    <div class="${THEME.card}">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] text-gray-500 font-bold">⚡ HIZLI EKLE</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 mb-4">
+                            ${quickAddHtml}
+                        </div>
+                        <button onclick="Actions.openMealModal()" class="${THEME.btn} w-full">
+                            <i class="fas fa-plus mr-2"></i>ÖĞÜN EKLE
+                        </button>
+                    </div>
+
+                    <!-- Meal List -->
+                    <div class="${THEME.card}">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] text-gray-500 font-bold">BUGÜNKÜ YAKITLAR (${meals.length})</span>
+                            <span class="text-neon-green font-bold text-sm">${t.c} kcal</span>
+                        </div>
+                        <div class="max-h-[300px] overflow-y-auto custom-scrollbar space-y-2">
+                            ${list}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Daily Plan -->
+                <div class="${THEME.card}">
+                    <div class="flex justify-between mb-4 items-center">
+                        <span class="text-[10px] text-gray-500 font-bold">📋 GÜNLÜK PLAN (${totalPlanCal} kcal)</span>
+                        <button onclick="Actions.rerollPlan()" class="text-xs text-neon-blue hover:text-white font-bold">
+                            <i class="fas fa-sync-alt mr-1"></i>YENİLE
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                        ${['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'].map(k => {
+            const times = { breakfast: '08:00', fuel: '11:00', lunch: '14:00', pre_workout: '17:00', dinner: '19:00', night: '23:00' };
+            const icons = { breakfast: 'fa-sun', fuel: 'fa-bolt', lunch: 'fa-utensils', pre_workout: 'fa-dumbbell', dinner: 'fa-moon', night: 'fa-bed' };
+            const labels = { breakfast: 'Kahvaltı', fuel: 'Ara Öğün', lunch: 'Öğle', pre_workout: 'Antrenman Öncesi', dinner: 'Akşam', night: 'Gece' };
+            const meal = plan[k];
+            return `
+                            <div class="flex items-center gap-3 p-2 rounded-lg ${meal ? 'bg-gray-900/50' : 'bg-gray-900/20 opacity-50'}">
+                                <div class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center">
+                                    <i class="fas ${icons[k]} text-xs text-gray-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-[10px] text-gray-500">${times[k]} - ${labels[k]}</div>
+                                    <div class="text-sm text-white font-bold">${meal ? meal.text : '...'}</div>
+                                </div>
+                                ${meal ? `<span class="text-[10px] text-neon-green">${meal.kcal} kcal</span>` : ''}
+                            </div>`;
+        }).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>`;
     },
 
     async progress() {

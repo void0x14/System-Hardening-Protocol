@@ -28,6 +28,79 @@ const Components = window.Components = {
         </div>`,
 
     /**
+     * Macro ring - circular progress for nutrition (SVG-based)
+     * @param {string} label - Label text (e.g., "CAL", "PROT")
+     * @param {number} current - Current value
+     * @param {number} target - Target value
+     * @param {string} unit - Unit display (e.g., "kcal", "g")
+     * @param {string} color - Hex color for ring
+     * @param {string} [size='80'] - Ring size in pixels
+     */
+    macroRing: (label, current, target, unit, color, size = '80') => {
+        const percent = Math.min(100, (current / target) * 100);
+        const radius = 35;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (percent / 100) * circumference;
+        const isOver = current > target;
+        const displayColor = isOver ? '#00ff41' : color;
+
+        return `
+        <div class="flex flex-col items-center">
+            <div class="relative" style="width: ${size}px; height: ${size}px;">
+                <svg class="macro-ring-svg" width="${size}" height="${size}" viewBox="0 0 80 80">
+                    <!-- Background circle -->
+                    <circle cx="40" cy="40" r="${radius}" fill="none" stroke="#1a1a22" stroke-width="6"/>
+                    <!-- Progress circle -->
+                    <circle cx="40" cy="40" r="${radius}" fill="none" stroke="${displayColor}" stroke-width="6"
+                        stroke-linecap="round"
+                        stroke-dasharray="${circumference}"
+                        stroke-dashoffset="${offset}"
+                        class="macro-ring-progress"
+                        style="transform: rotate(-90deg); transform-origin: center;"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-lg font-black text-white">${current}</span>
+                </div>
+            </div>
+            <div class="text-center mt-1">
+                <div class="text-[10px] font-bold" style="color: ${displayColor}">${label}</div>
+                <div class="text-[9px] text-gray-500">/${target}${unit}</div>
+            </div>
+        </div>`;
+    },
+
+    /**
+     * Enhanced meal card with macro breakdown
+     * @param {Object} meal - Meal object with name, cal, prot, carb, fat
+     * @param {number} idx - Index for delete action
+     */
+    mealCard: (meal, idx) => `
+        <div class="meal-item flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-gray-900/80 p-3 rounded-lg mb-2 border border-gray-800 group hover:border-gray-700 transition-all">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-neon-green/10 flex items-center justify-center text-neon-green">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div>
+                    <div class="text-white font-bold text-sm">${Utils.escapeHtml(meal.name)}</div>
+                    <div class="flex gap-2 text-[10px] text-gray-500 mt-0.5">
+                        ${meal.portionLabel ? `<span>${meal.portionLabel}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex gap-3 text-[10px]">
+                    <span class="text-neon-blue"><b>${meal.prot || 0}</b>P</span>
+                    <span class="text-accent-orange"><b>${meal.carb || 0}</b>C</span>
+                    <span class="text-yellow-400"><b>${meal.fat || 0}</b>F</span>
+                </div>
+                <span class="text-neon-green font-bold text-sm">${meal.cal} kcal</span>
+                <button onclick="Actions.deleteMeal(${idx})" class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-2" title="Sil">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>`,
+
+    /**
      * Labeled progress row (label + value + bar)
      * @param {string} label - Left label text
      * @param {string} value - Right value display

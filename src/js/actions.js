@@ -69,6 +69,50 @@ const Actions = window.Actions = {
         this.switchTab('dashboard');
     },
 
+    /**
+     * Quick add meal by food ID (for quick-add buttons)
+     * Uses default portion (1 unit for piece, first option for portion)
+     * @param {number} foodId - Food ID from DB.FOODS
+     */
+    async quickAddMeal(foodId) {
+        const foods = Store.getAllFoods();
+        const food = foods.find(f => f.id === foodId);
+        if (!food) {
+            UI.showToast("Yiyecek bulunamadı!", "error");
+            return;
+        }
+
+        let ratio = 1;
+        let unitLabel = "";
+
+        if (food.type === 'portion') {
+            // Use first option as default
+            const opt = food.options[0];
+            ratio = opt.ratio;
+            unitLabel = opt.label;
+        } else if (food.type === 'piece') {
+            ratio = 1;
+            unitLabel = food.unitName || 'Adet';
+        } else {
+            ratio = 1;
+            unitLabel = 'Adet';
+        }
+
+        await Store.addMeal({
+            name: food.name,
+            amount: 1,
+            unit: food.type || 'custom',
+            portionLabel: unitLabel,
+            cal: Math.round(food.vals.cal * ratio),
+            prot: Math.round(food.vals.prot * ratio),
+            carb: Math.round(food.vals.carb * ratio),
+            fat: Math.round(food.vals.fat * ratio)
+        });
+
+        UI.showToast(`${food.name} eklendi ⚡`);
+        this.switchTab('nutrition');
+    },
+
     async toggleTask(id) {
         await Store.toggleTask(id);
         this.switchTab('training');
