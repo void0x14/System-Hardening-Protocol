@@ -1,23 +1,26 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**v6.1.0 - Antrenman Takip Sistemi** - TAMAMLANDI ✅
+**v6.2.0 - Component Factory Pattern + HTML Düzeltme** - TAMAMLANDI ✅
 
 ### Son Güncelleme (13 Aralık 2025)
 
-#### trackingType Sistemi
-- `weighted` - Ağırlık × Tekrar + Intensity Hints
-- `timed` - Süre bazlı set (vacuum, plank)
-- `duration` - Tek süre toggle (cool_down)
-- `activity` - Aktivite toggle (farmers_walk, walk)
-- `task` - Görev toggle (weigh_in, prep_food)
+#### Components Factory (12 fonksiyon)
+- `card`, `progressBar`, `progressRow` - Layout
+- `statCard`, `statMini`, `badge` - Veri gösterimi
+- `btn`, `iconBtn` - Butonlar
+- `weightedSetRow`, `timedSetRow`, `simpleTaskBtn` - Set input
+- `statusDot` - Durum göstergesi
 
-#### Progressive Overload UI
-SET 1: WARMUP %70 → SET 4: 🔥 BURN
+#### Refactored Renderers
+- `training()` - Components kullanımına geçti (~70 satır azaldı)
 
-#### İstatistik Kartları (6 adet)
-MEVCUT | BUGÜN | HAFTALIK | AYLIK | TOPLAM SET | HEDEF
+#### HTML Regression Fix
+42 bozuk HTML tag düzeltildi:
+- `< div class=` → `<div class=`
+- `</div >` → `</div>`
+- `border - 2` → `border-2`
+- `onclick = ` → `onclick=`
 
-#### Yeni Action Handlers
-- `saveTimedSet()` - Süreli set kayıt
-- `toggleSimpleTask()` - Basit görev toggle
+#### trackingType Sistemi (v6.1.0)
+- `weighted`, `timed`, `duration`, `activity`, `task`

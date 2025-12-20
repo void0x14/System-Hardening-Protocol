@@ -1,6 +1,6 @@
 # İlerleme Durumu
 
-## Çalışan Özellikler - v6.0.0
+## Çalışan Özellikler - v6.2.0
 - ✅ Dashboard (streak, kilo, su, uyku takibi)
 - ✅ Antrenman sekmesi (premium set input, PR takibi)
 - ✅ Premium egzersiz bilgi modalı
@@ -15,14 +15,16 @@
 - ✅ Anatomi Lab
 - ✅ Gelişim
 - ✅ Veri yedekleme/geri yükleme
+- ✅ **Components Factory Pattern (12 reusable component)**
+- ✅ **trackingType sistemi (weighted/timed/duration/activity/task)**
 
-## Bilinen Sorunlar - v6.1.0'da Düzeltilecek
-- ❌ Ağırlık gerektirmeyen hareketler (vacuum, yürüyüş) set/tekrar zorluyor
-- ❌ Set onaylandığında yeşil gösterge yanmıyor
-- ❌ Günlük/haftalık/aylık istatistik UI'ı yok
+## Bilinen Sorunlar
+- ❌ Kalan renderer'lar henüz Components kullanmıyor (dashboard, progress)
+- ❌ Event delegation uygulanmadı (inline onclick'ler duruyor)
 
 ## Sürüm Geçmişi
-- v6.1.0: (Planla) Egzersiz tipi sistemi, istatistik UI'ı, bug fixes
+- v6.2.0: Components Factory, HTML regression fix, training refactor
+- v6.1.0: trackingType sistemi, istatistik UI'ı
 - v6.0.0: Modal kapatma, versiyon, JSDoc, video eğitimi
 - v5.9.x: Zihinsel yenileme, epik overlay, premium UI
 
