@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v6.3.0</title>
+    <title>PROJECT: MONK MODE | v7.0.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -627,7 +627,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '6.3.0',
+            VERSION: '7.0.0',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -1206,6 +1206,18 @@
             dateStr: () => new Date().toLocaleDateString('tr-TR').split('.').reverse().join('-'),
 
             /**
+             * v7.0.0: XSS önleme - HTML karakterlerini escape eder.
+             * @param {string} str - Escape edilecek string
+             * @returns {string} Güvenli HTML string
+             */
+            escapeHtml: (str) => {
+                if (str === null || str === undefined) return '';
+                const div = document.createElement('div');
+                div.textContent = String(str);
+                return div.innerHTML;
+            },
+
+            /**
              * Storage adapter - localStorage veya window.storage API kullanır.
              */
             storage: {
@@ -1249,6 +1261,32 @@
             },
 
             /**
+             * v7.0.0: JSON import validation - Bilinen key'leri kontrol eder.
+             * @param {Object} data - Parse edilmiş JSON
+             * @returns {Object} { valid: boolean, data: Object, skipped: string[] }
+             */
+            validateImportData: (data) => {
+                if (!data || typeof data !== 'object') {
+                    return { valid: false, data: null, skipped: [], error: 'Geçersiz veri formatı' };
+                }
+                const validPrefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
+                const validData = {};
+                const skipped = [];
+                for (const key in data) {
+                    if (key === 'meta') {
+                        validData[key] = data[key];
+                    } else if (validPrefixes.some(p => key.startsWith(p))) {
+                        if (data[key] !== null && data[key] !== undefined) {
+                            validData[key] = data[key];
+                        }
+                    } else {
+                        skipped.push(key);
+                    }
+                }
+                return { valid: !!validData.meta, data: validData, skipped, error: validData.meta ? null : 'Meta bilgisi eksik' };
+            },
+
+            /**
              * Belirtilen kategoriden rastgele öğün önerisi döndürür.
              * @param {('breakfast'|'fuel'|'lunch'|'pre_workout'|'dinner'|'night')} category - Öğün kategorisi
              * @returns {Object|null} Rastgele öğün objesi veya null
@@ -1287,6 +1325,19 @@
          */
         const Store = {
             state: { weight: 45.0, fuelDate: null, customFoods: [], meals: {}, dailyPlan: null, selectedMuscle: null, activeTab: 'dashboard' },
+
+            // v7.0.0: Performance cache
+            _cache: {},
+
+            /**
+             * v7.0.0: Cache'i temizle
+             * @param {string} [key] - Belirli bir cache key, boşsa tümünü temizle
+             */
+            clearCache(key) {
+                if (key) delete this._cache[key];
+                else this._cache = {};
+            },
+
             /**
              * Store'u başlat. localStorage'dan verileri yükler.
              * Uygulama başlangıcında çağrılır.
@@ -1769,6 +1820,7 @@
             async setSleep(hours) {
                 const date = Utils.dateStr();
                 await Utils.storage.set(CONFIG.KEYS.SLEEP + date, parseFloat(hours));
+                this.clearCache('sleepStats'); // v7.0.0
                 return true;
             },
 
@@ -1780,6 +1832,7 @@
                 const date = Utils.dateStr();
                 const current = await this.getWater(date);
                 await Utils.storage.set(CONFIG.KEYS.WATER + date, current + cups);
+                this.clearCache('waterStats'); // v7.0.0
                 return current + cups;
             },
 
@@ -2461,7 +2514,7 @@
                     } else {
                         amountDisplay = `(${m.amount} ${m.unit || 'Adet'})`;
                     }
-                    return `<div class="meal-item flex justify-between items-center text-xs bg-gray-900 p-3 rounded mb-1 border border-gray-800 group"><div><span class="text-white font-bold">${m.name}</span> <span class="text-gray-500 text-[10px]">${amountDisplay}</span></div><div class="flex items-center gap-3"><span class="text-neon-green font-mono">${m.cal} kcal</span><button onclick="Actions.deleteMeal(${idx})" class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition" title="Sil"><i class="fas fa-trash-alt"></i></button></div></div>`;
+                    return `<div class="meal-item flex justify-between items-center text-xs bg-gray-900 p-3 rounded mb-1 border border-gray-800 group"><div><span class="text-white font-bold">${Utils.escapeHtml(m.name)}</span> <span class="text-gray-500 text-[10px]">${amountDisplay}</span></div><div class="flex items-center gap-3"><span class="text-neon-green font-mono">${m.cal} kcal</span><button onclick="Actions.deleteMeal(${idx})" class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition" title="Sil"><i class="fas fa-trash-alt"></i></button></div></div>`;
                 }).join('') || '<div class="text-center text-gray-600 py-4 border-2 border-dashed border-gray-800 rounded">HENÜZ YAKIT GİRİLMEDİ<br><span class="text-[10px] text-neon-red">SİSTEM ZAYIFLIYOR!</span></div>';
 
                 // BRUTAL REALITY LOGIC
