@@ -1,41 +1,23 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**v6.0.0 - Egzersiz Video Entegrasyonu** - TAMAMLANDI ✅
+**v6.1.0 - Antrenman Takip Sistemi** - TAMAMLANDI ✅
 
-### Son Güncelleme (12 Aralık 2025)
+### Son Güncelleme (13 Aralık 2025)
 
-#### YouTube Video Eğitimi
-Egzersiz detay modal'ına YouTube video entegrasyonu eklendi.
+#### trackingType Sistemi
+- `weighted` - Ağırlık × Tekrar + Intensity Hints
+- `timed` - Süre bazlı set (vacuum, plank)
+- `duration` - Tek süre toggle (cool_down)
+- `activity` - Aktivite toggle (farmers_walk, walk)
+- `task` - Görev toggle (weigh_in, prep_food)
 
-**Özellikler:**
-- 📹 11 egzersiz için video eğitimi
-- 🎬 Collapsed varsayılan (kullanıcı talebine bırakıldı)
-- 🖱️ Tıklayınca expand/collapse
-- 🎨 Premium kırmızı gradient UI (YouTube teması)
-- 📱 Responsive 16:9 aspect ratio
+#### Progressive Overload UI
+SET 1: WARMUP %70 → SET 4: 🔥 BURN
 
-**Video Eklenen Egzersizler:**
-| Egzersiz | YouTube ID |
-|----------|-----------|
-| Squat | xqvCmoLULNY |
-| Goblet Squat | MxsFDhcyFyE |
-| Push-up | IODxDxX7oi4 |
-| One Arm Row | pYcpY20QaE8 |
-| RKC Plank | kL_NJAkCQBg |
-| Farmer's Walk | Fkzk_RqlYig |
-| Hammer Curl | zC3nLlEvin4 |
-| Mountain Climber | nmwgirgXLYM |
-| Leg Raise | JB2oyawG9KI |
-| Superman | z6PJMT2y8GQ |
+#### İstatistik Kartları (6 adet)
+MEVCUT | BUGÜN | HAFTALIK | AYLIK | TOPLAM SET | HEDEF
 
-#### Video Yok → Bölüm Görünmez
-`videoId` olmayan egzersizlerde (kegel, bulk ye, vb.) video bölümü görünmez.
-
-### Bugünkü Tüm Değişiklikler
-1. Antrenman premium UI
-2. Zihinsel sekmesi yenileme
-3. Modal ESC/backdrop kapatma
-4. Versiyon v6.0.0
-5. Kapsamlı JSDoc dokümantasyonu
-6. **Egzersiz video entegrasyonu**
+#### Yeni Action Handlers
+- `saveTimedSet()` - Süreli set kayıt
+- `toggleSimpleTask()` - Basit görev toggle
