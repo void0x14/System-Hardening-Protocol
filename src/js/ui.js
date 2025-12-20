@@ -121,7 +121,7 @@ const UI = window.UI = {
                         <div class="p-3 rounded border border-gray-600 bg-gray-900 text-gray-400 peer-checked:border-neon-green peer-checked:text-white peer-checked:bg-green-900/20 transition-all flex justify-between items-center gap-2 hover:border-gray-400">
                             <div class="flex items-center gap-3">
                                 <div class="w-4 h-4 rounded-full border border-gray-500 radio-dot flex items-center justify-center"></div>
-                                <span class="text-sm font-bold">${opt.label}</span>
+                                <span class="text-sm font-bold">${Utils.escapeHtml(opt.label)}</span>
                             </div>
                             <span class="text-xs text-gray-500 font-mono">~${Math.round(selectedFood.vals.cal * opt.ratio)} kcal</span>
                         </div>
@@ -133,8 +133,8 @@ const UI = window.UI = {
         } else {
             const unitName = selectedFood.unitName || 'Adet';
             container.innerHTML = `
-                <label class="text-[10px] text-gray-500 font-bold block mb-1">MİKTAR (${unitName})</label>
-                <input type="number" id="m-amount" class="${THEME.input}" value="1" placeholder="Kaç ${unitName}?">
+                <label class="text-[10px] text-gray-500 font-bold block mb-1">MİKTAR (${Utils.escapeHtml(unitName)})</label>
+                <input type="number" id="m-amount" class="${THEME.input}" value="1" placeholder="Kaç ${Utils.escapeHtml(unitName)}?">
             `;
         }
     },
