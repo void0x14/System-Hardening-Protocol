@@ -1,21 +1,27 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**v6.3.0 - Uyku/Su İstatistikleri** - TAMAMLANDI ✅
+**v7.1.0 - Video Player Fix + Technical Debt Documentation** - TAMAMLANDI ✅
 
 ### Son Güncelleme (13 Aralık 2025)
 
-#### Yeni Store Fonksiyonları
-- `getSleepStats()` - Haftalık/aylık uyku ortalaması
-- `getWaterStats()` - Haftalık/aylık su toplamı
+#### v7.1.0 Eklenenler
+- `VideoPlayer.openVideo()` - Robust fallback sistemi (embed URL → watch URL)
+- Video popup yerine yeni pencere/sekme
+- Detaylı technical debt analizi (10 madde)
 
-#### Dashboard Güncellemeleri
-- Uyku kartı: Haftalık + Aylık ortalama
-- Su kartı: Haftalık + Aylık toplam
+#### Bilinen Kritik Sorunlar
+- **[ERTELENDİ]** YouTube Error 153 - `file://` protokolü embed kısıtlaması (çözülemez)
+- CDN bağımlılığı (offline risk) - v7.1.0'da kısmen çözüldü (onerror handlers)
+- localStorage limiti (5-10MB) - v7.1.0'da kısmen çözüldü (QuotaExceededError toast)
+- Global namespace pollution (defer edildi)
+- **[YENİ]** Accessibility (A11Y) eksikliği
+- **[YENİ]** Timezone bug (`dateStr` implementation)
+- **[YENİ]** XSS risk (`innerHTML` kullanımı)
+- **[YENİ]** Data validation gaps
+- **[YENİ]** No automated tests
 
-#### Progress Güncellemeleri
-- 4 yeni istatistik kartı (uyku/su haftalık/aylık)
-
-#### Önceki: Components Factory (v6.2.0)
-- 12 reusable component fonksiyonu
-- `training()` renderer refactored
+#### Sonraki Adımlar
+- Technical debt'i önceliklendirme (A11Y, timezone bug, XSS)
+- Test suite eklemek (minimal: Utils, Store critical funcs)
+- future_refactoring_prompt.md dosyasına bak (Phase 3-5)
