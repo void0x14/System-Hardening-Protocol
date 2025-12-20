@@ -66,6 +66,33 @@
 
 ---
 
+### 3.5 🚀 YOLCULUK Tab (NEW - v8.3.0)
+**Current Issue**: Kullanıcının fitness yolculuğunu görsel takip edebileceği bir alan yok. 4 haftalık ilerlemeyi görselleştirmek için yeni sekme.
+
+**Planned Features (System Integrity Monitor)**:
+- [ ] **Integrity Ring** - SVG circular progress (45kg→60kg), Red→Yellow→Green renk geçişi
+- [ ] **Uptime Heatmap** - 28 günlük antrenman tutarlılık grid'i (disk defrag tarzı)
+- [ ] **Weekly Score Cards** - Haftalık kalite skorları (★★★★★ ile değerlendirme)
+- [ ] **Photo Gallery** - Haftalık vücut fotoğrafları + upload
+- [ ] **Before/After Slider** - Fotoğraf karşılaştırma (clip-path slider)
+- [ ] **Mass Gain Graph** - Kilo artış grafiği (SVG polyline)
+
+**Development Approach**:
+- **Opsiyon A**: Ayrı tab olarak oluştur ✅ (Seçildi)
+- **Opsiyon B**: Kademeli geliştir - 1 bileşen ekle, onay al, sonra bir sonraki
+- **Opsiyon C**: UI mockup önce çiz/onayla, sonra kod yaz
+
+**Technical Notes**:
+- Tab navigation'a yeni "YOLCULUK" tab'ı ekle
+- Renderers/journey.js oluştur
+- Store functions: getJourneyStats, getUptimeData, calculateWeekScore, addProgressPhoto
+- Photo storage: Base64 sıkıştır (~50KB/foto), max 12 fotoğraf (localStorage limit)
+
+**Priority**: 🔴 CRITICAL (User requested)
+
+---
+
+
 ### 4. 🦴 ANATOMİ LAB (Anatomy Tab)
 **Current Issue**: Looks nice but is very non-functional. 2D SVG feels limited.
 
