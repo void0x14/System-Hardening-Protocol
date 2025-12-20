@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v5.7.3 (Premium)</title>
+    <title>PROJECT: MONK MODE | v5.8.0 (Premium)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -557,7 +557,7 @@
                 <i class="fas fa-biohazard text-neon-green text-2xl"></i>
                 <div>
                     <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v5.7.3</span></h1>
+                            class="text-sm text-text-muted">v5.8.0</span></h1>
                     <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
                     </div>
                 </div>
@@ -565,6 +565,10 @@
             <div class="flex items-center gap-6">
                 <div id="clock-display" class="hidden md:block font-mono text-text-muted font-bold text-sm">--:--:--
                 </div>
+                <button onclick="Actions.openSettings()" id="btn-settings"
+                    class="bg-gray-800 text-gray-400 px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition">
+                    <i class="fas fa-cog"></i>
+                </button>
                 <button onclick="Actions.toggleOverride()" id="btn-override"
                     class="bg-neon-red/10 text-neon-red px-4 py-2 rounded-lg hover:bg-neon-red hover:text-white transition text-xs font-bold tracking-widest">
                     <i class="fas fa-power-off mr-2"></i> OVERRIDE
@@ -622,7 +626,7 @@
     <script>
         // --- CONFIG & DATA ---
         const CONFIG = {
-            VERSION: '5.7.3 Premium',
+            VERSION: '5.8.0 Premium',
             KEYS: {
                 WEIGHT: 'monk_weight',
                 FUEL: 'monk_fuel_date',
@@ -632,9 +636,18 @@
                 WEIGHT_HISTORY: 'monk_weight_history',
                 CUSTOM_FOODS: 'monk_custom_foods',
                 DAILY_PLAN: 'monk_daily_plan',
-                STREAK: 'monk_streak_data'
+                STREAK: 'monk_streak_data',
+                BACKUP: 'monk_last_backup_date',
+                SLEEP: 'monk_sleep_log_',
+                WATER: 'monk_water_'
             },
-            TARGETS: { START: 45.0, GOAL: 60.0, CAL: 3000, PROT: 225, CARB: 375, FAT: 67 }
+            TARGETS: { START: 45.0, GOAL: 60.0, CAL: 3000, PROT: 225, CARB: 375, FAT: 67, WATER: 8, SLEEP: 7.5 },
+            MILESTONES: [
+                { weight: 48, title: "Başlangıç +3kg", icon: "🌱" },
+                { weight: 50, title: "Yarım Yüzlük", icon: "⚡" },
+                { weight: 55, title: "Yarı Yol", icon: "🔥" },
+                { weight: 60, title: "HEDEF", icon: "🏆" }
+            ]
         };
 
         const THEME = {
@@ -1099,6 +1112,119 @@
                     }
                 }
             },
+
+            // --- PHASE 1: DATA SECURITY (BACKUP/RESTORE) ---
+            async exportData() {
+                const data = {};
+                for (const key in CONFIG.KEYS) {
+                    const storageKey = CONFIG.KEYS[key];
+                    if (storageKey.endsWith('_')) {
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const lsKey = localStorage.key(i);
+                            if (lsKey && lsKey.startsWith(storageKey)) {
+                                data[lsKey] = await Utils.storage.get(lsKey);
+                            }
+                        }
+                    } else {
+                        data[storageKey] = await Utils.storage.get(storageKey);
+                    }
+                }
+                data.meta = { version: CONFIG.VERSION, date: new Date().toISOString(), user: 'MONK_MODE_USER' };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `monk_mode_backup_${Utils.dateStr()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                await Utils.storage.set(CONFIG.KEYS.BACKUP, Utils.dateStr());
+                return true;
+            },
+
+            async importData(jsonContent) {
+                try {
+                    const data = JSON.parse(jsonContent);
+                    if (!data.meta) throw new Error("Geçersiz yedek dosyası");
+                    const prefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
+                    const keysToRemove = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && prefixes.some(p => key.startsWith(p))) keysToRemove.push(key);
+                    }
+                    keysToRemove.forEach(k => localStorage.removeItem(k));
+                    for (const key in data) {
+                        if (key !== 'meta') await Utils.storage.set(key, data[key]);
+                    }
+                    return { success: true, date: data.meta.date };
+                } catch (e) {
+                    console.error("Import Error:", e);
+                    return { success: false, error: e.message };
+                }
+            },
+
+            async checkBackupStatus() {
+                const lastBackup = await Utils.storage.get(CONFIG.KEYS.BACKUP);
+                if (!lastBackup) return 'NEVER';
+                const today = new Date();
+                const last = new Date(lastBackup.split('.').reverse().join('-'));
+                const diffDays = Math.ceil(Math.abs(today - last) / (1000 * 60 * 60 * 24));
+                if (diffDays > 7) return 'WARNING';
+                return 'OK';
+            },
+
+            // --- PHASE 2: ACTIVE TRAINING ENGINE ---
+            async getWorkoutData(date) {
+                return await Utils.storage.get('monk_workout_data_' + date) || {};
+            },
+
+            async logSet(taskId, setIndex, weight, reps, isDone) {
+                const date = Utils.dateStr();
+                const key = 'monk_workout_data_' + date;
+                const data = await Utils.storage.get(key) || {};
+                if (!data[taskId]) data[taskId] = [];
+                data[taskId][setIndex] = {
+                    weight: parseFloat(weight) || 0,
+                    reps: parseFloat(reps) || 0,
+                    timestamp: new Date().toISOString(),
+                    completed: isDone
+                };
+                await Utils.storage.set(key, data);
+                const hasCompletedSet = data[taskId].some(s => s && s.completed);
+                if (hasCompletedSet) await this.setTaskDone(taskId, true);
+                return true;
+            },
+
+            async setTaskDone(id, status) {
+                const date = Utils.dateStr();
+                let tasks = await this.getWorkout(date);
+                if (status) {
+                    if (!tasks.includes(id)) tasks.push(id);
+                } else {
+                    tasks = tasks.filter(t => t !== id);
+                }
+                await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
+                await this.updateStreak();
+            },
+
+            async getVolumeStats() {
+                const today = new Date();
+                const stats = { weekly: 0, daily: {} };
+                for (let i = 0; i < 7; i++) {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() - i);
+                    const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+                    const data = await this.getWorkoutData(dateStr);
+                    let vol = 0;
+                    Object.values(data).forEach(sets => {
+                        sets.forEach(s => { if (s && s.completed) vol += (s.weight * s.reps); });
+                    });
+                    stats.daily[dateStr] = vol;
+                    stats.weekly += vol;
+                }
+                return stats;
+            },
             async getTodayProgress() {
                 const today = Utils.dateStr();
                 const day = new Date().getDay();
@@ -1118,6 +1244,79 @@
                     caloriesTarget: CONFIG.TARGETS.CAL,
                     caloriesPercent: Math.round((totalCal / CONFIG.TARGETS.CAL) * 100)
                 };
+            },
+
+            // --- v5.8.0: SLEEP TRACKING ---
+            async getSleep(date) {
+                return await Utils.storage.get(CONFIG.KEYS.SLEEP + date) || 0;
+            },
+            async setSleep(hours) {
+                const date = Utils.dateStr();
+                await Utils.storage.set(CONFIG.KEYS.SLEEP + date, parseFloat(hours));
+                return true;
+            },
+
+            // --- v5.8.0: WATER TRACKING ---
+            async getWater(date) {
+                return await Utils.storage.get(CONFIG.KEYS.WATER + date) || 0;
+            },
+            async addWater(cups = 1) {
+                const date = Utils.dateStr();
+                const current = await this.getWater(date);
+                await Utils.storage.set(CONFIG.KEYS.WATER + date, current + cups);
+                return current + cups;
+            },
+
+            // --- v5.8.0: MILESTONE CHECK ---
+            getNextMilestone() {
+                const w = this.state.weight;
+                for (const m of CONFIG.MILESTONES) {
+                    if (w < m.weight) return m;
+                }
+                return CONFIG.MILESTONES[CONFIG.MILESTONES.length - 1];
+            },
+            getCompletedMilestones() {
+                return CONFIG.MILESTONES.filter(m => this.state.weight >= m.weight);
+            },
+
+            // --- v5.8.0: WEEKLY SUMMARY ---
+            async getWeeklySummary() {
+                const weeks = [];
+                const today = new Date();
+
+                for (let w = 0; w < 4; w++) {
+                    let totalCal = 0, calDays = 0, workoutDays = 0;
+                    let startWeight = null, endWeight = null;
+
+                    for (let d = 0; d < 7; d++) {
+                        const date = new Date(today);
+                        date.setDate(date.getDate() - (w * 7 + d));
+                        const dateStr = date.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+
+                        const meals = await this.getMeals(dateStr);
+                        if (meals.length > 0) {
+                            totalCal += meals.reduce((sum, m) => sum + m.cal, 0);
+                            calDays++;
+                        }
+
+                        const workout = await this.getWorkout(dateStr);
+                        if (workout.length > 0) workoutDays++;
+
+                        const hist = await this.getHistory();
+                        if (hist[dateStr]) {
+                            if (!endWeight) endWeight = hist[dateStr];
+                            startWeight = hist[dateStr];
+                        }
+                    }
+
+                    weeks.push({
+                        week: w + 1,
+                        avgCal: calDays > 0 ? Math.round(totalCal / calDays) : 0,
+                        workoutDays,
+                        weightChange: (startWeight && endWeight) ? (endWeight - startWeight).toFixed(1) : null
+                    });
+                }
+                return weeks;
             }
         };
 
@@ -1253,88 +1452,157 @@
             async dashboard() {
                 const p = Math.min(100, Math.max(0, ((Store.state.weight - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 100));
                 const fuelDone = Store.state.fuelDate === Utils.dateStr();
-                const fuelCardClass = fuelDone ? "border-l-4 border-l-neon-yellow" : "border-2 border-neon-red animate-pulse-urgent";
 
-                // Get streak and today's progress
+                // Get data
                 const streak = await Store.getStreak();
                 const progress = await Store.getTodayProgress();
+                const todaySleep = await Store.getSleep(Utils.dateStr());
+                const todayWater = await Store.getWater(Utils.dateStr());
+                const nextMilestone = Store.getNextMilestone();
+                const completedMilestones = Store.getCompletedMilestones();
+
+                // Milestone progress calculation
+                const prevMilestone = completedMilestones.length > 0 ? completedMilestones[completedMilestones.length - 1] : { weight: CONFIG.TARGETS.START };
+                const milestoneProgress = nextMilestone ?
+                    Math.min(100, Math.max(0, ((Store.state.weight - prevMilestone.weight) / (nextMilestone.weight - prevMilestone.weight)) * 100)) : 100;
+
+                // Sleep status
+                const sleepStatus = todaySleep === 0 ? { icon: '😴', text: 'Henüz girilmedi', color: 'text-gray-500' } :
+                    todaySleep < 6 ? { icon: '😵', text: 'Yetersiz', color: 'text-neon-red' } :
+                        todaySleep < 7 ? { icon: '😊', text: 'Kabul edilebilir', color: 'text-neon-yellow' } :
+                            todaySleep <= 8.5 ? { icon: '💪', text: 'Optimal', color: 'text-neon-green' } :
+                                { icon: '⚠️', text: 'Fazla uyku', color: 'text-neon-yellow' };
+
+                // Water status
+                const waterPercent = Math.min(100, (todayWater / CONFIG.TARGETS.WATER) * 100);
 
                 return `
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
-                        <!-- STREAK CARD - Prominent -->
+                        <!-- MILESTONE PROGRESS (NEW) -->
+                        <div class="${THEME.card} lg:col-span-3 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-r from-neon-purple/5 via-transparent to-neon-green/5"></div>
+                            <div class="relative">
+                                <div class="${THEME.label}">🏆 MILESTONE YOLCULUĞU</div>
+                                <div class="flex items-center justify-between mt-4 mb-3">
+                                    <div class="flex items-center gap-3">
+                                        ${completedMilestones.map(m => `<span class="text-2xl" title="${m.title}">${m.icon}</span>`).join('')}
+                                        ${completedMilestones.length === 0 ? '<span class="text-gray-500 text-sm">Henüz milestone yok</span>' : ''}
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-2xl font-bold text-white">${nextMilestone ? nextMilestone.icon : '🏆'} ${nextMilestone ? nextMilestone.title : 'TAMAMLANDI!'}</div>
+                                        <div class="text-sm text-text-muted">${nextMilestone ? `${nextMilestone.weight} kg hedef` : ''}</div>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-surface-raised h-3 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-neon-purple to-neon-green transition-all duration-1000 rounded-full" style="width: ${milestoneProgress}%"></div>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+                                    <span>${prevMilestone.weight} kg</span>
+                                    <span>${nextMilestone ? nextMilestone.weight : CONFIG.TARGETS.GOAL} kg</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- STREAK CARD -->
                         <div class="${THEME.card} text-center relative overflow-hidden">
                             <div class="absolute inset-0 bg-gradient-to-br from-neon-green/5 to-transparent"></div>
                             <div class="relative">
                                 <div class="${THEME.label}">🔥 STREAK</div>
-                                <div class="text-7xl md:text-8xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-text-muted'} leading-none">${streak}</div>
-                                <div class="text-sm text-text-muted mt-4 uppercase tracking-wider">${streak > 0 ? 'Gün Üst Üste' : 'Seri Kırıldı'}</div>
+                                <div class="text-6xl md:text-7xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-text-muted'} leading-none">${streak}</div>
+                                <div class="text-sm text-text-muted mt-3 uppercase tracking-wider">${streak > 0 ? 'Gün Üst Üste' : 'Seri Kırıldı'}</div>
                             </div>
                         </div>
                         
                         <!-- TODAY'S PROGRESS -->
                         <div class="${THEME.card}">
                             <div class="${THEME.label}">📊 BUGÜNKÜ DURUM</div>
-                            <div class="space-y-5 mt-4">
+                            <div class="space-y-4 mt-3">
                                 <div>
                                     <div class="flex justify-between text-sm mb-2">
-                                        <span class="text-text-muted uppercase tracking-wider">Görevler</span>
-                                        <span class="text-neon-green font-bold text-lg">${progress.tasksDone}/${progress.tasksTotal}</span>
+                                        <span class="text-text-muted">Görevler</span>
+                                        <span class="text-neon-green font-bold">${progress.tasksDone}/${progress.tasksTotal}</span>
                                     </div>
-                                    <div class="w-full bg-surface-raised h-3 rounded-full overflow-hidden">
-                                        <div class="h-full bg-neon-green transition-all duration-500 progress-shimmer rounded-full" style="width: ${progress.tasksPercent}%"></div>
+                                    <div class="w-full bg-surface-raised h-2 rounded-full overflow-hidden">
+                                        <div class="h-full bg-neon-green rounded-full" style="width: ${progress.tasksPercent}%"></div>
                                     </div>
                                 </div>
                                 <div>
                                     <div class="flex justify-between text-sm mb-2">
-                                        <span class="text-text-muted uppercase tracking-wider">Kalori</span>
-                                        <span class="text-accent-orange font-bold text-lg">${progress.calories}/${progress.caloriesTarget}</span>
+                                        <span class="text-text-muted">Kalori</span>
+                                        <span class="text-accent-orange font-bold">${progress.calories}/${progress.caloriesTarget}</span>
                                     </div>
-                                    <div class="w-full bg-surface-raised h-3 rounded-full overflow-hidden">
-                                        <div class="h-full bg-accent-orange transition-all duration-500 rounded-full" style="width: ${Math.min(100, progress.caloriesPercent)}%"></div>
+                                    <div class="w-full bg-surface-raised h-2 rounded-full overflow-hidden">
+                                        <div class="h-full bg-accent-orange rounded-full" style="width: ${Math.min(100, progress.caloriesPercent)}%"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- SYSTEM LOAD (WEIGHT) - Hero Card -->
-                        <div class="${THEME.card} md:row-span-2 flex flex-col justify-between">
+                        <!-- SYSTEM LOAD (WEIGHT) -->
+                        <div class="${THEME.card} flex flex-col justify-between">
                             <div>
                                 <div class="${THEME.label}">⚖️ SYSTEM LOAD</div>
-                                <div class="flex items-baseline gap-3 mt-4">
-                                    <input type="number" value="${Store.state.weight}" class="bg-transparent text-6xl md:text-7xl font-black text-white w-32 focus:text-neon-green outline-none transition-colors" onchange="Actions.saveWeight(this.value)">
-                                    <span class="text-text-muted text-xl">KG</span>
+                                <div class="flex items-baseline gap-2 mt-3">
+                                    <input type="number" value="${Store.state.weight}" class="bg-transparent text-5xl font-black text-white w-24 focus:text-neon-green outline-none" onchange="Actions.saveWeight(this.value)">
+                                    <span class="text-text-muted text-lg">KG</span>
                                 </div>
-                                <div class="text-text-muted mt-2">Hedef: ${CONFIG.TARGETS.GOAL} KG</div>
                             </div>
-                            <div class="mt-6">
-                                <div class="flex justify-between text-sm mb-2">
-                                    <span class="text-text-muted">İlerleme</span>
+                            <div class="mt-4">
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-text-muted">Hedefe</span>
                                     <span class="text-neon-green font-bold">${Math.round(p)}%</span>
                                 </div>
-                                <div class="w-full bg-surface-raised h-4 rounded-full overflow-hidden">
-                                    <div class="h-full bg-neon-green transition-all duration-1000 progress-shimmer rounded-full" style="width: ${p}%"></div>
+                                <div class="w-full bg-surface-raised h-3 rounded-full overflow-hidden">
+                                    <div class="h-full bg-neon-green progress-shimmer rounded-full" style="width: ${p}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- SLEEP TRACKING (NEW) -->
+                        <div class="${THEME.card}">
+                            <div class="${THEME.label}">😴 UYKU TAKİBİ</div>
+                            <div class="flex items-center justify-between mt-3">
+                                <div>
+                                    <div class="text-4xl font-bold ${sleepStatus.color}">${todaySleep > 0 ? todaySleep : '--'} <span class="text-lg text-text-muted">saat</span></div>
+                                    <div class="text-sm ${sleepStatus.color} mt-1">${sleepStatus.icon} ${sleepStatus.text}</div>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <input type="number" id="sleep-input" placeholder="Saat" step="0.5" min="0" max="14" 
+                                        class="w-20 bg-surface-raised text-white text-center rounded-lg p-2 text-sm" value="${todaySleep || ''}">
+                                    <button onclick="Actions.saveSleep()" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black px-3 py-1 rounded text-xs font-bold transition">KAYDET</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- WATER TRACKING (NEW) -->
+                        <div class="${THEME.card}">
+                            <div class="${THEME.label}">💧 SU TAKİBİ</div>
+                            <div class="flex items-center justify-between mt-3">
+                                <div>
+                                    <div class="text-4xl font-bold ${todayWater >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">${todayWater} <span class="text-lg text-text-muted">/ ${CONFIG.TARGETS.WATER}</span></div>
+                                    <div class="w-32 bg-surface-raised h-2 rounded-full overflow-hidden mt-2">
+                                        <div class="h-full bg-neon-blue rounded-full transition-all" style="width: ${waterPercent}%"></div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="Actions.addWater(1)" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black w-12 h-12 rounded-lg text-xl font-bold transition">+1</button>
+                                    <button onclick="Actions.addWater(-1)" class="bg-gray-800 hover:bg-gray-700 text-gray-400 w-12 h-12 rounded-lg text-xl font-bold transition">-1</button>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- FUEL STATUS -->
-                        <div class="${THEME.card} lg:col-span-2 ${!fuelDone ? 'ring-2 ring-neon-red/50' : ''} relative">
+                        <div class="${THEME.card} ${!fuelDone ? 'ring-2 ring-neon-red/50' : ''} relative">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <div class="${THEME.label}">⛽ FUEL STATUS</div>
-                                    <div class="text-2xl md:text-3xl font-bold text-white mt-2">GAINER SHAKE</div>
-                                    <div class="text-text-muted mt-1">Süt + Yulaf + Fıstık + Muz</div>
+                                    <div class="text-xl font-bold text-white mt-2">GAINER SHAKE</div>
+                                    <div class="text-text-muted text-sm mt-1">Süt + Yulaf + Fıstık + Muz</div>
                                 </div>
-                                <button onclick="Actions.injectFuel()" class="${fuelDone ? 'bg-neon-green text-gunmetal' : 'bg-neon-red text-white'} px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-wider transition-all hover:scale-105">
-                                    ${fuelDone ? '✓ ENJEKTE EDİLDİ' : '⚠ BEKLİYOR'}
+                                <button onclick="Actions.injectFuel()" class="${fuelDone ? 'bg-neon-green text-gunmetal' : 'bg-neon-red text-white'} px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all hover:scale-105">
+                                    ${fuelDone ? '✓ OK' : '⚠ BEKLİYOR'}
                                 </button>
                             </div>
-                            ${!fuelDone ? '<div class="absolute top-4 right-4 text-neon-red animate-pulse"><i class="fas fa-exclamation-circle text-xl"></i></div>' : ''}
-                        </div>
-                        
-                        <!-- MOTIVATIONAL QUOTE -->
-                        <div class="${THEME.card} text-center flex items-center justify-center bg-surface-raised/50">
-                            <div class="text-xl md:text-2xl font-bold text-white/80 italic">"Aksak ayakla yürü, ama yürü."</div>
                         </div>
                     </div>`;
             },
@@ -1342,22 +1610,59 @@
                 const day = new Date().getDay();
                 const plan = DB.WEEKLY_PLAN[day];
                 const done = await Store.getWorkout(Utils.dateStr());
+                const workoutData = await Store.getWorkoutData(Utils.dateStr());
                 const btnClass = "bg-gray-800 hover:bg-neon-blue hover:text-black text-neon-blue border border-neon-blue font-bold py-3 px-6 rounded transition w-full mb-6 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,243,255,0.2)]";
-                const warmUpBtn = `<button onclick="Actions.openWarmup()" class="${btnClass}"><i class="fas fa-fire animate-pulse"></i> SYSTEM BOOT (ISINMA)</button>`;
 
                 return `<div class="animate-slide-up">
                     <div class="flex justify-between items-end mb-6 border-b border-gray-800 pb-4">
                         <div><h2 class="text-3xl font-header font-bold text-white">${plan.name}</h2><div class="text-neon-green tracking-widest text-xs mt-1">${plan.title}</div></div>
                         <div class="text-xl font-mono text-white">0${day}</div>
                     </div>
-                    ${warmUpBtn}
-                    <div class="space-y-2">
+                    <button onclick="Actions.openWarmup()" class="${btnClass}"><i class="fas fa-fire animate-pulse"></i> SYSTEM BOOT (ISINMA)</button>
+                    <div class="space-y-4">
                         ${plan.tasks.map(tid => {
                     const ex = DB.EXERCISES[tid];
                     const isDone = done.includes(tid);
-                    return `<div class="exercise-card flex items-center justify-between p-4 border rounded ${isDone ? 'border-neon-green bg-gray-900' : 'border-gray-700 bg-gray-900/30'}" onclick="if(!event.target.type) Actions.showExercise('${tid}')">
-                                <div class="flex items-center gap-4"><i class="fas fa-info-circle text-gray-500"></i><div><div class="font-bold text-white">${ex.title}</div><div class="text-[10px] text-gray-500">${ex.tags.join(', ')}</div></div></div>
-                                <input type="checkbox" class="custom-checkbox" ${isDone ? 'checked' : ''} onclick="event.stopPropagation(); Actions.toggleTask('${tid}')">
+                    const logs = workoutData[tid] || [];
+
+                    // Parse Target Sets from description
+                    const targetMatch = ex.desc.match(/(\d+)\s*Set/i);
+                    const targetSets = targetMatch ? parseInt(targetMatch[1]) : 3;
+
+                    let setsHtml = '';
+                    for (let i = 0; i < targetSets; i++) {
+                        const log = logs[i] || {};
+                        const isSetDone = !!log.completed;
+                        setsHtml += `
+                                    <div class="flex items-center gap-2 mb-2 text-xs">
+                                        <div class="text-gray-500 w-8 font-mono flex-shrink-0">SET ${i + 1}</div>
+                                        <input type="number" placeholder="KG" value="${log.weight || ''}" id="w-${tid}-${i}" class="bg-gray-800 text-white rounded p-1 w-16 text-center border ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none" onchange="Actions.saveSet('${tid}', ${i}, false)">
+                                        <input type="number" placeholder="Tekrar" value="${log.reps || ''}" id="r-${tid}-${i}" class="bg-gray-800 text-white rounded p-1 w-16 text-center border ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none" onchange="Actions.saveSet('${tid}', ${i}, false)">
+                                        <button onclick="Actions.saveSet('${tid}', ${i}, true)" class="w-8 h-8 rounded flex-shrink-0 flex items-center justify-center ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'} transition">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </div>
+                                `;
+                    }
+
+                    return `
+                            <div class="bg-gray-900 border ${isDone ? 'border-neon-green shadow-[0_0_10px_rgba(0,255,65,0.1)]' : 'border-gray-700'} rounded-lg overflow-hidden transition-all">
+                                <div class="p-4 cursor-pointer hover:bg-gray-800/50 flex justify-between items-center" onclick="Actions.toggleExerciseBody('${tid}')">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 rounded-full ${isDone ? 'bg-neon-green' : 'bg-gray-600'}"></div>
+                                        <div>
+                                            <div class="font-bold text-white text-sm">${ex.title}</div>
+                                            <div class="text-[10px] text-gray-500">${targetSets} SET HEDEF | ${ex.tags.join(', ')}</div>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300" id="icon-${tid}"></i>
+                                </div>
+                                <div id="body-${tid}" class="hidden bg-black/20 p-4 border-t border-gray-800">
+                                    <div class="text-[10px] text-gray-400 mb-4 p-2 bg-gray-800/50 rounded italic border-l-2 border-neon-blue">${ex.desc}</div>
+                                    <div class="space-y-1">
+                                        ${setsHtml}
+                                    </div>
+                                </div>
                             </div>`;
                 }).join('')}
                     </div>
@@ -1411,12 +1716,18 @@
                 </div>
                 <div class="overflow-y-auto flex-1 h-[200px] custom-scrollbar">${list}</div></div></div>`;
             },
+
             async progress() {
                 const hist = await Store.getHistory();
                 const statsData = await Store.getStats();
+                const volStats = await Store.getVolumeStats();
                 const stats = statsData.current || {};
                 const measureHistory = statsData.history || [];
                 const dates = Object.keys(hist).sort().slice(-7);
+                const volDates = Object.keys(volStats.daily).sort();
+
+                // v5.8.0: Weekly Summary
+                const weeklySummary = await Store.getWeeklySummary();
 
                 // Turkish month names
                 const months = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
@@ -1427,7 +1738,6 @@
                 let weightHistoryTable = '';
 
                 if (dates.length > 0) {
-                    // Build bars with visible values
                     weightBars = dates.map(d => {
                         const h = ((hist[d] - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 70 + 15;
                         return `<div class="flex-1 flex flex-col items-center">
@@ -1436,7 +1746,6 @@
                         </div>`;
                     }).join('');
 
-                    // Build date labels
                     dateLabels = dates.map((d, i) => {
                         const parts = d.split('-');
                         const day = parts[2];
@@ -1445,7 +1754,6 @@
                         return `<div class="flex-1 text-center text-[8px] text-gray-500">${day}${showMonth ? ' ' + months[monthIdx] : ''}</div>`;
                     }).join('');
 
-                    // Build weight history table
                     const sortedDates = [...dates].reverse();
                     weightHistoryTable = `
                         <div class="mt-3 pt-3 border-t border-gray-800">
@@ -1472,11 +1780,29 @@
                     }).join('')}
                             </div>
                         </div>
-                    `;
+            `;
                 } else {
                     weightBars = '<div class="text-gray-600 text-xs w-full text-center self-center flex flex-col items-center justify-center h-full"><i class="fas fa-weight text-3xl mb-2 opacity-30"></i><span>Veri yok</span><span class="text-[10px] text-gray-700 mt-1">Dashboard\'dan kilo girin</span></div>';
                 }
 
+                // --- VOLUME CHART (PHASE 2) ---
+                let volumeChart = '';
+                if (volStats.weekly > 0) {
+                    const maxVol = Math.max(...Object.values(volStats.daily), 1);
+                    volumeChart = volDates.map(d => {
+                        const val = volStats.daily[d] || 0;
+                        const h = (val / maxVol) * 80;
+                        const parts = d.split('-');
+                        const day = parts[2];
+                        return `<div class="flex-1 flex flex-col items-center group">
+                            <div class="text-[8px] text-neon-blue font-bold mb-1 opacity-0 group-hover:opacity-100 transition">${val > 0 ? Math.round(val) : ''}</div>
+                            <div class="w-full bg-gray-800 hover:bg-neon-blue/60 rounded-t transition-all" style="height:${Math.max(5, h)}%"></div>
+                            <div class="text-[8px] text-gray-500 mt-1">${day}</div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    volumeChart = '<div class="text-gray-600 text-xs w-full text-center flex flex-col items-center justify-center h-full"><i class="fas fa-dumbbell text-3xl mb-2 opacity-30"></i><span>Henüz antrenman verisi yok</span></div>';
+                }
 
                 // Trend helper function
                 const getTrend = (key) => {
@@ -1491,14 +1817,10 @@
                     return { icon: '=', color: 'text-gray-500', diff: 0 };
                 };
 
-                // Measurement labels in Turkish
                 const labels = { chest: 'GÖĞÜS', arm: 'KOL', waist: 'BEL', leg: 'BACAK' };
-
-                // Last saved info
                 const savedAt = stats.savedAt || null;
                 const savedInfo = savedAt ? `<span class="text-neon-green text-[10px]">✓ ${savedAt}</span>` : '<span class="text-gray-600 text-[10px]">Henüz kayıt yok</span>';
 
-                // Measurement mini charts (last 5 entries from history)
                 const getMiniChart = (key) => {
                     if (measureHistory.length < 2) return '';
                     const lastFive = measureHistory.slice(-5);
@@ -1514,7 +1836,6 @@
                     return `<div class="flex items-end gap-0.5 h-6">${bars}</div>`;
                 };
 
-                // Build measurement inputs with trends
                 const measurementInputs = ['chest', 'arm', 'waist', 'leg'].map(k => {
                     const trend = getTrend(k);
                     const miniChart = getMiniChart(k);
@@ -1532,7 +1853,6 @@
                     `;
                 }).join('');
 
-                // History section
                 let historySection = '';
                 if (measureHistory.length > 0) {
                     const lastThree = measureHistory.slice(-3).reverse();
@@ -1548,30 +1868,93 @@
                                 `).join('')}
                             </div>
                         </div>
-                    `;
+            `;
                 }
 
                 return `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-up">
-                    <div class="${THEME.card} flex flex-col">
-                        <span class="text-[10px] text-gray-500 font-bold mb-2">AĞIRLIK GEÇMİŞİ (Son 7 Gün)</span>
-                        <div class="flex items-end gap-1 h-32 border-b border-gray-800">${weightBars}</div>
-                        <div class="flex gap-1 mt-1">${dateLabels}</div>
-                        ${weightHistoryTable}
+                <div class="space-y-6 animate-slide-up">
+                    <!-- SUMMARY ROW -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="${THEME.card} text-center py-4">
+                            <div class="text-[10px] text-gray-500 font-bold">MEVCUT KİLO</div>
+                            <div class="text-2xl font-bold text-white mt-1">${Store.state.weight} <span class="text-sm text-neon-green">kg</span></div>
+                        </div>
+                        <div class="${THEME.card} text-center py-4 border-neon-blue/30">
+                            <div class="text-[10px] text-neon-blue font-bold">HAFTALIK HACİM</div>
+                            <div class="text-2xl font-bold text-white mt-1">${(volStats.weekly / 1000).toFixed(1)} <span class="text-sm text-gray-500">ton</span></div>
+                        </div>
+                        <div class="${THEME.card} text-center py-4">
+                            <div class="text-[10px] text-gray-500 font-bold">HEDEF</div>
+                            <div class="text-2xl font-bold text-neon-green mt-1">${CONFIG.TARGETS.GOAL} <span class="text-sm">kg</span></div>
+                        </div>
+                        <div class="${THEME.card} text-center py-4">
+                            <div class="text-[10px] text-gray-500 font-bold">BUGÜN TONAJ</div>
+                            <div class="text-2xl font-bold text-neon-blue mt-1">${Math.round(volStats.daily[Utils.dateStr()] || 0)} <span class="text-sm text-gray-500">kg</span></div>
+                        </div>
                     </div>
 
+                    <!--VOLUME ANALYSIS-- >
                     <div class="${THEME.card}">
-                        <div class="flex justify-between mb-4 items-center">
+                        <div class="flex justify-between items-center mb-4">
                             <div>
-                                <span class="text-[10px] text-gray-500 font-bold block">ÖLÇÜLER (CM)</span>
-                                ${savedInfo}
+                                <span class="text-neon-blue font-bold text-sm">ANTRENMAN HACMİ</span>
+                                <span class="text-[10px] text-gray-500 ml-2">Son 7 Gün</span>
                             </div>
-                            <button onclick="Actions.saveStats()" class="bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black text-xs font-bold px-4 py-2 rounded-lg transition-all">
-                                <i class="fas fa-save mr-1"></i>KAYDET
-                            </button>
+                            <div class="text-xs text-gray-500">${volStats.weekly > 0 ? `Toplam: ${(volStats.weekly / 1000).toFixed(2)} ton` : ''}</div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">${measurementInputs}</div>
-                        ${historySection}
+                        <div class="flex items-end gap-1 h-28">${volumeChart}</div>
+                    </div>
+                    
+                    <!-- v5.8.0: WEEKLY SUMMARY -->
+                    <div class="${THEME.card}">
+                        <div class="${THEME.label}">📅 HAFTALIK ÖZET (Son 4 Hafta)</div>
+                        <div class="overflow-x-auto mt-4">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="text-gray-500 text-xs border-b border-gray-800">
+                                        <th class="text-left py-2">Hafta</th>
+                                        <th class="text-center py-2">Ort. Kalori</th>
+                                        <th class="text-center py-2">Antrenman</th>
+                                        <th class="text-right py-2">Kilo Δ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${weeklySummary.map((w, i) => `
+                                        <tr class="border-b border-gray-800/50 ${i === 0 ? 'bg-gray-800/30' : ''}">
+                                            <td class="py-2 ${i === 0 ? 'text-neon-green font-bold' : 'text-gray-400'}">${i === 0 ? 'Bu Hafta' : i === 1 ? 'Geçen Hafta' : `${w.week}. Hafta Önce`}</td>
+                                            <td class="text-center py-2 font-mono ${w.avgCal >= CONFIG.TARGETS.CAL ? 'text-neon-green' : w.avgCal > 0 ? 'text-accent-orange' : 'text-gray-600'}">${w.avgCal > 0 ? w.avgCal : '-'}</td>
+                                            <td class="text-center py-2">${w.workoutDays > 0 ? `<span class="text-neon-blue font-bold">${w.workoutDays}</span> gün` : '<span class="text-gray-600">-</span>'}</td>
+                                            <td class="text-right py-2 font-mono ${w.weightChange > 0 ? 'text-neon-green' : w.weightChange < 0 ? 'text-neon-red' : 'text-gray-500'}">${w.weightChange !== null ? (w.weightChange > 0 ? '+' : '') + w.weightChange + ' kg' : '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- WEIGHT HISTORY -->
+                        <div class="${THEME.card} flex flex-col">
+                            <span class="text-[10px] text-gray-500 font-bold mb-2">AĞIRLIK GEÇMİŞİ (Son 7 Gün)</span>
+                            <div class="flex items-end gap-1 h-32 border-b border-gray-800">${weightBars}</div>
+                            <div class="flex gap-1 mt-1">${dateLabels}</div>
+                            ${weightHistoryTable}
+                        </div>
+
+                        <!-- MEASUREMENTS -->
+                        <div class="${THEME.card}">
+                            <div class="flex justify-between mb-4 items-center">
+                                <div>
+                                    <span class="text-[10px] text-gray-500 font-bold block">ÖLÇÜLER (CM)</span>
+                                    ${savedInfo}
+                                </div>
+                                <button onclick="Actions.saveStats()" class="bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black text-xs font-bold px-4 py-2 rounded-lg transition-all">
+                                    <i class="fas fa-save mr-1"></i>KAYDET
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">${measurementInputs}</div>
+                            ${historySection}
+                        </div>
                     </div>
                 </div>`;
             },
@@ -1599,8 +1982,8 @@
                             <div class="flex justify-end"><button onclick="Actions.showPhase(${p.id})" class="text-[10px] px-3 py-1 border border-gray-700 hover:border-neon-purple rounded-full text-gray-500 hover:text-neon-purple font-mono transition">MODAL AÇ</button></div>
                         </div>
                     </details>
-                `).join('');
-                return `<div class="animate-slide-up"><div class="flex items-center gap-3 mb-4 border-b border-gray-800 pb-3"><i class="fas fa-brain text-neon-purple text-xl"></i><div><h2 class="font-header font-bold text-white">ZİHİNSEL SAVAŞ</h2><div class="text-[10px] text-gray-500 mt-1">Mental Hardening Protokolü v5.7.3</div></div></div>${phases}</div>`;
+            `).join('');
+                return `<div class="animate-slide-up"><div class="flex items-center gap-3 mb-4 border-b border-gray-800 pb-3"><i class="fas fa-brain text-neon-purple text-xl"></i><div><h2 class="font-header font-bold text-white">ZİHİNSEL SAVAŞ</h2><div class="text-[10px] text-gray-500 mt-1">Mental Hardening Protokolü v5.8.0</div></div></div>${phases}</div>`;
             }
         };
 
@@ -1616,6 +1999,25 @@
             },
             async saveWeight(v) { const num = parseFloat(v); if (isNaN(num) || num <= 0 || num > 300) { UI.showToast("Geçersiz kilo!", "error"); return; } if (await Store.saveWeight(num)) { UI.showToast("Kilo güncellendi."); this.switchTab('dashboard'); } },
             async injectFuel() { await Store.saveFuel(); UI.showToast("Yakıt alındı."); this.switchTab('dashboard'); },
+
+            // --- v5.8.0: SLEEP & WATER ACTIONS ---
+            async saveSleep() {
+                const input = document.getElementById('sleep-input');
+                if (!input || !input.value) { UI.showToast("Uyku saati girin!", "error"); return; }
+                const hours = parseFloat(input.value);
+                if (hours < 0 || hours > 14) { UI.showToast("Geçersiz değer (0-14)", "error"); return; }
+                await Store.setSleep(hours);
+                UI.showToast(`Uyku kaydedildi: ${hours} saat`);
+                this.switchTab('dashboard');
+            },
+            async addWater(cups) {
+                const current = await Store.getWater(Utils.dateStr());
+                const newVal = Math.max(0, current + cups);
+                await Utils.storage.set(CONFIG.KEYS.WATER + Utils.dateStr(), newVal);
+                if (cups > 0) UI.showToast(`+${cups} bardak 💧`);
+                this.switchTab('dashboard');
+            },
+
             async toggleTask(id) { await Store.toggleTask(id); this.switchTab('training'); },
             // ROBOT MODE (EMOTION OVERRIDE) SYSTEM
             overrideState: { active: false, startTime: null, timerInterval: null },
@@ -1640,7 +2042,7 @@
                     const elapsed = Math.floor((Date.now() - this.overrideState.startTime) / 1000);
                     const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
                     const secs = (elapsed % 60).toString().padStart(2, '0');
-                    document.getElementById('override-timer').textContent = `${mins}:${secs}`;
+                    document.getElementById('override-timer').textContent = `${mins}:${secs} `;
                 }, 1000);
 
                 // Generate mission based on incomplete tasks
@@ -1725,7 +2127,7 @@
             openMealModal() {
                 const foods = Store.getAllFoods();
                 UI.modal.open("YAKIT EKLE", `
-                    <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
+            <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
                         <button onclick="document.getElementById('tab-exist').style.display='block';document.getElementById('tab-new').style.display='none'" class="text-xs text-neon-green font-bold hover:underline">LİSTEDEN SEÇ</button>
                         <button onclick="document.getElementById('tab-exist').style.display='none';document.getElementById('tab-new').style.display='block'" class="text-xs text-gray-500 font-bold hover:text-white hover:underline">YENİ TANIMLA</button>
                     </div>
@@ -1943,6 +2345,115 @@
                     </div>
                 `;
                 UI.modal.open("SYSTEM BOOT (ISINMA)", warmupRoutine);
+            },
+
+            // --- PHASE 1: SETTINGS & DATA ---
+            openSettings() {
+                UI.modal.open("VERİ YÖNETİMİ", `
+                    <div class="space-y-6">
+                        <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-full bg-neon-green/20 flex items-center justify-center text-neon-green">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm">YEDEKLE (EXPORT)</h4>
+                                    <p class="text-[10px] text-gray-500">Tüm verilerini cihazına indir (.json)</p>
+                                </div>
+                            </div>
+                            <button onclick="Actions.exportData()" class="${THEME.btn} w-full text-xs">YEDEĞİ İNDİR</button>
+                        </div>
+
+                        <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-full bg-neon-red/20 flex items-center justify-center text-neon-red">
+                                    <i class="fas fa-upload"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm">GERİ YÜKLE (IMPORT)</h4>
+                                    <p class="text-[10px] text-gray-500">Dikkat: Mevcut veriler silinir!</p>
+                                </div>
+                            </div>
+                            <input type="file" id="import-file" accept=".json" class="hidden" onchange="Actions.startImport(this)">
+                            <button onclick="document.getElementById('import-file').click()" class="w-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 font-bold py-3 px-6 rounded-lg transition text-xs border border-dashed border-gray-600">DOSYA SEÇ VE YÜKLE</button>
+                        </div>
+                    </div>
+                `);
+            },
+
+            async exportData() {
+                if (confirm("Tüm veri yedeği indirilsin mi?")) {
+                    await Store.exportData();
+                    UI.showToast("Yedekleme başarılı ✓");
+                    UI.modal.close();
+                }
+            },
+
+            async startImport(input) {
+                if (input.files && input.files[0]) {
+                    if (confirm("DİKKAT: Bu işlem mevcut tüm verileri silecek ve yedeği yükleyecektir. Emin misin?")) {
+                        const reader = new FileReader();
+                        reader.onload = async function (e) {
+                            const result = await Store.importData(e.target.result);
+                            if (result.success) {
+                                alert(`Yedek başarıyla yüklendi! (Tarih: ${result.date})\nSayfa yenileniyor...`);
+                                location.reload();
+                            } else {
+                                alert("Hata: " + result.error);
+                            }
+                        };
+                        reader.readAsText(input.files[0]);
+                    } else {
+                        input.value = '';
+                    }
+                }
+            },
+
+            // --- PHASE 2: ACTIVE TRAINING ACTIONS ---
+            toggleExerciseBody(id) {
+                const el = document.getElementById(`body-${id}`);
+                const icon = document.getElementById(`icon-${id}`);
+                if (el.classList.contains('hidden')) {
+                    el.classList.remove('hidden');
+                    el.classList.add('animate-slide-down');
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('animate-slide-down');
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            },
+
+            async saveSet(taskId, setIdx, isDoneBtn) {
+                const wInput = document.getElementById(`w-${taskId}-${setIdx}`);
+                const rInput = document.getElementById(`r-${taskId}-${setIdx}`);
+                const weight = wInput ? wInput.value : 0;
+                const reps = rInput ? rInput.value : 0;
+
+                if (isDoneBtn && (!weight || !reps)) {
+                    UI.showToast("Kilo ve Tekrar girin!", "error");
+                    return;
+                }
+
+                await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
+
+                if (isDoneBtn) {
+                    const btn = event.currentTarget || event.target.closest('button');
+                    if (btn) {
+                        btn.classList.remove('bg-gray-700', 'text-gray-400', 'hover:bg-gray-600');
+                        btn.classList.add('bg-neon-green', 'text-black');
+                        btn.innerHTML = '<i class="fas fa-check"></i>';
+                    }
+                    if (wInput) {
+                        wInput.classList.replace('border-gray-600', 'border-neon-green');
+                        wInput.classList.add('text-neon-green');
+                    }
+                    if (rInput) {
+                        rInput.classList.replace('border-gray-600', 'border-neon-green');
+                        rInput.classList.add('text-neon-green');
+                    }
+                    UI.showToast("Set Kaydedildi ✓");
+                }
             }
         };
 
@@ -1951,6 +2462,16 @@
             console.log("SYSTEM BOOT...");
             await Store.init();
             UI.init();
+
+            // Auto Backup Reminder
+            const backupStatus = await Store.checkBackupStatus();
+            if (backupStatus !== 'OK') {
+                setTimeout(() => {
+                    const msg = backupStatus === 'NEVER' ? "Verilerinizi yedeklemeniz önerilir (Ayarlar)" : "⚠️ Yedekleme zamanı geldi! (>7 Gün)";
+                    const type = backupStatus === 'NEVER' ? "warning" : "error";
+                    UI.showToast(msg, type);
+                }, 3000);
+            }
         })();
     </script>
 </body>
