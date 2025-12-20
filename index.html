@@ -2258,24 +2258,8 @@
                         <div class="${THEME.card}">
                             <div class="${THEME.label}">📊 BUGÜNKÜ DURUM</div>
                             <div class="space-y-4 mt-3">
-                                <div>
-                                    <div class="flex justify-between text-sm mb-2">
-                                        <span class="text-text-muted">Görevler</span>
-                                        <span class="text-neon-green font-bold">${progress.tasksDone}/${progress.tasksTotal}</span>
-                                    </div>
-                                    <div class="w-full bg-surface-raised h-2 rounded-full overflow-hidden">
-                                        <div class="h-full bg-neon-green rounded-full" style="width: ${progress.tasksPercent}%"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-sm mb-2">
-                                        <span class="text-text-muted">Kalori</span>
-                                        <span class="text-accent-orange font-bold">${progress.calories}/${progress.caloriesTarget}</span>
-                                    </div>
-                                    <div class="w-full bg-surface-raised h-2 rounded-full overflow-hidden">
-                                        <div class="h-full bg-accent-orange rounded-full" style="width: ${Math.min(100, progress.caloriesPercent)}%"></div>
-                                    </div>
-                                </div>
+                                ${Components.progressRow('Görevler', `${progress.tasksDone}/${progress.tasksTotal}`, progress.tasksPercent)}
+                                ${Components.progressRow('Kalori', `${progress.calories}/${progress.caloriesTarget}`, Math.min(100, progress.caloriesPercent), 'accent-orange')}
                             </div>
                         </div>
                         
@@ -2310,7 +2294,7 @@
                                 <div class="flex flex-col gap-2">
                                     <input type="number" id="sleep-input" placeholder="Saat" step="0.5" min="0" max="14" 
                                         class="w-20 bg-surface-raised text-white text-center rounded-lg p-2 text-sm" value="${todaySleep || ''}">
-                                    <button onclick="Actions.saveSleep()" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black px-3 py-1 rounded text-xs font-bold transition">KAYDET</button>
+                                    <button data-action="saveSleep" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black px-3 py-1 rounded text-xs font-bold transition">KAYDET</button>
                                 </div>
                             </div>
                             <!-- Weekly Stats -->
@@ -2339,8 +2323,8 @@
                                     </div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button onclick="Actions.addWater(1)" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black w-12 h-12 rounded-lg text-xl font-bold transition">+1</button>
-                                    <button onclick="Actions.addWater(-1)" class="bg-gray-800 hover:bg-gray-700 text-gray-400 w-12 h-12 rounded-lg text-xl font-bold transition">-1</button>
+                                    <button data-action="addWater" data-params="[1]" class="bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black w-12 h-12 rounded-lg text-xl font-bold transition">+1</button>
+                                    <button data-action="addWater" data-params="[-1]" class="bg-gray-800 hover:bg-gray-700 text-gray-400 w-12 h-12 rounded-lg text-xl font-bold transition">-1</button>
                                 </div>
                             </div>
                             <!-- Weekly Stats -->
@@ -3897,6 +3881,20 @@
             console.log("SYSTEM BOOT...");
             await Store.init();
             UI.init();
+
+            // --- v6.3.0: EVENT DELEGATION ---
+            document.getElementById('view-container').addEventListener('click', async (e) => {
+                const actionEl = e.target.closest('[data-action]');
+                if (!actionEl) return;
+
+                const action = actionEl.dataset.action;
+                const params = actionEl.dataset.params ? JSON.parse(actionEl.dataset.params) : [];
+
+                if (Actions[action]) {
+                    e.preventDefault();
+                    await Actions[action](...params);
+                }
+            });
 
             // Auto Backup Reminder
             const backupStatus = await Store.checkBackupStatus();

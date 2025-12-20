@@ -20,8 +20,7 @@
 - ✅ **Uyku/Su haftalık ve aylık istatistikleri**
 
 ## Bilinen Sorunlar
-- ❌ Kalan renderer'lar henüz Components kullanmıyor (dashboard, progress)
-- ❌ Event delegation uygulanmadı (inline onclick'ler duruyor)
+- ⚠️ Bazı inline onclick'ler hala var (kısmi event delegation)
 
 ## Sürüm Geçmişi
 - v6.3.0: Uyku/Su istatistikleri (haftalık/aylık)
