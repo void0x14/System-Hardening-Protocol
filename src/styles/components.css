@@ -279,3 +279,67 @@ details summary {
         background: rgba(0, 255, 65, 0.1);
     }
 }
+/* ============================================
+   SNIPER DASHBOARD ELEMENTS
+   ============================================ */
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background-color: #1a1a22;
+    transition: all 0.2s ease;
+}
+
+.heatmap-cell.active-1 { background-color: rgba(0, 255, 65, 0.3); }
+.heatmap-cell.active-2 { background-color: rgba(0, 255, 65, 0.6); }
+.heatmap-cell.active-3 { background-color: rgba(0, 255, 65, 0.9); box-shadow: 0 0 5px rgba(0, 255, 65, 0.5); }
+
+.circular-chart {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 250px;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #1a1a22;
+    stroke-width: 2.5;
+}
+
+.circle {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease-out;
+}
+
+.sniper-panel {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.sniper-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.sniper-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 2px; height: 100%;
+    background-color: currentColor;
+    opacity: 0.5;
+}
+
+.sniper-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    letter-spacing: 0.05em;
+}

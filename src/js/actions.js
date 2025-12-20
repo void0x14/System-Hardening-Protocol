@@ -821,6 +821,22 @@ const Actions = window.Actions = {
         }
 
         await Actions.switchTab('training');
+    },
+
+    async completeDailyMission() {
+        if (!confirm("TÜM GÜNLÜK GÖREVLER TAMAMLANDI OLARAK İŞARETLENECEK. ONAYLIYOR MUSUN?")) return;
+
+        const day = new Date().getDay();
+        const plan = WEEKLY_PLAN[day];
+
+        if (plan && plan.tasks) {
+            for (const taskId of plan.tasks) {
+                await Store.setTaskDone(taskId, true);
+            }
+        }
+
+        UI.showEpicOverlay("🛡️", "SİSTEM GÜVENLİ", "Günlük protokol tamamlandı.", "#00ff41");
+        this.switchTab('dashboard');
     }
 };
 
