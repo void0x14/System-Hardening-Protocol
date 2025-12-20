@@ -963,10 +963,42 @@
             ]
         };
 
-        // --- UTILS ---
+        /**
+         * @namespace Utils
+         * @description Yardımcı fonksiyonlar ve storage adapter.
+         * Tarih formatı, localStorage/window.storage işlemleri ve yardımcı utilities.
+         * 
+         * @example
+         * // Bugünün tarihini al
+         * const today = Utils.dateStr(); // "2025-12-12"
+         * 
+         * // Veri kaydet
+         * await Utils.storage.set('key', {foo: 'bar'});
+         * 
+         * // Veri oku
+         * const data = await Utils.storage.get('key');
+         */
         const Utils = {
+            /**
+             * Bugünün tarihini YYYY-MM-DD formatında döndürür.
+             * @returns {string} Tarih string'i (örn: "2025-12-12")
+             * @example
+             * const today = Utils.dateStr(); // "2025-12-12"
+             */
             dateStr: () => new Date().toLocaleDateString('tr-TR').split('.').reverse().join('-'),
+
+            /**
+             * Storage adapter - localStorage veya window.storage API kullanır.
+             */
             storage: {
+                /**
+                 * Storage'dan veri oku.
+                 * @async
+                 * @param {string} key - Okunacak key
+                 * @returns {Promise<any|null>} Değer veya null
+                 * @example
+                 * const data = await Utils.storage.get('monk_weight');
+                 */
                 async get(key) {
                     try {
                         if (typeof window.storage !== 'undefined') {
@@ -976,6 +1008,16 @@
                         return JSON.parse(localStorage.getItem(key));
                     } catch (e) { return null; }
                 },
+
+                /**
+                 * Storage'a veri yaz.
+                 * @async
+                 * @param {string} key - Yazılacak key
+                 * @param {any} val - Kaydedilecek değer (JSON serialize edilir)
+                 * @returns {Promise<boolean>} Başarılı ise true
+                 * @example
+                 * await Utils.storage.set('monk_weight', 55.5);
+                 */
                 async set(key, val) {
                     try {
                         if (typeof window.storage !== 'undefined') {
@@ -987,6 +1029,15 @@
                     } catch (e) { UI.showToast("Kayıt Hatası!", "error"); return false; }
                 }
             },
+
+            /**
+             * Belirtilen kategoriden rastgele öğün önerisi döndürür.
+             * @param {('breakfast'|'fuel'|'lunch'|'pre_workout'|'dinner'|'night')} category - Öğün kategorisi
+             * @returns {Object|null} Rastgele öğün objesi veya null
+             * @example
+             * const meal = Utils.getRandomMeal('breakfast');
+             * // { text: "2 Haşlanmış Yumurta + Ekmek", kcal: 350 }
+             */
             getRandomMeal(category) {
                 const options = DB.MEAL_PLAN_DB[category];
                 if (!options) return null;
@@ -994,9 +1045,36 @@
             }
         };
 
-        // --- STORE ---
+        /**
+         * @namespace Store
+         * @description Uygulama state yönetimi ve veri işlemleri.
+         * Kilo, öğün, antrenman, uyku, su ve streak takibi.
+         * Tüm veriler localStorage'da saklanır.
+         * 
+         * @property {Object} state - Anlık uygulama durumu
+         * @property {number} state.weight - Mevcut kilo
+         * @property {string|null} state.fuelDate - Son gainer shake tarihi
+         * @property {Array} state.customFoods - Özel tanımlı yiyecekler
+         * @property {string} state.activeTab - Aktif sekme ID'si
+         * 
+         * @example
+         * // Store başlat
+         * await Store.init();
+         * 
+         * // Kilo kaydet
+         * await Store.saveWeight(55.5);
+         * 
+         * // Öğün ekle
+         * await Store.addMeal({name: 'Yumurta', cal: 150, prot: 12, carb: 1, fat: 11});
+         */
         const Store = {
             state: { weight: 45.0, fuelDate: null, customFoods: [], meals: {}, dailyPlan: null, selectedMuscle: null, activeTab: 'dashboard' },
+            /**
+             * Store'u başlat. localStorage'dan verileri yükler.
+             * Uygulama başlangıcında çağrılır.
+             * @async
+             * @returns {Promise<void>}
+             */
             async init() {
                 const w = await Utils.storage.get(CONFIG.KEYS.WEIGHT);
                 if (w) this.state.weight = parseFloat(w);
@@ -1013,6 +1091,12 @@
                     await this.generateDailyPlan();
                 }
             },
+            /**
+             * Günlük öğün planı oluştur.
+             * Tüm kategorilerden rastgele öğün seçer.
+             * @async
+             * @returns {Promise<void>}
+             */
             async generateDailyPlan() {
                 const plan = {
                     breakfast: Utils.getRandomMeal('breakfast'),
@@ -1025,7 +1109,20 @@
                 this.state.dailyPlan = plan;
                 await Utils.storage.set(CONFIG.KEYS.DAILY_PLAN, { date: Utils.dateStr(), plan: plan });
             },
+            /**
+             * Belirtilen tarihteki antrenman görevlerini al.
+             * @async
+             * @param {string} date - Tarih (YYYY-MM-DD)
+             * @returns {Promise<string[]>} Tamamlanan görev ID'leri
+             */
             async getWorkout(date) { return await Utils.storage.get(CONFIG.KEYS.WORKOUT + date) || []; },
+
+            /**
+             * Görev durumunu toggle et (tamamla/geri al).
+             * @async
+             * @param {string} id - Görev ID'si
+             * @returns {Promise<void>}
+             */
             async toggleTask(id) {
                 const date = Utils.dateStr();
                 let tasks = await this.getWorkout(date);
@@ -1033,6 +1130,14 @@
                 await Utils.storage.set(CONFIG.KEYS.WORKOUT + date, tasks);
                 await this.updateStreak(); // Update streak on task toggle
             },
+            /**
+             * Kiloyu kaydet ve geçmişe ekle.
+             * @async
+             * @param {number} w - Kaydedilecek kilo (kg)
+             * @returns {Promise<boolean>} Başarılı ise true
+             * @example
+             * await Store.saveWeight(55.5);
+             */
             async saveWeight(w) {
                 this.state.weight = parseFloat(w);
                 await Utils.storage.set(CONFIG.KEYS.WEIGHT, this.state.weight);
@@ -1041,10 +1146,29 @@
                 await Utils.storage.set(CONFIG.KEYS.WEIGHT_HISTORY, hist);
                 return true;
             },
+            /**
+             * Gainer Shake alındığını kaydet.
+             * Bugünün tarihini fuelDate olarak kaydeder.
+             * @async
+             * @returns {Promise<void>}
+             */
             async saveFuel() {
                 this.state.fuelDate = Utils.dateStr();
                 await Utils.storage.set(CONFIG.KEYS.FUEL, this.state.fuelDate);
             },
+            /**
+             * Öğün ekle.
+             * @async
+             * @param {Object} meal - Öğün objesi
+             * @param {string} meal.name - Yiyecek adı
+             * @param {number} meal.cal - Kalori
+             * @param {number} meal.prot - Protein (g)
+             * @param {number} meal.carb - Karbonhidrat (g)
+             * @param {number} meal.fat - Yağ (g)
+             * @returns {Promise<void>}
+             * @example
+             * await Store.addMeal({name: 'Yumurta', cal: 150, prot: 12, carb: 1, fat: 11});
+             */
             async addMeal(meal) {
                 const date = Utils.dateStr();
                 const key = CONFIG.KEYS.MEAL + date;
@@ -1052,7 +1176,20 @@
                 meals.push(meal);
                 await Utils.storage.set(key, meals);
             },
+            /**
+             * Belirtilen tarihteki öğünleri al.
+             * @async
+             * @param {string} date - Tarih (YYYY-MM-DD)
+             * @returns {Promise<Object[]>} Öğün listesi
+             */
             async getMeals(date) { return await Utils.storage.get(CONFIG.KEYS.MEAL + date) || []; },
+
+            /**
+             * Belirtilen indeksteki öğünü sil.
+             * @async
+             * @param {number} index - Silinecek öğün indeksi
+             * @returns {Promise<boolean>} Başarılı ise true
+             */
             async deleteMeal(index) {
                 const date = Utils.dateStr();
                 const key = CONFIG.KEYS.MEAL + date;
@@ -1064,10 +1201,21 @@
                 }
                 return false;
             },
+            /**
+             * Özel yiyecek ekle.
+             * @async
+             * @param {Object} food - Yiyecek objesi
+             * @returns {Promise<void>}
+             */
             async addCustomFood(food) {
                 this.state.customFoods.push(food);
                 await Utils.storage.set(CONFIG.KEYS.CUSTOM_FOODS, this.state.customFoods);
             },
+            /**
+             * Tüm yiyecekleri al (DB + özel tanımlı).
+             * Protokol kategorisi önce, sonra alfabetik sıralı.
+             * @returns {Object[]} Sıralı yiyecek listesi
+             */
             getAllFoods() {
                 // Sort by category first, then name
                 const combined = [...DB.FOODS, ...this.state.customFoods];
@@ -1078,6 +1226,11 @@
                     return a.name.localeCompare(b.name);
                 });
             },
+            /**
+             * Vücut ölçülerini al.
+             * @async
+             * @returns {Promise<{current: Object, history: Array}>} Mevcut ve geçmiş ölçüler
+             */
             async getStats() {
                 const data = await Utils.storage.get(CONFIG.KEYS.MEASURE);
                 if (!data) return { current: {}, history: [] };
@@ -1087,6 +1240,13 @@
                 }
                 return data;
             },
+            /**
+             * Vücut ölçülerini kaydet.
+             * Önceki değerler history'ye eklenir, son 30 kayıt saklanır.
+             * @async
+             * @param {Object} s - Ölçü objesi {chest, arm, waist, leg}
+             * @returns {Promise<void>}
+             */
             async saveStats(s) {
                 const existing = await this.getStats();
                 const today = Utils.dateStr();
@@ -1114,8 +1274,19 @@
                 await Utils.storage.set(CONFIG.KEYS.MEASURE, existing);
             },
 
+            /**
+             * Kilo geçmişini al.
+             * @async
+             * @returns {Promise<Object>} Tarih-kilo map'i {"2025-12-12": 55.5}
+             */
             async getHistory() { return await Utils.storage.get(CONFIG.KEYS.WEIGHT_HISTORY) || {}; },
 
+            /**
+             * Mevcut streak'i al.
+             * Dün aktivite yoksa streak sıfırlanır.
+             * @async
+             * @returns {Promise<number>} Streak sayısı
+             */
             // Streak & Progress Tracking
             async getStreak() {
                 const streakData = await Utils.storage.get(CONFIG.KEYS.STREAK) || { count: 0, lastDate: null };
@@ -1431,7 +1602,26 @@
             }
         };
 
-        // --- UI ---
+        /**
+         * @namespace UI
+         * @description Kullanıcı arayüzü yönetimi.
+         * Tab render, modal/alert sistemleri, toast bildirimleri ve epik overlay.
+         * 
+         * @property {string} activeView - Anatomi lab için aktif görünüm ('front'/'back')
+         * 
+         * @example
+         * // Toast göster
+         * UI.showToast('Kayıt başarılı!', 'success');
+         * 
+         * // Modal aç
+         * UI.modal.open('Başlık', '<p>Modal içeriği</p>');
+         * 
+         * // Modal kapat (ESC veya X ile de kapanır)
+         * UI.modal.close();
+         * 
+         * // Epik overlay göster
+         * UI.showEpicOverlay('🔥', 'TEBRİKLER!', 'Görev tamamlandı.', '#00ff41');
+         */
         const UI = {
             activeView: 'front',
             init() {
@@ -1464,6 +1654,14 @@
                 document.getElementById(`btn-${id}`)?.classList.add('active-tab', 'border-neon-green', 'text-neon-green', 'bg-gray-900/50');
                 document.getElementById(`btn-${id}`)?.classList.remove('text-gray-500', 'border-transparent');
             },
+            /**
+             * Toast bildirim göster.
+             * @param {string} msg - Gösterilecek mesaj
+             * @param {('success'|'error')} [type='success'] - Bildirim tipi
+             * @example
+             * UI.showToast('Kayıt başarılı!'); // Yeşil
+             * UI.showToast('Hata oluştu!', 'error'); // Kırmızı
+             */
             showToast(msg, type = 'success') {
                 const c = document.getElementById('toast-container');
                 const e = document.createElement('div');
@@ -1472,8 +1670,18 @@
                 c.appendChild(e);
                 setTimeout(() => e.remove(), 3000);
             },
+            /**
+             * Modal sistemi - ESC ve backdrop tıklama ile kapanır.
+             */
             modal: {
                 _escHandler: null,
+                /**
+                 * Modal aç.
+                 * @param {string} t - Modal başlığı
+                 * @param {string} c - Modal HTML içeriği
+                 * @example
+                 * UI.modal.open('Egzersiz Bilgisi', '<p>Detaylar...</p>');
+                 */
                 open(t, c) {
                     document.getElementById('modal-title').innerText = t;
                     document.getElementById('modal-body').innerHTML = c;
@@ -1482,6 +1690,9 @@
                     this._escHandler = (e) => { if (e.key === 'Escape') UI.modal.close(); };
                     document.addEventListener('keydown', this._escHandler);
                 },
+                /**
+                 * Modal kapat. ESC listener'i temizler.
+                 */
                 close() {
                     document.getElementById('universal-modal').classList.remove('active');
                     if (this._escHandler) {
@@ -1490,7 +1701,14 @@
                     }
                 }
             },
+            /**
+             * Alert sistemi - Kırmızı temalı uyarı modalı.
+             */
             alert: {
+                /**
+                 * Alert göster.
+                 * @param {string} msg - Alert mesajı (HTML destekler)
+                 */
                 show(msg) {
                     document.getElementById('alert-message').innerHTML = msg;
                     document.getElementById('alert-modal').classList.add('active');
@@ -1499,11 +1717,19 @@
                     document.getElementById('alert-modal').classList.remove('active');
                 }
             },
+            /**
+             * Saat göstericisini başlat.
+             * Nav bar'daki saati her saniye günceller.
+             */
             startClock() {
                 const el = document.getElementById('clock-display');
                 if (!el) return;
                 setInterval(() => el.innerText = new Date().toLocaleTimeString('tr-TR'), 1000);
             },
+            /**
+             * Seçili yiyeceğe göre porsiyon inputları render et.
+             * Modal içinde dinamik input oluşturur.
+             */
             renderPortionInputs() {
                 const select = document.getElementById('m-food');
                 const container = document.getElementById('portion-container');
@@ -1566,7 +1792,16 @@
 
                 this.renderPortionInputs();
             },
-            // Epik tam ekran overlay gösterici
+            /**
+             * Epik tam ekran motivasyon overlay'i göster.
+             * 2 saniye görüntülenir, ardından fade-out ile kapanır.
+             * @param {string} emoji - Gösterilecek emoji
+             * @param {string} text - Ana başlık
+             * @param {string} sub - Alt başlık
+             * @param {string} [color='#00ff41'] - Tema rengi (hex)
+             * @example
+             * UI.showEpicOverlay('🔥', 'TEBRİKLER!', 'Görev tamamlandı.', '#00ff41');
+             */
             showEpicOverlay(emoji, text, sub, color = '#00ff41') {
                 const overlay = document.createElement('div');
                 overlay.id = 'epic-overlay-' + Date.now();
@@ -1640,7 +1875,25 @@
             }
         };
 
-        // --- RENDERERS ---
+        /**
+         * @namespace Renderers
+         * @description Tab görünüm render fonksiyonları.
+         * Her fonksiyon async olup HTML string döndürür.
+         * Store'dan veri çeker ve UI'ı günceller.
+         * 
+         * @example
+         * // Dashboard render
+         * const html = await Renderers.dashboard();
+         * document.getElementById('view-container').innerHTML = html;
+         * 
+         * // Mevcut tab'lar:
+         * // - dashboard: Ana panel (streak, kilo, su, uyku)
+         * // - training: Antrenman (günlük program, set girişi)
+         * // - nutrition: Beslenme (kalori takibi, öğün ekleme)
+         * // - progress: Gelişim (grafikler, ölçüler)
+         * // - anatomy: Anatomi Lab (interaktif kas haritası)
+         * // - mental: Zihinsel Savaş (8 faz, pratik takibi)
+         */
         const Renderers = {
             async dashboard() {
                 const p = Math.min(100, Math.max(0, ((Store.state.weight - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 100));
@@ -2339,7 +2592,25 @@
             }
         };
 
-        // --- ACTIONS ---
+        /**
+         * @namespace Actions
+         * @description Kullanıcı etkileşim handler'ları.
+         * Tüm onclick, form submit ve kullanıcı aksiyonları burada.
+         * Store'u günceller, UI'ı yeniler, toast/overlay gösterir.
+         * 
+         * @example
+         * // Tab değiştir
+         * await Actions.switchTab('training');
+         * 
+         * // Kilo kaydet
+         * await Actions.saveWeight(55.5);
+         * 
+         * // Öğün ekle modalı aç
+         * Actions.openMealModal();
+         * 
+         * // Robot Mode toggle
+         * await Actions.toggleOverride();
+         */
         const Actions = {
             async switchTab(id) {
                 Store.state.activeTab = id;

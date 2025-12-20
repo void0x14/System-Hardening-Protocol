@@ -6,44 +6,45 @@
 - ✅ Premium egzersiz bilgi modalı
 - ✅ Uzun vadeli egzersiz geçmişi takibi
 - ✅ PR (Kişisel Rekor) sistemi
-- ✅ Epik overlay sistemi (showEpicOverlay)
-- ✅ System Boot epik başlangıç
-- ✅ Gainer Shake epik overlay
-- ✅ Günlük görevler tamamlandığında zafer overlay
+- ✅ Epik overlay sistemi
 - ✅ Zihinsel sekmesi (premium kartlar, günün fazı, pratik takibi)
-- ✅ **Modal ESC tuşu + backdrop tıklama kapatma**
-- ✅ Beslenme sekmesi (kalori/makro takibi)
-- ✅ Anatomi Lab (interaktif)
-- ✅ Gelişim (kilo grafiği, ölçüler, haftalık özet)
+- ✅ Modal ESC tuşu + backdrop tıklama kapatma
+- ✅ **Kapsamlı JSDoc kod dokümantasyonu**
+- ✅ Beslenme sekmesi
+- ✅ Anatomi Lab
+- ✅ Gelişim
 - ✅ Veri yedekleme/geri yükleme
 - ✅ Emotion Override (Robot Mode)
 
 ## Son Güncelleme (12 Aralık 2025)
 
-### v6.0.0 - Majör Sürüm
-- Modal ESC tuşu ile kapatma
-- Modal backdrop tıklama ile kapatma
-- Versiyon numaraları standardize edildi (title, nav, CONFIG, mental)
-
-### Önceki Değişiklikler (Aynı Gün)
-- Zihinsel sekmesi tam yenileme
-- Epik overlay sistemi
-- Premium set input UI
-- Premium egzersiz modalı
+### v6.0.0 - Majör Sürüm (Dokümantasyonlu)
+- Modal ESC/backdrop kapatma
+- Versiyon standardizasyonu
+- **Kapsamlı JSDoc dokümantasyonu (~140 satır)**
+  - Utils: 4 fonksiyon
+  - Store: 17 fonksiyon
+  - UI: 11 fonksiyon
+  - Namespace başlıkları: 5
 
 ## Bilinen Sorunlar
 - Tüm bildirilen sorunlar çözüldü ✅
 
 ## Versiyon Güncelleme Rehberi
-Versiyon güncellerken şu yerleri değiştir:
 1. `<title>` (satır ~7)
 2. Nav `<span>` (satır ~560)
 3. `CONFIG.VERSION` (satır ~629)
-4. Mental renderer (satır ~2274)
+4. Mental renderer (satır ~2300)
+
+## JSDoc Dokümantasyon Yapısı
+```
+Utils → Storage, tarih yardımcıları
+Store → State, veri CRUD işlemleri  
+UI → Tab, modal, toast, overlay
+Renderers → Tab HTML render
+Actions → Kullanıcı etkileşim
+```
 
 ## Sürüm Geçmişi
-- v6.0.0: Modal ESC/backdrop kapatma, versiyon standardizasyonu
-- v5.9.4: Zihinsel sekmesi tam yenileme
-- v5.9.3: Epik overlay sistemi
-- v5.9.2: Set input UI, epik motivasyon overlay
-- v5.9.1: Premium egzersiz modalı, PR sistemi
+- v6.0.0: Modal kapatma, versiyon standardizasyonu, JSDoc
+- v5.9.x: Zihinsel yenileme, epik overlay, premium UI
