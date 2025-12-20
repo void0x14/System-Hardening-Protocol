@@ -1,57 +1,49 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**Epik UI Geri Bildirim Sistemi** - TAMAMLANDI ✅
+**Zihinsel Sekmesi Tam UI/UX Yenileme** - TAMAMLANDI ✅
 
-### Tamamlanan Görevler (12 Aralık 2025)
+### Son Güncelleme (12 Aralık 2025)
 
-**Epik Overlay Sistemi**
-- ✅ `UI.showEpicOverlay(emoji, text, sub, color)` - Yeniden kullanılabilir fonksiyon
-- ✅ Parametrik renk desteği (neon-green, accent-orange, vb.)
-- ✅ Animasyonlar: emojiPulse, textSlideUp, progressFill, overlayFadeOut
+#### mental() Renderer - Tam Yenileme
+- ✅ Premium başlık (gradient ikon, ilerleme yüzdesi)
+- ✅ **Günün Fazı Spotlight** - Her gün farklı faz öne çıkar
+- ✅ **Günlük Pratik Bölümü** - Rastgele pratik + "Bunu Yaptım!" butonu
+- ✅ **İlerleme Çubuğu** - Tamamlanan faz sayısı / 8
+- ✅ **2x4 Premium Grid Kartları**
+  - Her faz için benzersiz ikon (🐆🎭🤖🔧⚡🎯🍀🔄)
+  - Bugün badge'i, tamamlandı işareti
+  - Gradient arka plan, hover efektleri
+  - Strateji/pratik sayısı gösterimi
 
-**System Boot (Isınma)**
-- ✅ "HAZIRIM, BAŞLAT!" → Tam ekran epik overlay
-- ✅ 7 farklı motive edici mesaj
-- ✅ Yeşil (#00ff41) renk teması
+#### showPhase() Modal - Premium Tasarım
+- ✅ Büyük faz ikonu (16x16)
+- ✅ Gradient çekirdek fikir kartı
+- ✅ 2 kolonlu strateji/pratik grid
+- ✅ "Bu Fazı Anladım" butonu
+- ✅ Tamamlandığında yeşil tik gösterimi
 
-**Gainer Shake (Yakıt)**  
-- ✅ `injectFuel()` → Tam ekran epik overlay
-- ✅ 5 farklı mesaj
-- ✅ Turuncu (#ff6b35) renk teması
-- ✅ 2.3sn sonra dashboard'a yönlendirme
+#### Yeni Action Fonksiyonları
+- ✅ `completeDailyPractice()` - Günlük pratik tamamlama + epik overlay
+- ✅ `markPhaseComplete(phaseId)` - Faz tamamlama + epik overlay
+- ✅ 8/8 faz tamamlandığında "MENTAL MASTER" özel overlay
 
-**Günlük Görevler Tamamlandığında**
-- ✅ `setTaskDone()` içinde kontrol
-- ✅ Tüm görevler bitince epik overlay
-- ✅ 5 farklı zafer mesajı
-- ✅ Yeşil (#00ff41) renk teması
+#### CONFIG Güncellemesi
+- ✅ `CONFIG.KEYS.MENTAL_PROGRESS: 'monk_mental_progress'`
 
-### Mesaj Havuzları
-
-**System Boot:**
+### Veri Yapısı
 ```javascript
-{ emoji: "🔥", text: "YANMAYA HAZIR OL!", sub: "Acı geçici, gurur kalıcı." }
-{ emoji: "💪", text: "GÜÇ SENDİR!", sub: "Limitler zihninde, kır onları." }
-// +5 daha
+monk_mental_progress: {
+    completedPhases: [1, 2, 3, ...], // Tamamlanan faz ID'leri
+    dailyPractice: {
+        "2025-12-12": true,  // Günlük pratik tamamlandı mı
+        ...
+    }
+}
 ```
 
-**Gainer Shake:**
-```javascript
-{ emoji: "⛽", text: "YAKIT ALINDI!", sub: "Motor çalışıyor. Kaslar büyüyor." }
-{ emoji: "�", text: "SHAKE İÇİLDİ!", sub: "Protein sızıyor. Anabolizma aktif." }
-// +3 daha
-```
-
-**Gün Tamamlandı:**
-```javascript
-{ emoji: "🏆", text: "GÜN TAMAMLANDI!", sub: "Bugünü fethetttin. Yarın daha güçlü dön." }
-{ emoji: "👑", text: "KRAL GİBİ!", sub: "Disiplin = Özgürlük. Bunu kanıtladın." }
-// +3 daha
-```
-
-### Teknik Detaylar
-- `UI.showEpicOverlay()` fonksiyonu eklendi
-- `setTaskDone()` içinde görev sayısı kontrolü
-- Overlay 2sn gösterilip fade-out ile kapanıyor
-- Her overlay benzersiz ID ile oluşturuluyor (çakışma önleme)
+### Önceki Çalışmalar (Aynı Seans)
+- Epik overlay sistemi (Gainer, Günlük tamamlanma, System Boot)
+- Premium antrenman set input UI
+- Egzersiz bilgi modalı premium tasarım
+- Uzun vadeli egzersiz geçmişi takibi
