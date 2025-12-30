@@ -131,7 +131,7 @@ const Renderers = window.Renderers = {
                                     ${water} <span class="text-lg text-gray-500">/ ${CONFIG.TARGETS.WATER}</span>
                                 </div>
                                 <div class="w-32 bg-gray-800 h-1 mt-2 rounded-full overflow-hidden">
-                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (water/CONFIG.TARGETS.WATER)*100)}%"></div>
+                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (water / CONFIG.TARGETS.WATER) * 100)}%"></div>
                                 </div>
                             </div>
                             <div class="flex gap-2">
@@ -155,7 +155,7 @@ const Renderers = window.Renderers = {
                                 <span class="text-white font-bold text-sm font-mono">${totalCal} / ${targetCal} kcal</span>
                             </div>
                             <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                                <div class="h-full ${totalCal >= targetCal ? 'bg-neon-green' : 'bg-accent-orange'} transition-all" style="width: ${Math.min(100, (totalCal/targetCal)*100)}%"></div>
+                                <div class="h-full ${totalCal >= targetCal ? 'bg-neon-green' : 'bg-accent-orange'} transition-all" style="width: ${Math.min(100, (totalCal / targetCal) * 100)}%"></div>
                             </div>
                         </div>
 
@@ -229,11 +229,14 @@ const Renderers = window.Renderers = {
             const logs = workoutData[tid] || [];
 
             const trackingType = ex.trackingType || 'weighted';
-            const targetSets = ex.sets || 3;
+            const defaultSets = ex.sets || 3;
+            // v8.3.0: Dynamic set count - use logs length if exists, else defaults
+            const targetSets = logs.length > 0 ? logs.length : defaultSets;
             const intensityHints = ex.intensityHints || [];
 
             let setsHtml = '';
             let completedSets = 0;
+            let addSetBtn = ''; // Add Set button HTML
 
             if (trackingType === 'weighted') {
                 for (let i = 0; i < targetSets; i++) {
@@ -242,6 +245,11 @@ const Renderers = window.Renderers = {
                     if (isSetDone) completedSets++;
                     setsHtml += Components.weightedSetRow(tid, i, log, isSetDone, intensityHints[i] || '');
                 }
+                // Add Set button for weighted exercises
+                addSetBtn = `<button onclick="Actions.addSet('${tid}')" 
+                    class="w-full mt-3 py-3 rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/30 text-gray-400 hover:border-neon-blue hover:text-neon-blue hover:bg-neon-blue/10 transition-all font-bold text-sm flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i> SET EKLE
+                </button>`;
             } else if (trackingType === 'timed') {
                 for (let i = 0; i < targetSets; i++) {
                     const log = logs[i] || {};
@@ -249,6 +257,11 @@ const Renderers = window.Renderers = {
                     if (isSetDone) completedSets++;
                     setsHtml += Components.timedSetRow(tid, i, log, isSetDone);
                 }
+                // Add Set button for timed exercises
+                addSetBtn = `<button onclick="Actions.addSet('${tid}')" 
+                    class="w-full mt-3 py-3 rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/30 text-gray-400 hover:border-neon-blue hover:text-neon-blue hover:bg-neon-blue/10 transition-all font-bold text-sm flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i> SET EKLE
+                </button>`;
             } else {
                 completedSets = isDone ? 1 : 0;
                 setsHtml = Components.simpleTaskBtn(tid, isDone);
@@ -289,6 +302,7 @@ const Renderers = window.Renderers = {
                                 </div>
                                 <div class="space-y-3">
                                     ${setsHtml}
+                                    ${addSetBtn}
                                 </div>
                             </div>
                         </div>`;

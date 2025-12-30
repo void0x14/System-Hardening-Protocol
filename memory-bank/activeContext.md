@@ -1,29 +1,29 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**v8.2.0 - Nutrition Tab Redesign** - ✅ COMPLETED (reverted from failed v8.3.0 attempt)
+**v8.3.0 - Dynamic Set Management** - ✅ COMPLETED
 
-### Son Güncelleme (17 Aralık 2025)
+### Son Güncelleme (30 Aralık 2025)
 
 #### Durum
-v8.3.0 System Integrity Monitor ilk denemesi başarısız oldu (berbat UI çıktı). 
-v8.2.0'a geri döndük. Yeni plan: Ayrı "YOLCULUK" tab'ı oluşturmak.
+Kullanıcı talebi üzerine antrenman takibi için "Dinamik Set Yönetimi" özelliğine başlandı. 
+Mevcut dashboard'da sabit olan set sayıları, kullanıcının isteği üzerine dinamik hale getiriliyor (Set Ekle/Sil).
 
-#### Sonraki Adım: YOLCULUK Tab'ı (v8.3.0)
-Yeni bir sekme oluşturulacak (Progress tab'ı ayrı kalacak):
-- Integrity Ring (journey progress)
-- Uptime Heatmap (28-gün consistency)
-- Weekly Score Cards
-- Photo Gallery + Before/After Slider
-- Mass Gain Graph
+#### Araştırma ve Planlama (Tamamlandı)
+- **Problem:** Sabit set sayıları esnekliği engelliyor. Silme işlemi için kullanıcı "hover/tap" hibrid bir etkileşim istedi.
+- **Çözüm (v8.3.0 Planı):**
+    1.  **Set Ekleme:** Liste sonunda geniş, premium hissettiren "SET EKLE" butonu. (Hevy/Strong benzeri ama daha geniş).
+    2.  **Set Silme:** "Set Numarası" badge'i üzerine hover yapıldığında (veya click intent) visual cue (kırmızı çarpı) oluşacak. Tıklanırsa silinecek.
+    3.  **Mobil/Desktop Hibrid:** Hover efektleri desktop için, touch-active state'leri mobil için optimize edilecek.
 
-#### Geliştirme Yaklaşımı:
-- **Opsiyon B**: Kademeli geliştir - 1 bileşen ekle, onay al, sonra bir sonraki
-- **Opsiyon C**: UI mockup önce çiz/onayla, sonra kod yaz
+#### Geliştirme Adımları:
+1.  `actions.js`: `addSet` ve `removeSet` fonksiyonları eklenecek.
+2.  `dashboard.js`: Sabit döngü yerine dinamik `logs.length` döngüsü kurulacak.
+3.  `components.js`: Set satırları interaktif badge ile güncellenecek.
 
 #### Tamamlanan Sürümler:
-- ✅ v8.2.0: Nutrition Tab Redesign (macro rings, quick-add)
-- ✅ v8.1.1: Training Tab UI/UX (compact set rows, simple toggle)
-- ✅ v8.1.0: Stealth Mode (Sanitize)
+- ✅ v8.2.0: Nutrition Tab Redesign
+- ✅ v8.1.1: Training Tab UI/UX
+- ✅ v8.1.0: Stealth Mode
 - ✅ v8.0.0: Modular Build
 

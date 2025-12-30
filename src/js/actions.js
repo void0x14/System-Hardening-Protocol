@@ -875,6 +875,76 @@ const Actions = window.Actions = {
 
         UI.showEpicOverlay("🛡️", "SİSTEM GÜVENLİ", "Günlük protokol tamamlandı.", "#00ff41");
         this.switchTab('dashboard');
+    },
+
+    // --- DYNAMIC SET MANAGEMENT (v8.3.0) ---
+    /**
+     * Adds a new empty set to the specified exercise.
+     * If no logs exist, initializes with default set count + 1.
+     * @param {string} taskId - Exercise ID
+     */
+    async addSet(taskId) {
+        const date = Utils.dateStr();
+        const key = 'monk_workout_data_' + date;
+        const data = await Utils.storage.get(key) || {};
+
+        // Get default set count from exercise definition
+        const ex = DB.EXERCISES[taskId];
+        const defaultSets = ex ? (ex.sets || 3) : 3;
+
+        // Initialize array if not exists
+        if (!data[taskId] || data[taskId].length === 0) {
+            data[taskId] = [];
+            for (let i = 0; i < defaultSets; i++) {
+                data[taskId].push({}); // Empty placeholder for default sets
+            }
+        }
+
+        // Add new empty set at the end
+        data[taskId].push({});
+
+        await Utils.storage.set(key, data);
+        UI.showToast(`Set ${data[taskId].length} eklendi ⚡`);
+        await this.switchTab('training');
+        // v8.3.0 UX: Re-open the exercise card after refresh
+        setTimeout(() => this.toggleExerciseBody(taskId), 50);
+    },
+
+    /**
+     * Removes a set from the specified exercise at the given index.
+     * Ensures at least 1 set remains.
+     * @param {string} taskId - Exercise ID
+     * @param {number} setIndex - Index of the set to remove (0-based)
+     */
+    async removeSet(taskId, setIndex) {
+        const date = Utils.dateStr();
+        const key = 'monk_workout_data_' + date;
+        const data = await Utils.storage.get(key) || {};
+
+        // If no data, initialize with defaults first
+        if (!data[taskId] || data[taskId].length === 0) {
+            const ex = DB.EXERCISES[taskId];
+            const defaultSets = ex ? (ex.sets || 3) : 3;
+            data[taskId] = [];
+            for (let i = 0; i < defaultSets; i++) {
+                data[taskId].push({});
+            }
+        }
+
+        // Don't allow removing if only 1 set remains
+        if (data[taskId].length <= 1) {
+            UI.showToast("En az 1 set olmalı!", "error");
+            return;
+        }
+
+        // Remove the set at the specified index
+        data[taskId].splice(setIndex, 1);
+
+        await Utils.storage.set(key, data);
+        UI.showToast(`Set ${setIndex + 1} kaldırıldı`);
+        await this.switchTab('training');
+        // v8.3.0 UX: Re-open the exercise card after refresh
+        setTimeout(() => this.toggleExerciseBody(taskId), 50);
     }
 };
 

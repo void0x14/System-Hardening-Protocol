@@ -191,10 +191,13 @@ const Components = window.Components = {
      */
     weightedSetRow: (tid, idx, log, isSetDone, hint = '') => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
-            <!-- Set Number Badge (Compact) -->
-            <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white'} font-black text-lg md:text-xl flex items-center justify-center">
-                ${idx + 1}
-            </div>
+            <!-- Set Number Badge (Interactive Delete v8.3.0) -->
+            <button onclick="Actions.removeSet('${tid}', ${idx})" 
+                class="group flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black hover:bg-red-900/80' : 'bg-gray-700 text-white hover:bg-red-900/80'} font-black text-lg md:text-xl flex items-center justify-center relative transition-all duration-200 hover:border-2 hover:border-red-500/50"
+                title="Set Sil">
+                <span class="group-hover:opacity-20 transition-opacity duration-200">${idx + 1}</span>
+                <i class="fas fa-times absolute inset-0 flex items-center justify-center text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+            </button>
             
             <!-- Inputs Row -->
             <div class="flex-1 flex items-center gap-2">
@@ -225,10 +228,13 @@ const Components = window.Components = {
      */
     timedSetRow: (tid, idx, log, isSetDone) => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
-            <!-- Set Number Badge (Compact) -->
-            <div class="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white'} font-black text-lg md:text-xl flex items-center justify-center">
-                ${idx + 1}
-            </div>
+            <!-- Set Number Badge (Interactive Delete v8.3.0) -->
+            <button onclick="Actions.removeSet('${tid}', ${idx})" 
+                class="group flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black hover:bg-red-900/80' : 'bg-gray-700 text-white hover:bg-red-900/80'} font-black text-lg md:text-xl flex items-center justify-center relative transition-all duration-200 hover:border-2 hover:border-red-500/50"
+                title="Set Sil">
+                <span class="group-hover:opacity-20 transition-opacity duration-200">${idx + 1}</span>
+                <i class="fas fa-times absolute inset-0 flex items-center justify-center text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
+            </button>
             
             <!-- Input -->
             <div class="flex-1">
