@@ -278,6 +278,8 @@ Detaylı strateji için: [`modularization_strategy.md`](file:///C:/Users/uzgunpa
 **Output**: Maintainable codebase, same single-file deployment
 
 ## Sürüm Geçmişi
+- **v8.3.0**: Dynamic Set Management - Dinamik set ekle/sil, interaktif silme badge'i, UX auto-reopen
+- **v8.2.0**: Nutrition Tab Redesign - Macro rings, quick-add
 - **v8.1.1**: Training Tab UI/UX Redesign - Kompakt set row, simple toggle for lifestyle tasks
 - **v8.1.0**: Stealth Mode (Sanitize) - Gizlilik modu
 - **v8.0.0**: Modular Build - Monolithic → Modular architecture

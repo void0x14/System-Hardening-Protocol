@@ -906,8 +906,12 @@ const Actions = window.Actions = {
         await Utils.storage.set(key, data);
         UI.showToast(`Set ${data[taskId].length} eklendi ⚡`);
         await this.switchTab('training');
-        // v8.3.0 UX: Re-open the exercise card after refresh
-        setTimeout(() => this.toggleExerciseBody(taskId), 50);
+        // v8.3.0 UX: Re-open the exercise card and scroll to it
+        setTimeout(() => {
+            this.toggleExerciseBody(taskId);
+            const card = document.getElementById('body-' + taskId);
+            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
     },
 
     /**
@@ -943,8 +947,12 @@ const Actions = window.Actions = {
         await Utils.storage.set(key, data);
         UI.showToast(`Set ${setIndex + 1} kaldırıldı`);
         await this.switchTab('training');
-        // v8.3.0 UX: Re-open the exercise card after refresh
-        setTimeout(() => this.toggleExerciseBody(taskId), 50);
+        // v8.3.0 UX: Re-open the exercise card and scroll to it
+        setTimeout(() => {
+            this.toggleExerciseBody(taskId);
+            const card = document.getElementById('body-' + taskId);
+            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
     }
 };
 
