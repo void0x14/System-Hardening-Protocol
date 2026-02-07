@@ -226,7 +226,10 @@ const Store = window.Store = {
         const today = Utils.dateStr();
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+        const yy = yesterday.getFullYear();
+        const ym = String(yesterday.getMonth() + 1).padStart(2, '0');
+        const yd = String(yesterday.getDate()).padStart(2, '0');
+        const yesterdayStr = `${yy}-${ym}-${yd}`;
 
         if (streakData.lastDate === today) {
             return streakData.count;
@@ -249,7 +252,10 @@ const Store = window.Store = {
             if (streakData.lastDate !== today) {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
-                const yesterdayStr = yesterday.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+                const yy = yesterday.getFullYear();
+                const ym = String(yesterday.getMonth() + 1).padStart(2, '0');
+                const yd = String(yesterday.getDate()).padStart(2, '0');
+                const yesterdayStr = `${yy}-${ym}-${yd}`;
 
                 if (streakData.lastDate === yesterdayStr) {
                     streakData.count += 1;
@@ -422,7 +428,10 @@ const Store = window.Store = {
         for (let i = 0; i < 30; i++) {
             const d = new Date(today);
             d.setDate(d.getDate() - i);
-            const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+            const dy = d.getFullYear();
+            const dm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const dateStr = `${dy}-${dm}-${dd}`;
             const data = await this.getWorkoutData(dateStr);
             let vol = 0;
             let sets = 0;
@@ -572,7 +581,10 @@ const Store = window.Store = {
             for (let d = 0; d < 7; d++) {
                 const date = new Date(today);
                 date.setDate(date.getDate() - (w * 7 + d));
-                const dateStr = date.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+                const dy = date.getFullYear();
+                const dm = String(date.getMonth() + 1).padStart(2, '0');
+                const dd = String(date.getDate()).padStart(2, '0');
+                const dateStr = `${dy}-${dm}-${dd}`;
 
                 const meals = await this.getMeals(dateStr);
                 if (meals.length > 0) {
@@ -601,4 +613,7 @@ const Store = window.Store = {
     }
 };
 
-console.log('[Store] State management loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[Store] State management loaded');
+}
+

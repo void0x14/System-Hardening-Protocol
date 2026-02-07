@@ -243,4 +243,7 @@ const UI = window.UI = {
     }
 };
 
-console.log('[UI] UI helpers loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[UI] UI helpers loaded');
+}
+

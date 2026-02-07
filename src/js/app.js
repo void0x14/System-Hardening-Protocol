@@ -2,7 +2,9 @@
 // Extracted from original index.html lines 3976-4004
 
 (async function () {
-    console.log("SYSTEM BOOT...");
+    if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+        console.log("SYSTEM BOOT...");
+    }
     await Store.init();
     await UI.init();
 
@@ -34,4 +36,7 @@
     }
 })();
 
-console.log('[App] v8.0.0 initialized');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log(`[App] v${CONFIG.VERSION} initialized`);
+}
+
