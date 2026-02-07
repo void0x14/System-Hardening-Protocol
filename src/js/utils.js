@@ -5,9 +5,16 @@
 const Utils = window.Utils = {
     /**
      * Bugünün tarihini YYYY-MM-DD formatında döndürür.
+     * Client Local Time kullanır (kullanıcının timezone'una göre).
      * @returns {string} Tarih string'i (örn: "2025-12-12")
      */
-    dateStr: () => new Date().toLocaleDateString('tr-TR').split('.').reverse().join('-'),
+    dateStr: () => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    },
 
     /**
      * v7.0.0: XSS önleme - HTML karakterlerini escape eder.
@@ -109,4 +116,6 @@ const Utils = window.Utils = {
     }
 };
 
-console.log('[Utils] Utility functions loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[Utils] Utility functions loaded');
+}

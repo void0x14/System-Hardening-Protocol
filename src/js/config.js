@@ -3,7 +3,8 @@
 
 // Global scope assignments
 const CONFIG = window.CONFIG = {
-    VERSION: '8.2.0',
+    VERSION: '8.3.1',
+    DEBUG_MODE: false, // Set to true for development debug logs
     KEYS: {
         WEIGHT: 'monk_weight',
         FUEL: 'monk_fuel_date',
@@ -45,4 +46,6 @@ const THEME = window.THEME = {
     label: "text-xs uppercase tracking-[0.2em] text-text-muted font-bold mb-3 block"
 };
 
-console.log(`[Config] System Hardening Protocol v${CONFIG.VERSION}`);
+if (CONFIG.DEBUG_MODE) {
+    console.log(`[Config] System Hardening Protocol v${CONFIG.VERSION}`);
+}
