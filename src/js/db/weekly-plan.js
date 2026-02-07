@@ -12,4 +12,7 @@ const WEEKLY_PLAN = window.WEEKLY_PLAN = {
     0: { name: "PAZAR", title: "SYSTEM REBOOT", tasks: ["weigh_in", "prep_food"] }
 };
 
-console.log('[DB] Weekly plan loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[DB] Weekly plan loaded');
+}
+

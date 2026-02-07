@@ -18,7 +18,9 @@ const Stealth = window.Stealth = {
                 this.toggle();
             }
         });
-        console.log('[Stealth] Initialized. Press Ctrl+Shift+H to toggle sanitize mode.');
+        if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+            console.log('[Stealth] Initialized. Press Ctrl+Shift+H to toggle sanitize mode.');
+        }
     },
 
     toggle() {
@@ -44,7 +46,9 @@ const Stealth = window.Stealth = {
             Actions.switchTab(currentTab);
         }
 
-        console.log('[Stealth] Sanitize mode ACTIVATED');
+        if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+            console.log('[Stealth] Sanitize mode ACTIVATED');
+        }
     },
 
     deactivate() {
@@ -61,7 +65,9 @@ const Stealth = window.Stealth = {
         // View'ı yeniden render et
         Actions.switchTab(Store.state.activeTab);
 
-        console.log('[Stealth] Sanitize mode DEACTIVATED');
+        if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+            console.log('[Stealth] Sanitize mode DEACTIVATED');
+        }
     },
 
     updateHeader(sanitized) {
@@ -105,4 +111,7 @@ const Stealth = window.Stealth = {
     }
 };
 
-console.log('[Stealth] Module loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[Stealth] Module loaded');
+}
+

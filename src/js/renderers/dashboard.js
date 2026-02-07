@@ -192,7 +192,10 @@ const Renderers = window.Renderers = {
         for (let i = 27; i >= 0; i--) {
             const d = new Date(today);
             d.setDate(d.getDate() - i);
-            const dateStr = d.toLocaleDateString('tr-TR').split('.').reverse().join('-');
+            const dy = d.getFullYear();
+            const dm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const dateStr = `${dy}-${dm}-${dd}`;
 
             const workout = await Store.getWorkout(dateStr);
 
@@ -743,4 +746,7 @@ const Renderers = window.Renderers = {
     }
 };
 
-console.log('[Renderers] All tab renderers loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[Renderers] All tab renderers loaded');
+}
+

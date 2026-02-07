@@ -219,4 +219,7 @@ DB.FOODS = [
 ];
 
 window.DB = DB;
-console.log(`[DB] ${Object.keys(DB.EXERCISES).length} exercises loaded`);
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log(`[DB] ${Object.keys(DB.EXERCISES).length} exercises loaded`);
+}
+

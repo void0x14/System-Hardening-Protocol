@@ -15,4 +15,7 @@ window.DB.ANATOMY_DB = {
     "pelvic": { name: "Pelvik Taban", function: "Boşalma kontrolü.", system: "Üreme", action: "Kegel", recovery: "24 Saat" }
 };
 
-console.log('[DB] Anatomy database loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[DB] Anatomy database loaded');
+}
+

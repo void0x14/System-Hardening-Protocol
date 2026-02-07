@@ -267,4 +267,7 @@ const Components = window.Components = {
         <div class="w-3 h-3 rounded-full ${active ? 'bg-neon-green shadow-[0_0_8px_rgba(0,255,65,0.5)]' : 'bg-gray-600'} transition-all"></div>`
 };
 
-console.log('[Components] UI component factory loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[Components] UI component factory loaded');
+}
+

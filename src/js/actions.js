@@ -9,11 +9,20 @@ const Actions = window.Actions = {
         UI.modal.open('Video Eğitimi', html);
     },
 
-    // v7.1.0: Inline video player
+    // v8.3.0: Fixed Error 153 by removing Data URI wrapper
     playVideoInline(el, videoId) {
-        const embedCode = `<style>body{margin:0;background:black;overflow:hidden}.video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden}.video-container iframe{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class='video-container'><iframe src='https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0' frameborder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe></div>`;
-        const dataUri = 'data:text/html;charset=utf-8,' + encodeURIComponent(embedCode);
-        el.innerHTML = `<iframe class="w-full aspect-video" src="${dataUri}" frameborder="0" allowfullscreen></iframe>`;
+        // Direct injection to preserve Origin/Referer headers
+        // This fixes "Video unavailable" (Error 153) caused by opaque origin in data: URIs
+        el.innerHTML = `<iframe 
+            class="w-full aspect-video" 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+            title="YouTube video player"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen>
+        </iframe>`;
+
         el.onclick = null;
         el.classList.remove('cursor-pointer', 'hover:border-red-600/50');
     },
@@ -425,7 +434,7 @@ const Actions = window.Actions = {
                 
                 ${ex.videoId ? `
                 <div class="border border-gray-800 rounded-xl overflow-hidden hover:border-red-600/50 transition-all group cursor-pointer video-trigger"
-                    onclick="VideoPlayer.openVideo('${ex.videoId}')">
+                    onclick="event.stopPropagation(); Actions.playVideoInline(this, '${ex.videoId}')">
                     <div class="relative">
                         <div class="aspect-video w-full bg-gray-900 relative overflow-hidden">
                             <img src="https://img.youtube.com/vi/${ex.videoId}/maxresdefault.jpg" 
@@ -956,4 +965,7 @@ const Actions = window.Actions = {
     }
 };
 
-console.log('[Actions] Event handlers loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[Actions] Event handlers loaded');
+}
+

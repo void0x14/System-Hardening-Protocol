@@ -80,4 +80,7 @@ const MENTAL_PHASES = window.MENTAL_PHASES = [
 // Add to DB namespace (exercises.js already declared DB)
 window.DB.MENTAL_PHASES = MENTAL_PHASES;
 
-console.log('[DB] Mental phases loaded');
+if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+    console.log('[DB] Mental phases loaded');
+}
+
