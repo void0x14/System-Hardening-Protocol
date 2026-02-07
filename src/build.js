@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔨 Building System Hardening Protocol v8.0.0...\n');
+console.log('🔨 Building System Hardening Protocol v8.3.1...\n');
 
 const srcDir = __dirname;
 const distDir = path.join(srcDir, '..', 'dist');
@@ -36,13 +36,10 @@ const jsFiles = [
     'video-player',
     'stealth',
 
-    // Layer 5: Renderers (depends on store, ui, components)
+    // Layer 5: Renderers (all consolidated in dashboard.js)
     'renderers/dashboard',
-    'renderers/training',
-    'renderers/nutrition',
-    'renderers/progress',
-    'renderers/anatomy',
-    'renderers/mental',
+    // NOTE: training, nutrition, progress, anatomy, mental were empty stubs
+    // All render logic is in dashboard.js
 
     // Layer 6: Actions (depends on everything)
     'actions',
