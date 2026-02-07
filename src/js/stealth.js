@@ -4,13 +4,15 @@
 const Stealth = window.Stealth = {
     active: false,
 
-    origTitle: 'PROJECT: MONK MODE | v8.0.0',
+    origTitle: null, // Will be set dynamically using CONFIG.VERSION
     safeTitle: 'Fitness Tracker',
 
     // Sensitive tags to sanitize
     sensitiveTags: ['Cinsel Güç', 'Pelvis', 'Libido'],
 
     init() {
+        // Initialize original title with VERSION
+        this.origTitle = `PROJECT: MONK MODE | v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION : '8.3.1'}`;
         document.addEventListener('keydown', (e) => {
             // Ctrl+Shift+H - Türk klavyesi için uygun
             if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'h') {
@@ -74,9 +76,9 @@ const Stealth = window.Stealth = {
         const header = document.querySelector('nav h1');
         if (header) {
             if (sanitized) {
-                header.innerHTML = `FT <span class="text-sm text-text-muted">v8.0</span>`;
+                header.innerHTML = `FT <span class="text-sm text-text-muted">v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION.split('.').slice(0, 2).join('.') : '8.3'}</span>`;
             } else {
-                header.innerHTML = `PROTOCOL <span class="text-sm text-text-muted">v8.0.0</span>`;
+                header.innerHTML = `PROTOCOL <span class="text-sm text-text-muted">v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION : '8.3.1'}</span>`;
             }
         }
 
