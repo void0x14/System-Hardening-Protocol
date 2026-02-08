@@ -79,21 +79,10 @@ DB.EXERCISES = {
         steps: ["Eller popo altı.", "Belini bas.", "Kontrollü indir."],
         videoId: "JB2oyawG9KI"
     },
-    "eat_bulk": { title: "BULK YE", tags: ["Yemek"], desc: "Kalori al.", steps: ["Öğün atlama."] },
-    "stretch": { title: "ESNEME", tags: ["Recovery"], desc: "Rahatla.", steps: ["Ağrıyan yeri esnet."] },
-    "walk_outside": { title: "YÜRÜYÜŞ", tags: ["Mental"], desc: "Hava al.", steps: ["Dışarı çık."] },
     "eat_home": { title: "EV YEMEĞİ", tags: ["Beslenme"], desc: "Dışarıdan yeme.", steps: [] },
-    "weigh_in": { title: "TARTIL", tags: ["Analiz"], desc: "Aç karna.", steps: [] },
-    "prep_food": { title: "STOK", tags: ["Lojistik"], desc: "Eksikleri al.", steps: [] },
     "single_leg_raise": { title: "Single Leg Raise", tags: ["Alt Karın"], desc: "Tek tek kaldır.<br><br><strong>HEDEF:</strong> 4 Set x 12.", steps: ["Tek bacak."] },
     "bottle_curl": { title: "Bottle Curl", tags: ["Pazı"], desc: "Ağırlık ile curl.<br><br><strong>HEDEF:</strong> 4 Set x 12.", steps: ["Kaldır."] },
     "squat_heavy": { title: "Bulgarian Split Squat", tags: ["Bacak"], desc: "Ayağını arkadaki koltuğa koy. Tek bacakla çök kalk.<br><br><strong>HEDEF:</strong> 4 Set x 12 (Her Bacak).", steps: ["Tek ayak koltukta.", "Dik dur.", "Çök."] },
-    "cool_down": {
-        title: "Cool Down (Soğuma)",
-        tags: ["Recovery", "Esneklik"],
-        desc: "Serbest Stil Esneme & Rahatlama.<br><br><strong>HEDEF:</strong> 5-10 Dakika.",
-        steps: ["Derin nefes al.", "Kaslarını uzat.", "Gevşe."]
-    },
     "superman": {
         title: "Superman",
         tags: ["Alt Sırt", "Core"],
