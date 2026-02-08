@@ -65,10 +65,7 @@ jsFiles.forEach(name => {
 
 console.log(`\n📦 JavaScript bundled: ${jsFiles.length} files\n`);
 
-// Read HTML template (contains all HTML and CSS inline)
-// NOTE: CSS files in src/styles/ are NOT used by the build.
-// All styles are embedded in template.html for single-file distribution.
-// The CSS files are kept as reference/documentation only.
+// Read HTML template (contains all HTML and CSS already)
 const templatePath = path.join(srcDir, 'template.html');
 if (!fs.existsSync(templatePath)) {
     console.error('❌ template.html not found!');

@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROJECT: MONK MODE | v8.3.1</title>
-    <!-- v8.3.1: Bug Fixes + Security Hardening -->
+    <title>PROJECT: MONK MODE | v8.2.0</title>
+    <!-- v8.2.0: Nutrition Tab Redesign + Security Fix -->
     <script src="https://cdn.tailwindcss.com"
         onerror="console.error('Tailwind CDN failed'); document.body.innerHTML='<div style=\'padding:2rem;color:#ff003c;font-family:monospace\'>⚠️ CDN OFFLINE - Internet bağlantısı gerekli</div>';"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"
@@ -20,15 +20,11 @@
                 extend: {
                     colors: {
                         'gunmetal': '#0a0a0f',
-                        'cyber-dark': '#0a0a0f',
                         'surface-card': '#111116',
                         'surface-raised': '#1a1a22',
                         'surface-hover': '#222230',
                         'neon-green': '#00ff41',
                         'neon-red': '#ff003c',
-                        'neon-blue': '#00f3ff',
-                        'neon-yellow': '#ffed4a',
-                        'neon-purple': '#a855f7',
                         'accent-orange': '#ff6b35',
                         'text-muted': '#6b7280',
                     },
@@ -643,45 +639,6 @@
             font-size: 16px;
             padding: 1rem;
         }
-
-        /* Heatmap & Circular Chart */
-        .heatmap-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-        }
-
-        .heatmap-cell {
-            aspect-ratio: 1;
-            border-radius: 2px;
-            background-color: #1a1a22;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s ease;
-        }
-
-        .heatmap-cell.active-1 { background-color: rgba(0, 255, 65, 0.3); }
-        .heatmap-cell.active-2 { background-color: rgba(0, 255, 65, 0.6); }
-        .heatmap-cell.active-3 { background-color: rgba(0, 255, 65, 0.9); box-shadow: 0 0 5px rgba(0, 255, 65, 0.5); }
-
-        .circular-chart {
-            display: block;
-            margin: 0 auto;
-            max-width: 100%;
-            max-height: 250px;
-        }
-
-        .circle-bg {
-            fill: none;
-            stroke: #1a1a22;
-            stroke-width: 2.5;
-        }
-
-        .circle {
-            fill: none;
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            transition: stroke-dasharray 1s ease-out;
-        }
     </style>
 </head>
 
@@ -694,7 +651,7 @@
                 <i class="fas fa-biohazard text-neon-green text-2xl"></i>
                 <div>
                     <h1 class="font-header font-bold text-white tracking-wider text-lg md:text-xl">PROTOCOL <span
-                            class="text-sm text-text-muted">v8.3.1</span></h1>
+                            class="text-sm text-text-muted">v8.2.0</span></h1>
                     <div class="text-[10px] text-neon-green font-bold tracking-[0.2em] uppercase">FIELD TEST APPROVED
                     </div>
                 </div>
@@ -902,10 +859,21 @@ DB.EXERCISES = {
         steps: ["Eller popo altı.", "Belini bas.", "Kontrollü indir."],
         videoId: "JB2oyawG9KI"
     },
+    "eat_bulk": { title: "BULK YE", tags: ["Yemek"], desc: "Kalori al.", steps: ["Öğün atlama."] },
+    "stretch": { title: "ESNEME", tags: ["Recovery"], desc: "Rahatla.", steps: ["Ağrıyan yeri esnet."] },
+    "walk_outside": { title: "YÜRÜYÜŞ", tags: ["Mental"], desc: "Hava al.", steps: ["Dışarı çık."] },
     "eat_home": { title: "EV YEMEĞİ", tags: ["Beslenme"], desc: "Dışarıdan yeme.", steps: [] },
+    "weigh_in": { title: "TARTIL", tags: ["Analiz"], desc: "Aç karna.", steps: [] },
+    "prep_food": { title: "STOK", tags: ["Lojistik"], desc: "Eksikleri al.", steps: [] },
     "single_leg_raise": { title: "Single Leg Raise", tags: ["Alt Karın"], desc: "Tek tek kaldır.<br><br><strong>HEDEF:</strong> 4 Set x 12.", steps: ["Tek bacak."] },
     "bottle_curl": { title: "Bottle Curl", tags: ["Pazı"], desc: "Ağırlık ile curl.<br><br><strong>HEDEF:</strong> 4 Set x 12.", steps: ["Kaldır."] },
     "squat_heavy": { title: "Bulgarian Split Squat", tags: ["Bacak"], desc: "Ayağını arkadaki koltuğa koy. Tek bacakla çök kalk.<br><br><strong>HEDEF:</strong> 4 Set x 12 (Her Bacak).", steps: ["Tek ayak koltukta.", "Dik dur.", "Çök."] },
+    "cool_down": {
+        title: "Cool Down (Soğuma)",
+        tags: ["Recovery", "Esneklik"],
+        desc: "Serbest Stil Esneme & Rahatlama.<br><br><strong>HEDEF:</strong> 5-10 Dakika.",
+        steps: ["Derin nefes al.", "Kaslarını uzat.", "Gevşe."]
+    },
     "superman": {
         title: "Superman",
         tags: ["Alt Sırt", "Core"],
@@ -1725,8 +1693,7 @@ const Store = window.Store = {
         const lastBackup = await Utils.storage.get(CONFIG.KEYS.BACKUP);
         if (!lastBackup) return 'NEVER';
         const today = new Date();
-        const last = new Date(lastBackup);
-        if (isNaN(last.getTime())) return 'WARNING';
+        const last = new Date(lastBackup.split('.').reverse().join('-'));
         const diffDays = Math.ceil(Math.abs(today - last) / (1000 * 60 * 60 * 24));
         if (diffDays > 7) return 'WARNING';
         return 'OK';
@@ -2078,7 +2045,7 @@ const UI = window.UI = {
         const c = document.getElementById('toast-container');
         const e = document.createElement('div');
         e.className = `toast mb-3 rounded shadow-lg bg-cyber-dark border-l-4 ${type === 'success' ? 'border-neon-green text-neon-green' : 'border-neon-red text-neon-red'} text-sm font-bold flex items-center gap-3`;
-        e.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${Utils.escapeHtml(msg)}`;
+        e.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
         c.appendChild(e);
         setTimeout(() => e.remove(), 3000);
     },
@@ -2496,7 +2463,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveSet('${tid}', ${idx}, true, event)" 
+            <button onclick="Actions.saveSet('${tid}', ${idx}, true)" 
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -2524,7 +2491,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveTimedSet('${tid}', ${idx}, event)" 
+            <button onclick="Actions.saveTimedSet('${tid}', ${idx})" 
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -2563,13 +2530,35 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Global scope assignment
 const VideoPlayer = window.VideoPlayer = {
     openVideo(videoId) {
+        // Embed URL ile dene
+        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+        // FAILSAFE: Override Popup logic to prevent Error 153 on file://
+        // const popup = window.open(embedUrl, 'VideoPlayer', 'width=854,height=480,resizable=yes');
         console.warn('VideoPlayer.openVideo deprecated. Use Actions.playVideoInline instead.');
+        return;
+
+        // 3 saniye sonra kontrol et
+        setTimeout(() => {
+            try {
+                if (!popup || popup.closed) {
+                    // Popup kapandıysa normal YouTube'a yönlendir
+                    window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+                    UI.showToast('Video yeni sekmede açılıyor...', 'info');
+                }
+            } catch (error) {
+                // Cross-origin hatası - normal davranış
+                if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
+                    console.log('Video popup açıldı (cross-origin)');
+                }
+            }
+        }, 3000);
     }
 };
 
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[VideoPlayer] Video system loaded');
 }
+
 
 
 // ============================================
@@ -2808,12 +2797,11 @@ const Renderers = window.Renderers = {
                             </div>
 
                             <!-- Sleep -->
-                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'} cursor-pointer hover:bg-surface-hover transition-all" onclick="Actions.openSleepModal()">
+                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'}">
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="text-xs font-bold text-gray-300">UYKU</span>
                                     <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${sleepHours} Saat</span>
                                 </div>
-                                <div class="text-[9px] text-gray-600">Kaydetmek icin tikla</div>
                             </div>
                         </div>
                     </div>
@@ -2901,21 +2889,12 @@ const Renderers = window.Renderers = {
 
             const workout = await Store.getWorkout(dateStr);
 
-            // Calculate level based on task completion (0-3 scale)
-            const dayOfWeek = d.getDay();
-            const dayPlan = WEEKLY_PLAN[dayOfWeek];
-            const totalDayTasks = dayPlan ? dayPlan.tasks.length : 1;
             let level = 0;
-            if (workout.length > 0) {
-                const percent = workout.length / totalDayTasks;
-                if (percent >= 0.75) level = 3;
-                else if (percent >= 0.5) level = 2;
-                else level = 1;
-            }
+            if (workout.length > 0) level = 2; // Simple: Workout = Green
 
             // Checking if date is future
             const isFuture = d > new Date();
-            const colorClass = isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${level}`;
+            const colorClass = isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${Math.min(3, level + 1)}`;
 
             html += `<div class="heatmap-cell ${colorClass}" title="${dateStr}"></div>`;
         }
@@ -3532,9 +3511,8 @@ const Actions = window.Actions = {
         const input = document.getElementById('sleep-input');
         if (!input || !input.value) { UI.showToast("Uyku saati girin!", "error"); return; }
         const hours = parseFloat(input.value);
-        if (hours < 0 || hours > 14) { UI.showToast("Gecersiz deger (0-14)", "error"); return; }
+        if (hours < 0 || hours > 14) { UI.showToast("Geçersiz değer (0-14)", "error"); return; }
         await Store.setSleep(hours);
-        UI.modal.close();
         UI.showToast(`Uyku kaydedildi: ${hours} saat`);
         this.switchTab('dashboard');
     },
@@ -4214,7 +4192,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveSet(taskId, setIdx, isDoneBtn, event) {
+    async saveSet(taskId, setIdx, isDoneBtn) {
         const wInput = document.getElementById(`w-${taskId}-${setIdx}`);
         const rInput = document.getElementById(`r-${taskId}-${setIdx}`);
         const weight = wInput ? wInput.value : 0;
@@ -4231,7 +4209,7 @@ const Actions = window.Actions = {
         const result = await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
 
         if (isDoneBtn) {
-            const btn = event ? (event.currentTarget || event.target?.closest('button')) : null;
+            const btn = event.currentTarget || event.target.closest('button');
             if (btn) {
                 btn.classList.remove('bg-gray-700', 'text-gray-400', 'hover:bg-gray-600');
                 btn.classList.add('bg-neon-green', 'text-black');
@@ -4255,7 +4233,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveTimedSet(taskId, setIdx, event) {
+    async saveTimedSet(taskId, setIdx) {
         const dInput = document.getElementById(`d-${taskId}-${setIdx}`);
         const duration = dInput ? parseFloat(dInput.value) || 0 : 0;
 
@@ -4277,7 +4255,7 @@ const Actions = window.Actions = {
             dInput.classList.replace('border-gray-600', 'border-neon-green');
             dInput.classList.add('text-neon-green');
         }
-        const btn = event ? (event.currentTarget || event.target?.closest('button')) : null;
+        const btn = event.currentTarget || event.target.closest('button');
         if (btn) {
             btn.classList.remove('bg-gray-700', 'text-gray-400');
             btn.classList.add('bg-neon-green', 'text-black');
@@ -4299,22 +4277,6 @@ const Actions = window.Actions = {
         }
 
         await Actions.switchTab('training');
-    },
-
-    openSleepModal() {
-        const currentSleep = 0;
-        UI.modal.open("UYKU KAYDI", `
-            <div class="space-y-4">
-                <div class="text-center">
-                    <div class="text-[10px] text-gray-500 mb-2 tracking-widest">KAC SAAT UYUDUN?</div>
-                    <input type="number" id="sleep-input" value="" step="0.5" min="0" max="14" placeholder="7.5" class="${THEME.input} text-center text-4xl font-black text-white h-20 border-2 border-neon-blue focus:border-neon-green bg-black/50">
-                </div>
-                <button onclick="Actions.saveSleep()" class="${THEME.btn} w-full bg-neon-green text-black hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(0,255,65,0.3)]">
-                    <i class="fas fa-save mr-2"></i>KAYDET
-                </button>
-            </div>
-        `);
-        setTimeout(() => document.getElementById('sleep-input')?.focus(), 100);
     },
 
     openWeightModal() {
