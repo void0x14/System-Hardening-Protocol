@@ -64,8 +64,9 @@ const Actions = window.Actions = {
         const input = document.getElementById('sleep-input');
         if (!input || !input.value) { UI.showToast("Uyku saati girin!", "error"); return; }
         const hours = parseFloat(input.value);
-        if (hours < 0 || hours > 14) { UI.showToast("Geçersiz değer (0-14)", "error"); return; }
+        if (hours < 0 || hours > 14) { UI.showToast("Gecersiz deger (0-14)", "error"); return; }
         await Store.setSleep(hours);
+        UI.modal.close();
         UI.showToast(`Uyku kaydedildi: ${hours} saat`);
         this.switchTab('dashboard');
     },
@@ -745,7 +746,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveSet(taskId, setIdx, isDoneBtn) {
+    async saveSet(taskId, setIdx, isDoneBtn, event) {
         const wInput = document.getElementById(`w-${taskId}-${setIdx}`);
         const rInput = document.getElementById(`r-${taskId}-${setIdx}`);
         const weight = wInput ? wInput.value : 0;
@@ -762,7 +763,7 @@ const Actions = window.Actions = {
         const result = await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
 
         if (isDoneBtn) {
-            const btn = event.currentTarget || event.target.closest('button');
+            const btn = event ? (event.currentTarget || event.target?.closest('button')) : null;
             if (btn) {
                 btn.classList.remove('bg-gray-700', 'text-gray-400', 'hover:bg-gray-600');
                 btn.classList.add('bg-neon-green', 'text-black');
@@ -786,7 +787,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveTimedSet(taskId, setIdx) {
+    async saveTimedSet(taskId, setIdx, event) {
         const dInput = document.getElementById(`d-${taskId}-${setIdx}`);
         const duration = dInput ? parseFloat(dInput.value) || 0 : 0;
 
@@ -808,7 +809,7 @@ const Actions = window.Actions = {
             dInput.classList.replace('border-gray-600', 'border-neon-green');
             dInput.classList.add('text-neon-green');
         }
-        const btn = event.currentTarget || event.target.closest('button');
+        const btn = event ? (event.currentTarget || event.target?.closest('button')) : null;
         if (btn) {
             btn.classList.remove('bg-gray-700', 'text-gray-400');
             btn.classList.add('bg-neon-green', 'text-black');
@@ -830,6 +831,22 @@ const Actions = window.Actions = {
         }
 
         await Actions.switchTab('training');
+    },
+
+    openSleepModal() {
+        const currentSleep = 0;
+        UI.modal.open("UYKU KAYDI", `
+            <div class="space-y-4">
+                <div class="text-center">
+                    <div class="text-[10px] text-gray-500 mb-2 tracking-widest">KAC SAAT UYUDUN?</div>
+                    <input type="number" id="sleep-input" value="" step="0.5" min="0" max="14" placeholder="7.5" class="${THEME.input} text-center text-4xl font-black text-white h-20 border-2 border-neon-blue focus:border-neon-green bg-black/50">
+                </div>
+                <button onclick="Actions.saveSleep()" class="${THEME.btn} w-full bg-neon-green text-black hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(0,255,65,0.3)]">
+                    <i class="fas fa-save mr-2"></i>KAYDET
+                </button>
+            </div>
+        `);
+        setTimeout(() => document.getElementById('sleep-input')?.focus(), 100);
     },
 
     openWeightModal() {
