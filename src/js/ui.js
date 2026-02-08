@@ -51,7 +51,7 @@ const UI = window.UI = {
         const c = document.getElementById('toast-container');
         const e = document.createElement('div');
         e.className = `toast mb-3 rounded shadow-lg bg-cyber-dark border-l-4 ${type === 'success' ? 'border-neon-green text-neon-green' : 'border-neon-red text-neon-red'} text-sm font-bold flex items-center gap-3`;
-        e.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+        e.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${Utils.escapeHtml(msg)}`;
         c.appendChild(e);
         setTimeout(() => e.remove(), 3000);
     },
