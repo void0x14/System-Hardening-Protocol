@@ -323,7 +323,8 @@ const Store = window.Store = {
         const lastBackup = await Utils.storage.get(CONFIG.KEYS.BACKUP);
         if (!lastBackup) return 'NEVER';
         const today = new Date();
-        const last = new Date(lastBackup.split('.').reverse().join('-'));
+        const last = new Date(lastBackup);
+        if (isNaN(last.getTime())) return 'WARNING';
         const diffDays = Math.ceil(Math.abs(today - last) / (1000 * 60 * 60 * 24));
         if (diffDays > 7) return 'WARNING';
         return 'OK';
