@@ -107,11 +107,12 @@ const Renderers = window.Renderers = {
                             </div>
 
                             <!-- Sleep -->
-                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'}">
+                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'} cursor-pointer hover:bg-surface-hover transition-all" onclick="Actions.openSleepModal()">
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="text-xs font-bold text-gray-300">UYKU</span>
                                     <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${sleepHours} Saat</span>
                                 </div>
+                                <div class="text-[9px] text-gray-600">Kaydetmek icin tikla</div>
                             </div>
                         </div>
                     </div>
@@ -199,12 +200,21 @@ const Renderers = window.Renderers = {
 
             const workout = await Store.getWorkout(dateStr);
 
+            // Calculate level based on task completion (0-3 scale)
+            const dayOfWeek = d.getDay();
+            const dayPlan = WEEKLY_PLAN[dayOfWeek];
+            const totalDayTasks = dayPlan ? dayPlan.tasks.length : 1;
             let level = 0;
-            if (workout.length > 0) level = 2; // Simple: Workout = Green
+            if (workout.length > 0) {
+                const percent = workout.length / totalDayTasks;
+                if (percent >= 0.75) level = 3;
+                else if (percent >= 0.5) level = 2;
+                else level = 1;
+            }
 
             // Checking if date is future
             const isFuture = d > new Date();
-            const colorClass = isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${Math.min(3, level + 1)}`;
+            const colorClass = isFuture ? 'opacity-0' : level === 0 ? 'opacity-50' : `active-${level}`;
 
             html += `<div class="heatmap-cell ${colorClass}" title="${dateStr}"></div>`;
         }
