@@ -1,11 +1,34 @@
 # Teknik Bağlam
 
 ## Teknolojiler
-- **HTML5**: Tek dosya yapısı (`index.html`)
-- **CSS**: Tailwind CSS (CDN), özel stiller inline
-- **JavaScript**: Vanilla JS, ES6+ async/await
+- **HTML5**: Tek dosya yapısı (`dist/index.html` — build output)
+- **CSS**: Tailwind CSS (CDN) + özel stiller (4 modüler CSS dosyası)
+- **JavaScript**: Vanilla JS, ES6+ async/await (15 modüler dosya)
 - **Fontlar**: JetBrains Mono, Orbitron, Inter (Google Fonts CDN)
 - **İkonlar**: Font Awesome 6.4 (CDN)
+
+## Paket Yönetimi
+- **pnpm**: Proje paket yöneticisi (`packageManager` field ile sabitlenmiş)
+- **package.json**: Build scriptleri tanımlı, harici bağımlılık yok
+- **Build komutu**: `pnpm run build` → `node src/build.js`
+
+## Build Sistemi
+- **Yaklaşım**: Build-time bundling (modüler src → tek dist/index.html)
+- **Build Script**: `src/build.js` — Node.js built-in `fs`/`path` ile
+- **Girdi**: `src/template.html` + `src/js/*.js` + `src/styles/*.css`
+- **Çıktı**: `dist/index.html` (~208 KB)
+- **Bağımlılık**: Sadece Node.js runtime (harici npm paketi yok)
+
+## Modül Yapısı (Dependency Order)
+```
+Layer 1: config.js, db/ (exercises, foods, weekly-plan, mental-phases, anatomy)
+Layer 2: utils.js
+Layer 3: store.js
+Layer 4: ui.js, components.js, video-player.js, stealth.js
+Layer 5: renderers/dashboard.js
+Layer 6: actions.js
+Layer 7: app.js
+```
 
 ## Veri Depolama
 - **localStorage**: Tüm veriler tarayıcıda
@@ -14,21 +37,10 @@
   - `monk_workout_log_YYYY-MM-DD` - Günlük tamamlanan görevler
   - `monk_workout_data_YYYY-MM-DD` - Set/tekrar detayları
   - `monk_meal_log_YYYY-MM-DD` - Günlük öğünler
-  - `monk_exercise_history` - Tüm zamanların egzersiz geçmişi (YENİ)
-
-## Mimari Yapı
-```
-CONFIG → Sabitler, hedefler, anahtarlar
-DB → Egzersizler, yiyecekler, haftalık plan
-Utils → Yardımcı fonksiyonlar, storage adapter
-Store → State yönetimi, veri işlemleri
-UI → DOM manipülasyonu, modal, toast
-Renderers → Tab görünümleri (dashboard, training, nutrition...)
-Actions → Kullanıcı etkileşim handlerleri
-```
+  - `monk_exercise_history` - Tüm zamanların egzersiz geçmişi
 
 ## Kısıtlamalar
 - Tek dosya olmalı (bağımsız çalışma)
 - İnternet kesilse de çalışmalı (localStorage)
-- Derleme/build adımı yok
+- Build adımı: `pnpm run build`
 - Test framework yok (manuel test)

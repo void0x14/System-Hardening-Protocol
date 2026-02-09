@@ -251,5 +251,5 @@ Proje v8.0.0 haliyle **fonksiyonel ve modüler** ama hala **çok ham**. Her sekm
 
 ---
 
-**Last Updated**: 16 Aralık 2025  
-**Current Version**: v8.1.1 (Training Tab Redesign)
+**Last Updated**: 10 Şubat 2026  
+**Current Version**: v8.3.1 (Documentation + pnpm Migration)
