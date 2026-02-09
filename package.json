@@ -1,0 +1,24 @@
+{
+    "name": "system-hardening-protocol",
+    "version": "8.3.1",
+    "description": "Military-grade personal tracking system for human performance optimization",
+    "private": true,
+    "type": "commonjs",
+    "packageManager": "pnpm@10.6.0",
+    "scripts": {
+        "build": "node src/build.js",
+        "build:test": "node src/build-test.js",
+        "build:test:single": "node src/build-test-single.js"
+    },
+    "keywords": [
+        "fitness",
+        "tracking",
+        "personal-development",
+        "dashboard"
+    ],
+    "author": "void0x14",
+    "license": "MIT",
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
