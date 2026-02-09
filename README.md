@@ -1,102 +1,205 @@
+<p align="center">
+  <img src="docs/screenshots/dashboard_full_hd.png" alt="System Hardening Protocol Dashboard" width="800">
+</p>
 
-# 🛡️ SYSTEM HARDENING PROTOCOL v8.3.1
+<h1 align="center">🛡️ System Hardening Protocol</h1>
 
-> **"Discipline equals Freedom."**  
-> Operational Security (OPSEC) for your biological and mental capabilities.
+<p align="center">
+  <strong>Military-grade personal tracking system for human performance optimization.</strong>
+</p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/version-8.3.1-00ff88?style=for-the-badge&labelColor=0a0a0a" alt="Version">
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=0a0a0a" alt="License">
+  <img src="https://img.shields.io/badge/zero-dependencies-ff4444?style=for-the-badge&labelColor=0a0a0a" alt="Zero Dependencies">
+  <img src="https://img.shields.io/badge/offline-first-00ccff?style=for-the-badge&labelColor=0a0a0a" alt="Offline First">
+  <img src="https://img.shields.io/badge/single-file-ffaa00?style=for-the-badge&labelColor=0a0a0a" alt="Single File">
+</p>
 
-![Dashboard](docs/screenshots/dashboard_full_hd.png)
+<p align="center">
+  <em>"Discipline equals Freedom."</em><br>
+  Operational Security (OPSEC) for your biological and mental capabilities.
+</p>
 
-## 📋 Mission Brief
+---
 
-The **System Hardening Protocol** is a military-grade personal tracking system designed to optimize human performance. It treats your body and mind as a high-value asset that requires constant maintenance, upgrading, and protection.
+## ⚡ What Is This?
 
-This is not a "fitness tracker" or a "diet app". It is a command center for your biological existence.
+**System Hardening Protocol** is a zero-dependency, offline-first personal command center that treats your body and mind as a high-value asset. It compiles into a **single HTML file** — no servers, no cloud, no data leaks. Everything runs locally in your browser.
 
-### ⚡ Core Directives
+This is **not** a fitness tracker. This is **not** a diet app. This is a **command center** for your biological existence.
 
-*   **System Integrity**: Track body metrics as system diagnostics.
-*   **Combat Readiness**: Training protocols designed for functional strength.
-*   **Fuel Injection**: Precision nutrition tracking for anabolic optimization.
-*   **Mental Hardening**: Daily psychological warfare against weakness.
+### Why Use It?
+
+- 🔒 **100% Private** — All data stays in your browser's localStorage. No accounts, no tracking, no telemetry.
+- ⚡ **Instant** — Single HTML file, zero load time. Works offline.
+- 🎯 **All-in-One** — Training, nutrition, progress analytics, anatomy visualization, and mental conditioning in one place.
+- 🖥️ **Cyberpunk UI** — Military-grade dark interface with neon accents. Not your average wellness app.
+- 🕵️ **Stealth Mode** — Press `Ctrl+Shift+H` to instantly disguise the app in public.
 
 ---
 
 ## 🖥️ Command Center
 
-### 1. Dashboard (Situation Room)
-Real-time diagnostics of your current status.
-- **System Integrity**: Current vs Goal weight visualization.
-- **Uptime Streak**: Consistency tracking.
-- **Fuel & Energy**: Daily caloric and macro breakdown.
+### 📊 Dashboard (Situation Room)
+Real-time diagnostics of your current status — weight tracking, uptime streaks, daily caloric breakdown, and mission completion status.
 
-![Dashboard](docs/screenshots/dashboard_full_hd.png)
+<p align="center">
+  <img src="docs/screenshots/dashboard_full_hd.png" alt="Dashboard" width="700">
+</p>
 
-### 2. Training (Operations)
-Daily mission protocols.
-- **Detailed Workouts**: Full breakdown of exercises, sets, and targets.
-- **Smart Tracking**: Auto-logging of volume and intensity.
+### 🏋️ Training (Operations)
+Full workout protocols with exercise databases, dynamic set management, volume tracking, and embedded video demonstrations.
 
-![Training](docs/screenshots/training_full_hd.png)
+<p align="center">
+  <img src="docs/screenshots/training_full_hd.png" alt="Training" width="700">
+</p>
 
-### 3. Nutrition (Logistics)
-Advanced fuel management system.
-- **Macro Tracking**: Protein, Carb, Fat, Water.
-- **Meal Logs**: Detailed operational consumption records.
-- **Smart suggestions**: Auto-calculated daily fuel requirements.
+### 🍽️ Nutrition (Logistics)
+Advanced macro tracking with protein/carb/fat/water monitoring, meal logging, custom food creation, and smart daily fuel calculations.
 
-![Nutrition](docs/screenshots/nutrition_full_hd.png)
+<p align="center">
+  <img src="docs/screenshots/nutrition_full_hd.png" alt="Nutrition" width="700">
+</p>
 
-### 4. Progress (Intelligence)
-Analyzes data trends to measure operational effectiveness.
-- **Weekly Summary**: Calorie and workout volume analysis.
-- **Weight History**: Track system mass fluctuations.
-- **Measurements**: Chest, Arm, Waist, Leg dimensions.
+### 📈 Progress (Intelligence)
+Data analysis engine — weekly calorie summaries, workout volume trends, weight history graphs, and body measurement tracking.
 
-![Progress](docs/screenshots/progress_full_hd.png)
+<p align="center">
+  <img src="docs/screenshots/progress_full_hd.png" alt="Progress" width="700">
+</p>
 
-### 5. Anatomy Lab (Diagnostics)
-Visual interface for targeting specific biological subsystems.
-- **Muscle Selection**: Isolate and analyze muscle groups.
-- **Diagnostic Panel**: Check status of specific body parts.
+### 🧬 Anatomy Lab (Diagnostics)
+Interactive visual body map for targeting specific muscle groups. Click on any muscle to view exercises, status, and diagnostic data.
 
-![Anatomy Interactive](docs/screenshots/anatomy_interactive.png)
+<p align="center">
+  <img src="docs/screenshots/anatomy_interactive.png" alt="Anatomy Lab" width="700">
+</p>
 
-### 6. Mental Warfare (Psyops)
-Psychological conditioning protocols.
-- **Phases**: Level up your mindset through 8 distinct phases.
-- **Daily Actions**: "Micro-actions" to build discipline.
-- **Jaguar Theory**: Perception management tools.
+### 🧠 Mental Warfare (Psyops)
+Psychological conditioning through 8 progressive phases, daily micro-actions, and perception management protocols.
 
-![Mental](docs/screenshots/mental_full_hd.png)
+<p align="center">
+  <img src="docs/screenshots/mental_full_hd.png" alt="Mental Warfare" width="700">
+</p>
 
 ---
 
-## 🚀 Deployment
+## 🛠️ Tech Stack
 
-This system works locally in your browser. No external servers, no data leaks. Your data stays on your machine.
+| Technology | Purpose |
+|-----------|---------|
+| **HTML5** | Single-file application structure |
+| **Vanilla JavaScript** | Zero-framework, pure ES6+ logic |
+| **Tailwind CSS** | Utility-first styling via CDN |
+| **localStorage** | Client-side data persistence |
+| **Node.js** | Build-time bundling only |
+| **pnpm** | Package manager for build scripts |
+
+### Architecture
+
+```
+State-Renderer-Actions Pattern
+
+┌─────────┐     ┌───────────┐     ┌──────────┐
+│  Store   │────▶│ Renderers │────▶│ Actions  │
+│ (State)  │◀────│   (View)  │◀────│ (Logic)  │
+└─────────┘     └───────────┘     └──────────┘
+      │                                  │
+      └──── localStorage ◀──────────────┘
+```
+
+**15 modular JS files** are concatenated in dependency order and injected into a single HTML template at build time. No bundler overhead. No virtual DOM. Pure performance.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) 18+
+- [pnpm](https://pnpm.io/) (recommended) or npm
 
 ### Installation
 
-1.  Clone the repository:
-    ```bash
-    git clone git@github.com:void0x14/System-Hardening-Protocol.git
-    ```
-2.  Open `dist/index.html` in any modern browser.
-3.  **Execute.**
+```bash
+# Clone the repository
+git clone git@github.com:void0x14/System-Hardening-Protocol.git
+cd System-Hardening-Protocol
 
-### Stealth Mode (OPSEC)
-Press `Ctrl + Shift + H` to activate **Sanitize Mode**.
-- Hides sensitive metrics.
-- Changes branding to "Personal Tracker".
-- Safe for use in public environments.
+# Build the application
+pnpm run build
+
+# Open the app
+open dist/index.html   # macOS
+xdg-open dist/index.html  # Linux
+start dist/index.html  # Windows
+```
+
+### Or Simply
+
+Download `dist/index.html` and open it in any modern browser. That's it. No install needed.
 
 ---
 
-## 🔒 Version History
+## 🕵️ Stealth Mode (OPSEC)
 
-**Current Version: v8.3.1**
+Press **`Ctrl + Shift + H`** to activate **Sanitize Mode**:
+- Hides all sensitive metrics and personal data
+- Changes branding to generic "Personal Tracker"
+- Safe for use in public environments (office, library, etc.)
 
 ---
 
-> *This is not a game. This is not a simulation. This is your life. Harden or perish.*
+## 📁 Project Structure
+
+```
+System-Hardening-Protocol/
+├── dist/
+│   └── index.html          # ← Production build (single file)
+├── src/
+│   ├── template.html       # Base HTML template
+│   ├── build.js            # Build script
+│   ├── js/                 # 15 modular JavaScript files
+│   │   ├── config.js       # Global configuration
+│   │   ├── db/             # Exercise, food & plan databases
+│   │   ├── store.js        # State management (localStorage)
+│   │   ├── ui.js           # UI rendering engine
+│   │   ├── actions.js      # User interaction handlers
+│   │   └── app.js          # Entry point
+│   └── styles/             # 4 CSS modules
+├── docs/screenshots/       # Application screenshots
+├── package.json            # Build scripts (pnpm)
+├── LICENSE                 # MIT License
+└── CONTRIBUTING.md         # Contribution guidelines
+```
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Test coverage with Playwright
+- [ ] Accessibility (A11Y) improvements
+- [ ] Data export/import (JSON backup)
+- [ ] PWA support for mobile installation
+- [ ] i18n — Multi-language support
+- [ ] Performance profiling & optimization
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## ⭐ Support
+
+If this project helps you on your journey, consider giving it a **star** ⭐ — it helps others discover it.
+
+---
+
+<p align="center">
+  <em>This is not a game. This is not a simulation. This is your life. Harden or perish.</em>
+</p>
