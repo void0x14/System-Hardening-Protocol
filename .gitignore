@@ -1,5 +1,3 @@
-# Agent workspace (private)
-.agent/
 memory-bank/
 
 # Build artifacts
@@ -15,5 +13,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-.agent/
 .jules/
+
+# Backups
+README_backup_*.md

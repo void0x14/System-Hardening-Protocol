@@ -12,7 +12,7 @@ const Stealth = window.Stealth = {
 
     init() {
         // Initialize original title with VERSION
-        this.origTitle = `PROJECT: MONK MODE | v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION : '8.3.1'}`;
+        this.origTitle = `SYSTEM HARDENING PROTOCOL | v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION : '8.3.1'}`;
         document.addEventListener('keydown', (e) => {
             // Ctrl+Shift+H - Türk klavyesi için uygun
             if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'h') {
@@ -97,7 +97,7 @@ const Stealth = window.Stealth = {
         // Subtitle değiştir
         const subtitle = document.querySelector('nav .tracking-\\[0\\.2em\\]');
         if (subtitle) {
-            subtitle.textContent = sanitized ? 'PERSONAL TRACKER' : 'FIELD TEST APPROVED';
+            subtitle.textContent = sanitized ? 'PERSONAL TRACKER' : 'SYSTEM ONLINE';
         }
     },
 

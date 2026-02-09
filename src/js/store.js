@@ -284,12 +284,12 @@ const Store = window.Store = {
                 data[storageKey] = await Utils.storage.get(storageKey);
             }
         }
-        data.meta = { version: CONFIG.VERSION, date: new Date().toISOString(), user: 'MONK_MODE_USER' };
+        data.meta = { version: CONFIG.VERSION, date: new Date().toISOString(), user: 'SYSTEM_HARDENING_USER' };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `monk_mode_backup_${Utils.dateStr()}.json`;
+        a.download = `system_hardening_backup_${Utils.dateStr()}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

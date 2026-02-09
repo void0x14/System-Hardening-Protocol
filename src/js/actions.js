@@ -762,7 +762,8 @@ const Actions = window.Actions = {
         const result = await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
 
         if (isDoneBtn) {
-            const btn = event.currentTarget || event.target.closest('button');
+            const evt = window.event;
+            const btn = evt ? (evt.currentTarget || evt.target.closest('button')) : null;
             if (btn) {
                 btn.classList.remove('bg-gray-700', 'text-gray-400', 'hover:bg-gray-600');
                 btn.classList.add('bg-neon-green', 'text-black');
