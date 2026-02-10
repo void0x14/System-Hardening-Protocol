@@ -182,6 +182,9 @@ System-Hardening-Protocol/
 - [ ] Data export/import (JSON backup)
 - [ ] PWA support for mobile installation
 - [ ] i18n — Multi-language support
+- [ ] Architecture Modernization (Vite)
+- [ ] Automated i18n String Extraction
+- [ ] Zero-Trust Offline Connectivity (Local Assets)
 - [ ] Performance profiling & optimization
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
