@@ -3,12 +3,25 @@
 // Extracted from original index.html lines 2257-2993
 
 // Using window. for global scope access
+const toSafeNumber = (value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.min(max, Math.max(min, parsed));
+};
+
+const toSafeText = (value, maxLength = 160) => {
+    if (value === null || value === undefined) return '';
+    return Utils.escapeHtml(String(value).slice(0, maxLength));
+};
+
+const isIsoDateKey = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value);
+
 const Renderers = window.Renderers = {
     async dashboard() {
         const today = Utils.dateStr();
 
         // 1. DATA GATHERING
-        const currentWeight = Store.state.weight;
+        const currentWeight = toSafeNumber(Store.state.weight, CONFIG.TARGETS.START, 20, 500);
         const startWeight = CONFIG.TARGETS.START;
         const goalWeight = CONFIG.TARGETS.GOAL;
         const weightProgress = Math.min(100, Math.max(0, ((currentWeight - startWeight) / (goalWeight - startWeight)) * 100));
@@ -19,6 +32,10 @@ const Renderers = window.Renderers = {
         const sleepHours = await Store.getSleep(today);
         const water = await Store.getWater(today);
         const fuelDone = Store.state.fuelDate === today;
+
+        const safeStreak = Math.trunc(toSafeNumber(streak, 0, 0, 10000));
+        const safeSleepHours = toSafeNumber(sleepHours, 0, 0, 24);
+        const safeWater = Math.round(toSafeNumber(water, 0, 0, 50));
 
         const dayIdx = new Date().getDay();
         const dailyPlan = WEEKLY_PLAN[dayIdx];
@@ -32,7 +49,7 @@ const Renderers = window.Renderers = {
 
         const isTrainingDone = totalTasks > 0 && completedTasks >= totalTasks;
         const isProteinDone = totalProtein >= targetProtein;
-        const isSleepDone = sleepHours >= 7;
+        const isSleepDone = safeSleepHours >= 7;
 
         const heatmapHTML = await this.getHeatmapHTML();
 
@@ -68,7 +85,7 @@ const Renderers = window.Renderers = {
                         <div>
                             <div class="${THEME.label}">UPTIME STREAK</div>
                             <div class="flex items-baseline gap-2 mb-4">
-                                <div class="text-5xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${streak}</div>
+                                <div class="text-5xl font-header font-black ${safeStreak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${safeStreak}</div>
                                 <div class="text-xs text-text-muted uppercase tracking-wider">GÜN</div>
                             </div>
                         </div>
@@ -110,7 +127,7 @@ const Renderers = window.Renderers = {
                             <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'} cursor-pointer hover:bg-surface-hover transition-all" onclick="Actions.openSleepModal()">
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="text-xs font-bold text-gray-300">UYKU</span>
-                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${sleepHours} Saat</span>
+                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${safeSleepHours} Saat</span>
                                 </div>
                                 <div class="text-[9px] text-gray-600">Kaydetmek icin tikla</div>
                             </div>
@@ -128,11 +145,11 @@ const Renderers = window.Renderers = {
                         </div>
                         <div class="flex items-end justify-between">
                             <div>
-                                <div class="text-4xl font-bold ${water >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">
-                                    ${water} <span class="text-lg text-gray-500">/ ${CONFIG.TARGETS.WATER}</span>
+                                <div class="text-4xl font-bold ${safeWater >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">
+                                    ${safeWater} <span class="text-lg text-gray-500">/ ${CONFIG.TARGETS.WATER}</span>
                                 </div>
                                 <div class="w-32 bg-gray-800 h-1 mt-2 rounded-full overflow-hidden">
-                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (water / CONFIG.TARGETS.WATER) * 100)}%"></div>
+                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (safeWater / CONFIG.TARGETS.WATER) * 100)}%"></div>
                                 </div>
                             </div>
                             <div class="flex gap-2">
@@ -377,7 +394,7 @@ const Renderers = window.Renderers = {
         const plan = Store.state.dailyPlan || {};
         let totalPlanCal = 0;
         ['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'].forEach(k => {
-            if (plan[k]) totalPlanCal += plan[k].kcal;
+            if (plan[k]) totalPlanCal += toSafeNumber(plan[k].kcal, 0, 0, 5000);
         });
 
         return `
@@ -446,9 +463,9 @@ const Renderers = window.Renderers = {
                                 </div>
                                 <div class="flex-1">
                                     <div class="text-[10px] text-gray-500">${times[k]} - ${labels[k]}</div>
-                                    <div class="text-sm text-white font-bold">${meal ? meal.text : '...'}</div>
+                                    <div class="text-sm text-white font-bold">${meal ? toSafeText(meal.text, 120) : '...'}</div>
                                 </div>
-                                ${meal ? `<span class="text-[10px] text-neon-green">${meal.kcal} kcal</span>` : ''}
+                                ${meal ? `<span class="text-[10px] text-neon-green">${toSafeNumber(meal.kcal, 0, 0, 5000)} kcal</span>` : ''}
                             </div>`;
         }).join('')}
                     </div>
@@ -463,7 +480,7 @@ const Renderers = window.Renderers = {
         const volStats = await Store.getVolumeStats();
         const stats = statsData.current || {};
         const measureHistory = statsData.history || [];
-        const dates = Object.keys(hist).sort().slice(-7);
+        const dates = Object.keys(hist).filter(date => isIsoDateKey(date)).sort().slice(-7);
         const volDates = Object.keys(volStats.daily).sort();
         const weeklySummary = await Store.getWeeklySummary();
         const sleepStats = await Store.getSleepStats();
@@ -474,8 +491,9 @@ const Renderers = window.Renderers = {
 
         if (dates.length > 0) {
             weightBars = dates.map(d => {
-                const h = ((hist[d] - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 70 + 15;
-                return `<div class="flex-1 flex flex-col items-center"><div class="text-[9px] text-neon-green font-bold mb-1">${hist[d]}</div><div class="w-full bg-gray-800 hover:bg-neon-green/50 rounded-t transition-all" style="height:${h}%"></div></div>`;
+                const safeWeight = toSafeNumber(hist[d], CONFIG.TARGETS.START, 20, 500);
+                const h = ((safeWeight - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 70 + 15;
+                return `<div class="flex-1 flex flex-col items-center"><div class="text-[9px] text-neon-green font-bold mb-1">${safeWeight}</div><div class="w-full bg-gray-800 hover:bg-neon-green/50 rounded-t transition-all" style="height:${h}%"></div></div>`;
             }).join('');
 
             dateLabels = dates.map((d, i) => {

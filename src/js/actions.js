@@ -11,11 +11,19 @@ const Actions = window.Actions = {
 
     // v8.3.0: Fixed Error 153 by removing Data URI wrapper
     playVideoInline(el, videoId) {
+        const safeVideoId = (typeof videoId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(videoId))
+            ? videoId
+            : null;
+        if (!safeVideoId) {
+            UI.showToast("Geçersiz video kimliği", "error");
+            return;
+        }
+
         // Direct injection to preserve Origin/Referer headers
         // This fixes "Video unavailable" (Error 153) caused by opaque origin in data: URIs
         el.innerHTML = `<iframe 
             class="w-full aspect-video" 
-            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+            src="https://www.youtube.com/embed/${safeVideoId}?autoplay=1&rel=0&modestbranding=1" 
             title="YouTube video player"
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -365,24 +373,39 @@ const Actions = window.Actions = {
         const ex = DB.EXERCISES[id];
         const history = await Store.getExerciseHistory(id);
         const pr = await Store.getPersonalBest(id);
+        const toSafeNumber = (value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+            const parsed = Number(value);
+            if (!Number.isFinite(parsed)) return fallback;
+            return Math.min(max, Math.max(min, parsed));
+        };
+        const safeDateLabel = (value) => {
+            if (typeof value !== 'string') return '';
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
+            return value.split('-')[2];
+        };
+        const safeVideoId = (typeof ex.videoId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(ex.videoId))
+            ? ex.videoId
+            : null;
 
         const targetMatch = ex.desc.match(/(\d+)\s*Set\s*x\s*(\d+)/i);
         const targetSets = targetMatch ? targetMatch[1] : '3-4';
         const targetReps = targetMatch ? targetMatch[2] : '12';
 
         const last5 = history.slice(-5);
-        const maxVol = Math.max(...last5.map(h => h.volume || 0), 1);
+        const maxVol = Math.max(...last5.map(h => toSafeNumber(h.volume, 0, 0, 1000000)), 1);
         const miniChart = last5.length > 0
             ? last5.map(h => {
-                const height = Math.max(8, ((h.volume || 0) / maxVol) * 60);
-                return `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full bg-neon-blue/60 rounded-t transition-all" style="height:${height}px"></div><div class="text-[8px] text-gray-600">${h.date ? h.date.split('-')[2] : ''}</div></div>`;
+                const safeVolume = toSafeNumber(h.volume, 0, 0, 1000000);
+                const height = Math.max(8, (safeVolume / maxVol) * 60);
+                const dayLabel = safeDateLabel(h.date);
+                return `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full bg-neon-blue/60 rounded-t transition-all" style="height:${height}px"></div><div class="text-[8px] text-gray-600">${dayLabel}</div></div>`;
             }).join('')
             : '<div class="text-gray-600 text-xs text-center w-full">Henüz veri yok</div>';
 
         const stepsHtml = ex.steps.map((s, i) => `
             <div class="flex items-start gap-3 p-2 bg-gray-800/50 rounded-lg">
                 <div class="w-6 h-6 rounded-full bg-neon-green/20 border border-neon-green/50 flex items-center justify-center text-neon-green font-bold text-xs flex-shrink-0">${i + 1}</div>
-                <span class="text-gray-200 text-sm">${s}</span>
+                <span class="text-gray-200 text-sm">${Utils.escapeHtml(s)}</span>
             </div>
         `).join('');
 
@@ -394,7 +417,7 @@ const Actions = window.Actions = {
                     </div>
                     <div class="flex-1">
                         <div class="flex flex-wrap gap-2">
-                            ${ex.tags.map(t => `<span class="text-[10px] px-2 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700">${t}</span>`).join('')}
+                            ${ex.tags.map(t => `<span class="text-[10px] px-2 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700">${Utils.escapeHtml(t)}</span>`).join('')}
                         </div>
                     </div>
                 </div>
@@ -416,9 +439,9 @@ const Actions = window.Actions = {
                             <i class="fas fa-trophy text-neon-yellow mr-1"></i>KİŞİSEL REKOR (PR)
                         </div>
                         ${pr
-                ? `<div class="text-2xl font-bold text-white">${pr.volume} <span class="text-sm text-gray-500">vol</span></div>
-                               <div class="text-xs text-gray-500 mt-1">${pr.weight}kg × ${pr.reps} tekrar</div>
-                               <div class="text-[10px] text-gray-600 mt-2">${pr.date || ''}</div>`
+                ? `<div class="text-2xl font-bold text-white">${toSafeNumber(pr.volume, 0, 0, 1000000)} <span class="text-sm text-gray-500">vol</span></div>
+                               <div class="text-xs text-gray-500 mt-1">${toSafeNumber(pr.weight, 0, 0, 1000)}kg × ${toSafeNumber(pr.reps, 0, 0, 1000)} tekrar</div>
+                               <div class="text-[10px] text-gray-600 mt-2">${Utils.escapeHtml(typeof pr.date === 'string' ? pr.date.slice(0, 20) : '')}</div>`
                 : `<div class="text-gray-600 text-sm">Henüz kayıt yok</div>
                                <div class="text-[10px] text-gray-700 mt-1">İlk setini tamamla!</div>`
             }
@@ -432,15 +455,15 @@ const Actions = window.Actions = {
                     </div>
                 </div>
                 
-                ${ex.videoId ? `
+                ${safeVideoId ? `
                 <div class="border border-gray-800 rounded-xl overflow-hidden hover:border-red-600/50 transition-all group cursor-pointer video-trigger"
-                    onclick="event.stopPropagation(); Actions.playVideoInline(this, '${ex.videoId}')">
+                    onclick="event.stopPropagation(); Actions.playVideoInline(this, '${safeVideoId}')">
                     <div class="relative">
                         <div class="aspect-video w-full bg-gray-900 relative overflow-hidden">
-                            <img src="https://img.youtube.com/vi/${ex.videoId}/maxresdefault.jpg" 
+                            <img src="https://img.youtube.com/vi/${safeVideoId}/maxresdefault.jpg" 
                                 alt="Video thumbnail"
                                 class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
-                                onerror="this.src='https://img.youtube.com/vi/${ex.videoId}/hqdefault.jpg'">
+                                onerror="this.src='https://img.youtube.com/vi/${safeVideoId}/hqdefault.jpg'">
                             <div class="absolute inset-0 flex items-center justify-center">
                                 <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                     <i class="fas fa-play text-white text-2xl ml-1"></i>

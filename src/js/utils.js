@@ -87,13 +87,13 @@ const Utils = window.Utils = {
         if (!data || typeof data !== 'object') {
             return { valid: false, data: null, skipped: [], error: 'Geçersiz veri formatı' };
         }
-        const validPrefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
+        const keyRules = Object.values(CONFIG.KEYS);
         const validData = {};
         const skipped = [];
         for (const key in data) {
             if (key === 'meta') {
                 validData[key] = data[key];
-            } else if (validPrefixes.some(p => key.startsWith(p))) {
+            } else if (keyRules.some(rule => rule.endsWith('_') ? key.startsWith(rule) : key === rule)) {
                 if (data[key] !== null && data[key] !== undefined) {
                     validData[key] = data[key];
                 }

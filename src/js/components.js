@@ -2,6 +2,12 @@
 // Extracted from original index.html lines 672-872
 
 // Global scope assignment
+const safeNumberInputValue = (value, min = 0, max = 10000) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return '';
+    return String(Math.min(max, Math.max(min, parsed)));
+};
+
 const Components = window.Components = {
     /**
      * Standard card wrapper with optional accent border
@@ -202,13 +208,13 @@ const Components = window.Components = {
             <!-- Inputs Row -->
             <div class="flex-1 flex items-center gap-2">
                 <div class="flex-1">
-                    <input type="number" placeholder="KG" value="${log.weight || ''}" id="w-${tid}-${idx}" 
+                    <input type="number" placeholder="KG" value="${safeNumberInputValue(log.weight, 0, 1000)}" id="w-${tid}-${idx}" 
                         class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
                         onchange="Actions.saveSet('${tid}', ${idx}, false)">
                 </div>
                 <span class="text-gray-500 text-xl font-bold">×</span>
                 <div class="flex-1">
-                    <input type="number" placeholder="REP" value="${log.reps || ''}" id="r-${tid}-${idx}" 
+                    <input type="number" placeholder="REP" value="${safeNumberInputValue(log.reps, 0, 500)}" id="r-${tid}-${idx}" 
                         class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
                         onchange="Actions.saveSet('${tid}', ${idx}, false)">
                 </div>
@@ -238,7 +244,7 @@ const Components = window.Components = {
             
             <!-- Input -->
             <div class="flex-1">
-                <input type="number" placeholder="SANİYE" value="${log.duration || ''}" id="d-${tid}-${idx}" 
+                <input type="number" placeholder="SANİYE" value="${safeNumberInputValue(log.duration, 0, 7200)}" id="d-${tid}-${idx}" 
                     class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
             </div>
             

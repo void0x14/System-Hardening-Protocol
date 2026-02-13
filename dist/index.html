@@ -1320,13 +1320,13 @@ const Utils = window.Utils = {
         if (!data || typeof data !== 'object') {
             return { valid: false, data: null, skipped: [], error: 'Geçersiz veri formatı' };
         }
-        const validPrefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
+        const keyRules = Object.values(CONFIG.KEYS);
         const validData = {};
         const skipped = [];
         for (const key in data) {
             if (key === 'meta') {
                 validData[key] = data[key];
-            } else if (validPrefixes.some(p => key.startsWith(p))) {
+            } else if (keyRules.some(rule => rule.endsWith('_') ? key.startsWith(rule) : key === rule)) {
                 if (data[key] !== null && data[key] !== undefined) {
                     validData[key] = data[key];
                 }
@@ -1390,12 +1390,12 @@ const Store = window.Store = {
      */
     async init() {
         const w = await Utils.storage.get(CONFIG.KEYS.WEIGHT);
-        if (w) this.state.weight = parseFloat(w);
-        this.state.fuelDate = await Utils.storage.get(CONFIG.KEYS.FUEL);
-        this.state.customFoods = await Utils.storage.get(CONFIG.KEYS.CUSTOM_FOODS) || [];
+        this.state.weight = this._toSafeNumber(w, this.state.weight, 20, 500);
+        this.state.fuelDate = this._sanitizeDateString(await Utils.storage.get(CONFIG.KEYS.FUEL)) || null;
+        this.state.customFoods = this._sanitizeCustomFoods(await Utils.storage.get(CONFIG.KEYS.CUSTOM_FOODS) || []);
 
         const today = Utils.dateStr();
-        const savedPlan = await Utils.storage.get(CONFIG.KEYS.DAILY_PLAN);
+        const savedPlan = this._sanitizeDailyPlanData(await Utils.storage.get(CONFIG.KEYS.DAILY_PLAN));
 
         if (savedPlan && savedPlan.date === today) {
             this.state.dailyPlan = savedPlan.plan;
@@ -1663,6 +1663,203 @@ const Store = window.Store = {
         return Math.min(max, Math.max(min, parsed));
     },
 
+    _isIsoDateKey(value) {
+        return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+    },
+
+    _sanitizeDateString(value) {
+        if (typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        return this._isIsoDateKey(trimmed) ? trimmed : '';
+    },
+
+    _sanitizeTimestampString(value) {
+        if (typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        return /^[0-9]{4}-[0-9]{2}-[0-9]{2}(?:[T ][0-9:.+\-Z]+)?$/.test(trimmed)
+            ? trimmed.slice(0, 40)
+            : '';
+    },
+
+    _sanitizeWorkoutLog(logData) {
+        if (!Array.isArray(logData)) return [];
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        return logData
+            .filter(id => typeof id === 'string' && (allowedIds.size === 0 || allowedIds.has(id)))
+            .slice(0, 128);
+    },
+
+    _sanitizeWeightHistory(historyData) {
+        if (!historyData || typeof historyData !== 'object') return {};
+        const out = {};
+        for (const [date, value] of Object.entries(historyData)) {
+            if (!this._isIsoDateKey(date)) continue;
+            const safeWeight = this._toSafeNumber(value, NaN, 20, 500);
+            if (Number.isFinite(safeWeight)) out[date] = safeWeight;
+        }
+        return out;
+    },
+
+    _sanitizeStreakData(streakData) {
+        if (!streakData || typeof streakData !== 'object') {
+            return { count: 0, lastDate: null };
+        }
+        const count = Math.trunc(this._toSafeNumber(streakData.count, 0, 0, 10000));
+        const lastDate = this._sanitizeDateString(streakData.lastDate);
+        return { count, lastDate: lastDate || null };
+    },
+
+    _sanitizeDailyPlanMeal(meal) {
+        if (!meal || typeof meal !== 'object') return null;
+        const text = typeof meal.text === 'string' ? meal.text.slice(0, 140) : '';
+        const kcal = this._toSafeNumber(meal.kcal, 0, 0, 5000);
+        if (!text && kcal === 0) return null;
+        return { text, kcal };
+    },
+
+    _sanitizeDailyPlanData(planData) {
+        if (!planData || typeof planData !== 'object') {
+            return { date: Utils.dateStr(), plan: {} };
+        }
+
+        const planSource = (planData.plan && typeof planData.plan === 'object') ? planData.plan : planData;
+        const keys = ['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'];
+        const safePlan = {};
+
+        keys.forEach(key => {
+            const safeMeal = this._sanitizeDailyPlanMeal(planSource[key]);
+            if (safeMeal) safePlan[key] = safeMeal;
+        });
+
+        const safeDate = this._sanitizeDateString(planData.date) || Utils.dateStr();
+        return { date: safeDate, plan: safePlan };
+    },
+
+    _sanitizeCustomFoodOption(option) {
+        if (!option || typeof option !== 'object') return null;
+        const label = typeof option.label === 'string' ? option.label.slice(0, 80) : '';
+        const ratio = this._toSafeNumber(option.ratio, NaN, 0.01, 100);
+        if (!label || !Number.isFinite(ratio)) return null;
+        return { label, ratio };
+    },
+
+    _sanitizeCustomFood(food) {
+        if (!food || typeof food !== 'object') return null;
+
+        const type = food.type === 'portion' ? 'portion' : (food.type === 'piece' ? 'piece' : 'custom');
+        const safeVals = {
+            cal: this._toSafeNumber(food?.vals?.cal, 0, 0, 20000),
+            prot: this._toSafeNumber(food?.vals?.prot, 0, 0, 1000),
+            carb: this._toSafeNumber(food?.vals?.carb, 0, 0, 1000),
+            fat: this._toSafeNumber(food?.vals?.fat, 0, 0, 1000)
+        };
+
+        const safeFood = {
+            id: this._toSafeNumber(food.id, 0, 0, Number.MAX_SAFE_INTEGER),
+            cat: typeof food.cat === 'string' ? food.cat.slice(0, 24) : 'CUSTOM',
+            name: typeof food.name === 'string' ? food.name.slice(0, 120) : '',
+            type,
+            vals: safeVals
+        };
+
+        if (type === 'portion') {
+            safeFood.options = Array.isArray(food.options)
+                ? food.options.map(option => this._sanitizeCustomFoodOption(option)).filter(Boolean).slice(0, 8)
+                : [];
+            if (safeFood.options.length === 0) {
+                safeFood.options = [{ label: '1 Porsiyon', ratio: 1 }];
+            }
+        } else if (type === 'piece') {
+            safeFood.unitName = typeof food.unitName === 'string' ? food.unitName.slice(0, 24) : 'Adet';
+        } else {
+            safeFood.unit = typeof food.unit === 'string' ? food.unit.slice(0, 16) : 'custom';
+        }
+
+        return safeFood.name ? safeFood : null;
+    },
+
+    _sanitizeCustomFoods(customFoods) {
+        if (!Array.isArray(customFoods)) return [];
+        return customFoods
+            .map(food => this._sanitizeCustomFood(food))
+            .filter(Boolean)
+            .slice(-300);
+    },
+
+    _sanitizeExerciseHistoryEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        const safeWeight = this._toSafeNumber(entry.weight, NaN, 0, 1000);
+        const safeReps = this._toSafeNumber(entry.reps, NaN, 0, 1000);
+        const providedVolume = this._toSafeNumber(entry.volume, NaN, 0, 1000000);
+        const computedVolume = (Number.isFinite(safeWeight) && Number.isFinite(safeReps))
+            ? safeWeight * safeReps
+            : NaN;
+        const safeVolume = Number.isFinite(providedVolume) ? providedVolume : computedVolume;
+
+        const out = {};
+        if (Number.isFinite(safeWeight)) out.weight = safeWeight;
+        if (Number.isFinite(safeReps)) out.reps = safeReps;
+        if (Number.isFinite(safeVolume)) out.volume = safeVolume;
+
+        const safeDate = this._sanitizeDateString(entry.date);
+        if (safeDate) out.date = safeDate;
+
+        const safeTimestamp = this._sanitizeTimestampString(entry.timestamp);
+        if (safeTimestamp) out.timestamp = safeTimestamp;
+
+        return Object.keys(out).length > 0 ? out : null;
+    },
+
+    _sanitizeExerciseHistoryData(historyData) {
+        if (!historyData || typeof historyData !== 'object') return {};
+
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        const out = {};
+
+        for (const [exerciseId, entries] of Object.entries(historyData)) {
+            if (allowedIds.size > 0 && !allowedIds.has(exerciseId)) continue;
+            if (!Array.isArray(entries)) continue;
+
+            const safeEntries = entries
+                .map(entry => this._sanitizeExerciseHistoryEntry(entry))
+                .filter(Boolean)
+                .slice(-100);
+
+            if (safeEntries.length > 0) out[exerciseId] = safeEntries;
+        }
+
+        return out;
+    },
+
+    _sanitizeMentalProgressData(mentalData) {
+        if (!mentalData || typeof mentalData !== 'object') {
+            return { completedPhases: [], dailyPractice: {} };
+        }
+
+        const completedPhases = Array.isArray(mentalData.completedPhases)
+            ? Array.from(new Set(
+                mentalData.completedPhases
+                    .map(phase => this._toSafeNumber(phase, NaN, 1, 8))
+                    .filter(Number.isFinite)
+                    .map(phase => Math.trunc(phase))
+            ))
+            : [];
+
+        const dailyPractice = {};
+        if (mentalData.dailyPractice && typeof mentalData.dailyPractice === 'object') {
+            for (const [date, done] of Object.entries(mentalData.dailyPractice)) {
+                if (!this._isIsoDateKey(date)) continue;
+                dailyPractice[date] = done === true;
+            }
+        }
+
+        const out = { completedPhases, dailyPractice };
+        const lastPracticeDate = this._sanitizeDateString(mentalData.lastPracticeDate);
+        if (lastPracticeDate) out.lastPracticeDate = lastPracticeDate;
+        return out;
+    },
+
     _sanitizeMealEntry(entry) {
         if (!entry || typeof entry !== 'object') return null;
 
@@ -1698,8 +1895,10 @@ const Store = window.Store = {
         if (Number.isFinite(arm)) out.arm = arm;
         if (Number.isFinite(waist)) out.waist = waist;
         if (Number.isFinite(leg)) out.leg = leg;
-        if (typeof entry.savedAt === 'string') out.savedAt = entry.savedAt.slice(0, 32);
-        if (typeof entry.date === 'string') out.date = entry.date.slice(0, 32);
+        const safeSavedAt = this._sanitizeDateString(entry.savedAt);
+        const safeDate = this._sanitizeDateString(entry.date);
+        if (safeSavedAt) out.savedAt = safeSavedAt;
+        if (safeDate) out.date = safeDate;
 
         return out;
     },
@@ -1737,6 +1936,30 @@ const Store = window.Store = {
                 safeData[key] = this._sanitizeMealLog(importData[key]);
             } else if (key === CONFIG.KEYS.MEASURE) {
                 safeData[key] = this._sanitizeMeasureData(importData[key]);
+            } else if (key === CONFIG.KEYS.WEIGHT) {
+                safeData[key] = this._toSafeNumber(importData[key], this.state.weight, 20, 500);
+            } else if (key === CONFIG.KEYS.WEIGHT_HISTORY) {
+                safeData[key] = this._sanitizeWeightHistory(importData[key]);
+            } else if (key === CONFIG.KEYS.CUSTOM_FOODS) {
+                safeData[key] = this._sanitizeCustomFoods(importData[key]);
+            } else if (key === CONFIG.KEYS.DAILY_PLAN) {
+                safeData[key] = this._sanitizeDailyPlanData(importData[key]);
+            } else if (key === CONFIG.KEYS.STREAK) {
+                safeData[key] = this._sanitizeStreakData(importData[key]);
+            } else if (key === CONFIG.KEYS.FUEL) {
+                safeData[key] = this._sanitizeDateString(importData[key]) || null;
+            } else if (key.startsWith(CONFIG.KEYS.WORKOUT)) {
+                safeData[key] = this._sanitizeWorkoutLog(importData[key]);
+            } else if (key.startsWith(CONFIG.KEYS.SLEEP)) {
+                safeData[key] = this._toSafeNumber(importData[key], 0, 0, 24);
+            } else if (key.startsWith(CONFIG.KEYS.WATER)) {
+                safeData[key] = this._toSafeNumber(importData[key], 0, 0, 50);
+            } else if (key === CONFIG.KEYS.EXERCISE_HISTORY) {
+                safeData[key] = this._sanitizeExerciseHistoryData(importData[key]);
+            } else if (key === CONFIG.KEYS.MENTAL_PROGRESS) {
+                safeData[key] = this._sanitizeMentalProgressData(importData[key]);
+            } else if (key === CONFIG.KEYS.BACKUP) {
+                safeData[key] = this._sanitizeDateString(importData[key]) || Utils.dateStr();
             } else {
                 safeData[key] = importData[key];
             }
@@ -1830,7 +2053,11 @@ const Store = window.Store = {
 
     async getExerciseHistory(exerciseId) {
         const history = await Utils.storage.get(CONFIG.KEYS.EXERCISE_HISTORY) || {};
-        return history[exerciseId] || [];
+        if (!Array.isArray(history[exerciseId])) return [];
+        return history[exerciseId]
+            .map(record => this._sanitizeExerciseHistoryEntry(record))
+            .filter(Boolean)
+            .slice(-100);
     },
 
     async getPersonalBest(exerciseId) {
@@ -2332,6 +2559,12 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 672-872
 
 // Global scope assignment
+const safeNumberInputValue = (value, min = 0, max = 10000) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return '';
+    return String(Math.min(max, Math.max(min, parsed)));
+};
+
 const Components = window.Components = {
     /**
      * Standard card wrapper with optional accent border
@@ -2532,13 +2765,13 @@ const Components = window.Components = {
             <!-- Inputs Row -->
             <div class="flex-1 flex items-center gap-2">
                 <div class="flex-1">
-                    <input type="number" placeholder="KG" value="${log.weight || ''}" id="w-${tid}-${idx}" 
+                    <input type="number" placeholder="KG" value="${safeNumberInputValue(log.weight, 0, 1000)}" id="w-${tid}-${idx}" 
                         class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
                         onchange="Actions.saveSet('${tid}', ${idx}, false)">
                 </div>
                 <span class="text-gray-500 text-xl font-bold">×</span>
                 <div class="flex-1">
-                    <input type="number" placeholder="REP" value="${log.reps || ''}" id="r-${tid}-${idx}" 
+                    <input type="number" placeholder="REP" value="${safeNumberInputValue(log.reps, 0, 500)}" id="r-${tid}-${idx}" 
                         class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
                         onchange="Actions.saveSet('${tid}', ${idx}, false)">
                 </div>
@@ -2568,7 +2801,7 @@ const Components = window.Components = {
             
             <!-- Input -->
             <div class="flex-1">
-                <input type="number" placeholder="SANİYE" value="${log.duration || ''}" id="d-${tid}-${idx}" 
+                <input type="number" placeholder="SANİYE" value="${safeNumberInputValue(log.duration, 0, 7200)}" id="d-${tid}-${idx}" 
                     class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
             </div>
             
@@ -2753,12 +2986,25 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 2257-2993
 
 // Using window. for global scope access
+const toSafeNumber = (value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.min(max, Math.max(min, parsed));
+};
+
+const toSafeText = (value, maxLength = 160) => {
+    if (value === null || value === undefined) return '';
+    return Utils.escapeHtml(String(value).slice(0, maxLength));
+};
+
+const isIsoDateKey = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value);
+
 const Renderers = window.Renderers = {
     async dashboard() {
         const today = Utils.dateStr();
 
         // 1. DATA GATHERING
-        const currentWeight = Store.state.weight;
+        const currentWeight = toSafeNumber(Store.state.weight, CONFIG.TARGETS.START, 20, 500);
         const startWeight = CONFIG.TARGETS.START;
         const goalWeight = CONFIG.TARGETS.GOAL;
         const weightProgress = Math.min(100, Math.max(0, ((currentWeight - startWeight) / (goalWeight - startWeight)) * 100));
@@ -2769,6 +3015,10 @@ const Renderers = window.Renderers = {
         const sleepHours = await Store.getSleep(today);
         const water = await Store.getWater(today);
         const fuelDone = Store.state.fuelDate === today;
+
+        const safeStreak = Math.trunc(toSafeNumber(streak, 0, 0, 10000));
+        const safeSleepHours = toSafeNumber(sleepHours, 0, 0, 24);
+        const safeWater = Math.round(toSafeNumber(water, 0, 0, 50));
 
         const dayIdx = new Date().getDay();
         const dailyPlan = WEEKLY_PLAN[dayIdx];
@@ -2782,7 +3032,7 @@ const Renderers = window.Renderers = {
 
         const isTrainingDone = totalTasks > 0 && completedTasks >= totalTasks;
         const isProteinDone = totalProtein >= targetProtein;
-        const isSleepDone = sleepHours >= 7;
+        const isSleepDone = safeSleepHours >= 7;
 
         const heatmapHTML = await this.getHeatmapHTML();
 
@@ -2818,7 +3068,7 @@ const Renderers = window.Renderers = {
                         <div>
                             <div class="${THEME.label}">UPTIME STREAK</div>
                             <div class="flex items-baseline gap-2 mb-4">
-                                <div class="text-5xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${streak}</div>
+                                <div class="text-5xl font-header font-black ${safeStreak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${safeStreak}</div>
                                 <div class="text-xs text-text-muted uppercase tracking-wider">GÜN</div>
                             </div>
                         </div>
@@ -2860,7 +3110,7 @@ const Renderers = window.Renderers = {
                             <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'} cursor-pointer hover:bg-surface-hover transition-all" onclick="Actions.openSleepModal()">
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="text-xs font-bold text-gray-300">UYKU</span>
-                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${sleepHours} Saat</span>
+                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${safeSleepHours} Saat</span>
                                 </div>
                                 <div class="text-[9px] text-gray-600">Kaydetmek icin tikla</div>
                             </div>
@@ -2878,11 +3128,11 @@ const Renderers = window.Renderers = {
                         </div>
                         <div class="flex items-end justify-between">
                             <div>
-                                <div class="text-4xl font-bold ${water >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">
-                                    ${water} <span class="text-lg text-gray-500">/ ${CONFIG.TARGETS.WATER}</span>
+                                <div class="text-4xl font-bold ${safeWater >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">
+                                    ${safeWater} <span class="text-lg text-gray-500">/ ${CONFIG.TARGETS.WATER}</span>
                                 </div>
                                 <div class="w-32 bg-gray-800 h-1 mt-2 rounded-full overflow-hidden">
-                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (water / CONFIG.TARGETS.WATER) * 100)}%"></div>
+                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (safeWater / CONFIG.TARGETS.WATER) * 100)}%"></div>
                                 </div>
                             </div>
                             <div class="flex gap-2">
@@ -3127,7 +3377,7 @@ const Renderers = window.Renderers = {
         const plan = Store.state.dailyPlan || {};
         let totalPlanCal = 0;
         ['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'].forEach(k => {
-            if (plan[k]) totalPlanCal += plan[k].kcal;
+            if (plan[k]) totalPlanCal += toSafeNumber(plan[k].kcal, 0, 0, 5000);
         });
 
         return `
@@ -3196,9 +3446,9 @@ const Renderers = window.Renderers = {
                                 </div>
                                 <div class="flex-1">
                                     <div class="text-[10px] text-gray-500">${times[k]} - ${labels[k]}</div>
-                                    <div class="text-sm text-white font-bold">${meal ? meal.text : '...'}</div>
+                                    <div class="text-sm text-white font-bold">${meal ? toSafeText(meal.text, 120) : '...'}</div>
                                 </div>
-                                ${meal ? `<span class="text-[10px] text-neon-green">${meal.kcal} kcal</span>` : ''}
+                                ${meal ? `<span class="text-[10px] text-neon-green">${toSafeNumber(meal.kcal, 0, 0, 5000)} kcal</span>` : ''}
                             </div>`;
         }).join('')}
                     </div>
@@ -3213,7 +3463,7 @@ const Renderers = window.Renderers = {
         const volStats = await Store.getVolumeStats();
         const stats = statsData.current || {};
         const measureHistory = statsData.history || [];
-        const dates = Object.keys(hist).sort().slice(-7);
+        const dates = Object.keys(hist).filter(date => isIsoDateKey(date)).sort().slice(-7);
         const volDates = Object.keys(volStats.daily).sort();
         const weeklySummary = await Store.getWeeklySummary();
         const sleepStats = await Store.getSleepStats();
@@ -3224,8 +3474,9 @@ const Renderers = window.Renderers = {
 
         if (dates.length > 0) {
             weightBars = dates.map(d => {
-                const h = ((hist[d] - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 70 + 15;
-                return `<div class="flex-1 flex flex-col items-center"><div class="text-[9px] text-neon-green font-bold mb-1">${hist[d]}</div><div class="w-full bg-gray-800 hover:bg-neon-green/50 rounded-t transition-all" style="height:${h}%"></div></div>`;
+                const safeWeight = toSafeNumber(hist[d], CONFIG.TARGETS.START, 20, 500);
+                const h = ((safeWeight - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 70 + 15;
+                return `<div class="flex-1 flex flex-col items-center"><div class="text-[9px] text-neon-green font-bold mb-1">${safeWeight}</div><div class="w-full bg-gray-800 hover:bg-neon-green/50 rounded-t transition-all" style="height:${h}%"></div></div>`;
             }).join('');
 
             dateLabels = dates.map((d, i) => {
@@ -3531,11 +3782,19 @@ const Actions = window.Actions = {
 
     // v8.3.0: Fixed Error 153 by removing Data URI wrapper
     playVideoInline(el, videoId) {
+        const safeVideoId = (typeof videoId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(videoId))
+            ? videoId
+            : null;
+        if (!safeVideoId) {
+            UI.showToast("Geçersiz video kimliği", "error");
+            return;
+        }
+
         // Direct injection to preserve Origin/Referer headers
         // This fixes "Video unavailable" (Error 153) caused by opaque origin in data: URIs
         el.innerHTML = `<iframe 
             class="w-full aspect-video" 
-            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+            src="https://www.youtube.com/embed/${safeVideoId}?autoplay=1&rel=0&modestbranding=1" 
             title="YouTube video player"
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -3885,24 +4144,39 @@ const Actions = window.Actions = {
         const ex = DB.EXERCISES[id];
         const history = await Store.getExerciseHistory(id);
         const pr = await Store.getPersonalBest(id);
+        const toSafeNumber = (value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+            const parsed = Number(value);
+            if (!Number.isFinite(parsed)) return fallback;
+            return Math.min(max, Math.max(min, parsed));
+        };
+        const safeDateLabel = (value) => {
+            if (typeof value !== 'string') return '';
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
+            return value.split('-')[2];
+        };
+        const safeVideoId = (typeof ex.videoId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(ex.videoId))
+            ? ex.videoId
+            : null;
 
         const targetMatch = ex.desc.match(/(\d+)\s*Set\s*x\s*(\d+)/i);
         const targetSets = targetMatch ? targetMatch[1] : '3-4';
         const targetReps = targetMatch ? targetMatch[2] : '12';
 
         const last5 = history.slice(-5);
-        const maxVol = Math.max(...last5.map(h => h.volume || 0), 1);
+        const maxVol = Math.max(...last5.map(h => toSafeNumber(h.volume, 0, 0, 1000000)), 1);
         const miniChart = last5.length > 0
             ? last5.map(h => {
-                const height = Math.max(8, ((h.volume || 0) / maxVol) * 60);
-                return `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full bg-neon-blue/60 rounded-t transition-all" style="height:${height}px"></div><div class="text-[8px] text-gray-600">${h.date ? h.date.split('-')[2] : ''}</div></div>`;
+                const safeVolume = toSafeNumber(h.volume, 0, 0, 1000000);
+                const height = Math.max(8, (safeVolume / maxVol) * 60);
+                const dayLabel = safeDateLabel(h.date);
+                return `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full bg-neon-blue/60 rounded-t transition-all" style="height:${height}px"></div><div class="text-[8px] text-gray-600">${dayLabel}</div></div>`;
             }).join('')
             : '<div class="text-gray-600 text-xs text-center w-full">Henüz veri yok</div>';
 
         const stepsHtml = ex.steps.map((s, i) => `
             <div class="flex items-start gap-3 p-2 bg-gray-800/50 rounded-lg">
                 <div class="w-6 h-6 rounded-full bg-neon-green/20 border border-neon-green/50 flex items-center justify-center text-neon-green font-bold text-xs flex-shrink-0">${i + 1}</div>
-                <span class="text-gray-200 text-sm">${s}</span>
+                <span class="text-gray-200 text-sm">${Utils.escapeHtml(s)}</span>
             </div>
         `).join('');
 
@@ -3914,7 +4188,7 @@ const Actions = window.Actions = {
                     </div>
                     <div class="flex-1">
                         <div class="flex flex-wrap gap-2">
-                            ${ex.tags.map(t => `<span class="text-[10px] px-2 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700">${t}</span>`).join('')}
+                            ${ex.tags.map(t => `<span class="text-[10px] px-2 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700">${Utils.escapeHtml(t)}</span>`).join('')}
                         </div>
                     </div>
                 </div>
@@ -3936,9 +4210,9 @@ const Actions = window.Actions = {
                             <i class="fas fa-trophy text-neon-yellow mr-1"></i>KİŞİSEL REKOR (PR)
                         </div>
                         ${pr
-                ? `<div class="text-2xl font-bold text-white">${pr.volume} <span class="text-sm text-gray-500">vol</span></div>
-                               <div class="text-xs text-gray-500 mt-1">${pr.weight}kg × ${pr.reps} tekrar</div>
-                               <div class="text-[10px] text-gray-600 mt-2">${pr.date || ''}</div>`
+                ? `<div class="text-2xl font-bold text-white">${toSafeNumber(pr.volume, 0, 0, 1000000)} <span class="text-sm text-gray-500">vol</span></div>
+                               <div class="text-xs text-gray-500 mt-1">${toSafeNumber(pr.weight, 0, 0, 1000)}kg × ${toSafeNumber(pr.reps, 0, 0, 1000)} tekrar</div>
+                               <div class="text-[10px] text-gray-600 mt-2">${Utils.escapeHtml(typeof pr.date === 'string' ? pr.date.slice(0, 20) : '')}</div>`
                 : `<div class="text-gray-600 text-sm">Henüz kayıt yok</div>
                                <div class="text-[10px] text-gray-700 mt-1">İlk setini tamamla!</div>`
             }
@@ -3952,15 +4226,15 @@ const Actions = window.Actions = {
                     </div>
                 </div>
                 
-                ${ex.videoId ? `
+                ${safeVideoId ? `
                 <div class="border border-gray-800 rounded-xl overflow-hidden hover:border-red-600/50 transition-all group cursor-pointer video-trigger"
-                    onclick="event.stopPropagation(); Actions.playVideoInline(this, '${ex.videoId}')">
+                    onclick="event.stopPropagation(); Actions.playVideoInline(this, '${safeVideoId}')">
                     <div class="relative">
                         <div class="aspect-video w-full bg-gray-900 relative overflow-hidden">
-                            <img src="https://img.youtube.com/vi/${ex.videoId}/maxresdefault.jpg" 
+                            <img src="https://img.youtube.com/vi/${safeVideoId}/maxresdefault.jpg" 
                                 alt="Video thumbnail"
                                 class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
-                                onerror="this.src='https://img.youtube.com/vi/${ex.videoId}/hqdefault.jpg'">
+                                onerror="this.src='https://img.youtube.com/vi/${safeVideoId}/hqdefault.jpg'">
                             <div class="absolute inset-0 flex items-center justify-center">
                                 <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                     <i class="fas fa-play text-white text-2xl ml-1"></i>
