@@ -45,6 +45,34 @@ const Actions = window.Actions = {
         document.getElementById('view-container').innerHTML = await Renderers[id]();
     },
 
+    closeModal() {
+        UI.modal.close();
+    },
+
+    closeAlert() {
+        UI.alert.close();
+    },
+
+    filterFoodList() {
+        UI.filterFoodList();
+    },
+
+    renderPortionInputs() {
+        UI.renderPortionInputs();
+    },
+
+    switchMealModalTab(tab) {
+        const showExisting = tab === 'exist';
+        const existTab = document.getElementById('tab-exist');
+        const newTab = document.getElementById('tab-new');
+        if (existTab) existTab.style.display = showExisting ? 'block' : 'none';
+        if (newTab) newTab.style.display = showExisting ? 'none' : 'block';
+    },
+
+    triggerImportFilePicker() {
+        document.getElementById('import-file')?.click();
+    },
+
     async saveWeight(v) {
         const num = parseFloat(v);
         if (isNaN(num) || num <= 0 || num > 300) {
@@ -245,21 +273,21 @@ const Actions = window.Actions = {
         const foods = Store.getAllFoods();
         UI.modal.openHtml("YAKIT EKLE", `
             <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
-                <button onclick="document.getElementById('tab-exist').style.display='block';document.getElementById('tab-new').style.display='none'" class="text-xs text-neon-green font-bold hover:underline">LİSTEDEN SEÇ</button>
-                <button onclick="document.getElementById('tab-exist').style.display='none';document.getElementById('tab-new').style.display='block'" class="text-xs text-gray-500 font-bold hover:text-white hover:underline">YENİ TANIMLA</button>
+                <button ${Utils.actionAttrs('switchMealModalTab', ['exist'])} class="text-xs text-neon-green font-bold hover:underline">LİSTEDEN SEÇ</button>
+                <button ${Utils.actionAttrs('switchMealModalTab', ['new'])} class="text-xs text-gray-500 font-bold hover:text-white hover:underline">YENİ TANIMLA</button>
             </div>
             <div id="tab-exist">
                 <div class="space-y-4">
                     <div>
-                        <input type="text" id="food-search" placeholder="Besin Ara (örn: Döner, Pilav)" class="${THEME.input} mb-2 border-neon-blue/30 text-sm" onkeyup="UI.filterFoodList()">
-                        <select id="m-food" class="${THEME.input} custom-scrollbar" onchange="UI.renderPortionInputs()" size="5">
+                        <input type="text" id="food-search" placeholder="Besin Ara (örn: Döner, Pilav)" class="${THEME.input} mb-2 border-neon-blue/30 text-sm" ${Utils.actionAttrs('filterFoodList', [], { event: 'input' })}>
+                        <select id="m-food" class="${THEME.input} custom-scrollbar" ${Utils.actionAttrs('renderPortionInputs', [], { event: 'change' })} size="5">
                             ${foods.map((f, i) => `<option value="${i}">${Utils.escapeHtml(f.name)}</option>`).join('')}
                         </select>
                     </div>
                     <div id="portion-container">
                         <!-- Dynamic Inputs Here -->
                     </div>
-                    <button onclick="Actions.submitMeal()" class="${THEME.btn} w-full mt-2">EKLE</button>
+                    <button ${Utils.actionAttrs('submitMeal')} class="${THEME.btn} w-full mt-2">EKLE</button>
                 </div>
             </div>
             <div id="tab-new" style="display:none">
@@ -278,7 +306,7 @@ const Actions = window.Actions = {
                             <option value="ad">Adet/Porsiyon</option>
                         </select>
                     </div>
-                    <button onclick="Actions.createCustomFood()" class="${THEME.btn} w-full border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black">VERİTABANINA KAYDET</button>
+                    <button ${Utils.actionAttrs('createCustomFood')} class="${THEME.btn} w-full border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black">VERİTABANINA KAYDET</button>
                 </div>
             </div>
         `);
@@ -461,13 +489,13 @@ const Actions = window.Actions = {
                 
                 ${safeVideoId ? `
                 <div class="border border-gray-800 rounded-xl overflow-hidden hover:border-red-600/50 transition-all group cursor-pointer video-trigger"
-                    onclick="event.stopPropagation(); Actions.playVideoInline(this, '${safeVideoId}')">
+                    ${Utils.actionAttrs('playVideoInline', [safeVideoId], { passElement: true, stopPropagation: true })}>
                     <div class="relative">
                         <div class="aspect-video w-full bg-gray-900 relative overflow-hidden">
                             <img src="https://img.youtube.com/vi/${safeVideoId}/maxresdefault.jpg" 
                                 alt="Video thumbnail"
                                 class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
-                                onerror="this.src='https://img.youtube.com/vi/${safeVideoId}/hqdefault.jpg'">
+                                data-fallback-src="https://img.youtube.com/vi/${safeVideoId}/hqdefault.jpg">
                             <div class="absolute inset-0 flex items-center justify-center">
                                 <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                     <i class="fas fa-play text-white text-2xl ml-1"></i>
@@ -564,7 +592,7 @@ const Actions = window.Actions = {
                 
                 <div class="flex gap-3 pt-4 border-t border-gray-800">
                     ${!isCompleted ? `
-                        <button onclick="Actions.markPhaseComplete(${p.id})" 
+                        <button ${Utils.actionAttrs('markPhaseComplete', [p.id])}
                             class="flex-1 py-3 bg-neon-green/10 border-2 border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black transition-all">
                             <i class="fas fa-check-double mr-2"></i>Bu Fazı Anladım
                         </button>
@@ -573,7 +601,7 @@ const Actions = window.Actions = {
                             <i class="fas fa-trophy mr-2"></i>Faz Tamamlandı!
                         </div>
                     `}
-                    <button onclick="UI.modal.close()" 
+                    <button ${Utils.actionAttrs('closeModal')}
                         class="px-6 py-3 bg-gray-800 border border-gray-700 text-gray-400 font-bold rounded-xl hover:bg-gray-700 hover:text-white transition-all">
                         Kapat
                     </button>
@@ -670,7 +698,7 @@ const Actions = window.Actions = {
                     </ul>
                 </div>
                 <div class="text-center">
-                    <button onclick="Actions.startWorkout()" class="${THEME.btn} w-full bg-neon-green/20 border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-bold text-lg py-4 rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,255,65,0.3)]">
+                    <button ${Utils.actionAttrs('startWorkout')} class="${THEME.btn} w-full bg-neon-green/20 border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-bold text-lg py-4 rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,255,65,0.3)]">
                         <i class="fas fa-rocket mr-2"></i>HAZIRIM, BAŞLAT!
                     </button>
                 </div>
@@ -709,7 +737,7 @@ const Actions = window.Actions = {
                             <p class="text-[10px] text-gray-500">Tüm verilerini cihazına indir (.json)</p>
                         </div>
                     </div>
-                    <button onclick="Actions.exportData()" class="${THEME.btn} w-full text-xs">YEDEĞİ İNDİR</button>
+                    <button ${Utils.actionAttrs('exportData')} class="${THEME.btn} w-full text-xs">YEDEĞİ İNDİR</button>
                 </div>
 
                 <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
@@ -722,8 +750,8 @@ const Actions = window.Actions = {
                             <p class="text-[10px] text-gray-500">Dikkat: Mevcut veriler silinir!</p>
                         </div>
                     </div>
-                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="Actions.startImport(this)">
-                    <button onclick="document.getElementById('import-file').click()" class="w-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 font-bold py-3 px-6 rounded-lg transition text-xs border border-dashed border-gray-600">DOSYA SEÇ VE YÜKLE</button>
+                    <input type="file" id="import-file" accept=".json" class="hidden" ${Utils.actionAttrs('startImport', [], { event: 'change', passElement: true })}>
+                    <button ${Utils.actionAttrs('triggerImportFilePicker')} class="w-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 font-bold py-3 px-6 rounded-lg transition text-xs border border-dashed border-gray-600">DOSYA SEÇ VE YÜKLE</button>
                 </div>
             </div>
         `);
@@ -868,7 +896,7 @@ const Actions = window.Actions = {
                     <div class="text-[10px] text-gray-500 mb-2 tracking-widest">MEVCUT SİSTEM YÜKÜ</div>
                     <input type="number" id="modal-weight-input" value="${current}" step="0.1" class="${THEME.input} text-center text-4xl font-black text-white h-20 border-2 border-neon-blue focus:border-neon-green bg-black/50">
                 </div>
-                <button onclick="Actions.saveWeightFromModal()" class="${THEME.btn} w-full bg-neon-green text-black hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(0,255,65,0.3)]">
+                <button ${Utils.actionAttrs('saveWeightFromModal')} class="${THEME.btn} w-full bg-neon-green text-black hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(0,255,65,0.3)]">
                     <i class="fas fa-save mr-2"></i>VERİYİ İŞLE
                 </button>
             </div>
@@ -891,8 +919,8 @@ const Actions = window.Actions = {
                     <p class="text-gray-400 text-xs mt-2">Tüm günlük görevler (Antrenman, Beslenme vb.) 'TAMAMLANDI' olarak işaretlenecek.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-4">
-                    <button onclick="UI.modal.close()" class="py-3 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition text-xs font-bold">İPTAL</button>
-                    <button onclick="Actions.confirmDailyMission()" class="py-3 rounded-lg bg-neon-green text-black font-bold hover:bg-white transition text-xs shadow-[0_0_15px_rgba(0,255,65,0.3)]">ONAYLA</button>
+                    <button ${Utils.actionAttrs('closeModal')} class="py-3 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition text-xs font-bold">İPTAL</button>
+                    <button ${Utils.actionAttrs('confirmDailyMission')} class="py-3 rounded-lg bg-neon-green text-black font-bold hover:bg-white transition text-xs shadow-[0_0_15px_rgba(0,255,65,0.3)]">ONAYLA</button>
                 </div>
             </div>
         `);

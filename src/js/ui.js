@@ -26,7 +26,7 @@ const UI = window.UI = {
             tabs = tabs.filter(t => t.id !== 'mental');
         }
         document.getElementById('nav-tabs').innerHTML = tabs.map(t =>
-            `<button onclick="Actions.switchTab('${t.id}')" id="btn-${t.id}" class="tab-btn flex-none px-6 py-3 font-bold text-xs md:text-sm whitespace-nowrap text-gray-500 hover:text-white transition-colors border-b-2 border-transparent relative">
+            `<button ${Utils.actionAttrs('switchTab', [t.id])} id="btn-${t.id}" class="tab-btn flex-none px-6 py-3 font-bold text-xs md:text-sm whitespace-nowrap text-gray-500 hover:text-white transition-colors border-b-2 border-transparent relative">
                 <i class="fas ${t.i} mr-2"></i>${t.l}
                 <div id="badge-${t.id}" class="notification-badge hidden"></div>
             </button>`
@@ -66,6 +66,7 @@ const UI = window.UI = {
             const body = document.getElementById('modal-body');
             if (allowHtml) {
                 body.innerHTML = String(c ?? '');
+                UI.bindMediaFallbacks(body);
             } else {
                 body.textContent = String(c ?? '');
             }
@@ -177,6 +178,21 @@ const UI = window.UI = {
         }
 
         this.renderPortionInputs();
+    },
+
+    bindMediaFallbacks(root) {
+        if (!root) return;
+        const images = root.querySelectorAll('img[data-fallback-src]');
+        images.forEach(img => {
+            if (img.dataset.fallbackBound === 'true') return;
+            img.dataset.fallbackBound = 'true';
+            img.addEventListener('error', () => {
+                const fallbackSrc = img.dataset.fallbackSrc;
+                if (!fallbackSrc || img.dataset.fallbackApplied === 'true') return;
+                img.dataset.fallbackApplied = 'true';
+                img.src = fallbackSrc;
+            });
+        });
     },
 
     /**

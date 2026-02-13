@@ -100,7 +100,7 @@ const Components = window.Components = {
                     <span class="text-yellow-400"><b>${meal.fat || 0}</b>F</span>
                 </div>
                 <span class="text-neon-green font-bold text-sm">${meal.cal} kcal</span>
-                <button onclick="Actions.deleteMeal(${idx})" class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-2" title="Sil">
+                <button ${Utils.actionAttrs('deleteMeal', [idx])} class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-2" title="Sil">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -159,12 +159,13 @@ const Components = window.Components = {
     /**
      * Button component
      * @param {string} text - Button text
-     * @param {string} onclick - onclick handler
+     * @param {string} action - Action method name
+     * @param {Array<any>} params - Action params
      * @param {string} [type='primary'] - 'primary', 'secondary', 'danger', 'ghost'
      * @param {string} [icon=''] - FontAwesome icon class
      * @param {string} [extra=''] - Additional classes
      */
-    btn: (text, onclick, type = 'primary', icon = '', extra = '') => {
+    btn: (text, action, params = [], type = 'primary', icon = '', extra = '') => {
         const styles = {
             primary: 'bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black',
             secondary: 'bg-gray-800 hover:bg-gray-700 text-gray-300',
@@ -173,20 +174,20 @@ const Components = window.Components = {
             blue: 'bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black'
         };
         const iconHtml = icon ? `<i class="fas ${icon} mr-2"></i>` : '';
-        return `<button onclick="${onclick}" class="${styles[type] || styles.primary} px-4 py-2 rounded-lg font-bold text-sm transition-all ${extra}">${iconHtml}${text}</button>`;
+        return `<button ${Utils.actionAttrs(action, params)} class="${styles[type] || styles.primary} px-4 py-2 rounded-lg font-bold text-sm transition-all ${extra}">${iconHtml}${text}</button>`;
     },
 
     /**
      * Icon button (square)
      */
-    iconBtn: (icon, onclick, type = 'primary', size = 'w-12 h-12') => {
+    iconBtn: (icon, action, params = [], type = 'primary', size = 'w-12 h-12') => {
         const styles = {
             primary: 'bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black',
             secondary: 'bg-gray-800 hover:bg-gray-700 text-gray-400',
             success: 'bg-neon-green text-black',
             danger: 'bg-neon-red/20 hover:bg-neon-red text-neon-red hover:text-white'
         };
-        return `<button onclick="${onclick}" class="${styles[type] || styles.primary} ${size} rounded-xl flex items-center justify-center text-lg transition-all">
+        return `<button ${Utils.actionAttrs(action, params)} class="${styles[type] || styles.primary} ${size} rounded-xl flex items-center justify-center text-lg transition-all">
             <i class="fas ${icon}"></i>
         </button>`;
     },
@@ -198,7 +199,7 @@ const Components = window.Components = {
     weightedSetRow: (tid, idx, log, isSetDone, hint = '') => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
             <!-- Set Number Badge (Interactive Delete v8.3.0) -->
-            <button onclick="Actions.removeSet('${tid}', ${idx})" 
+            <button ${Utils.actionAttrs('removeSet', [tid, idx])}
                 class="group flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black hover:bg-red-900/80' : 'bg-gray-700 text-white hover:bg-red-900/80'} font-black text-lg md:text-xl flex items-center justify-center relative transition-all duration-200 hover:border-2 hover:border-red-500/50"
                 title="Set Sil">
                 <span class="group-hover:opacity-20 transition-opacity duration-200">${idx + 1}</span>
@@ -208,20 +209,22 @@ const Components = window.Components = {
             <!-- Inputs Row -->
             <div class="flex-1 flex items-center gap-2">
                 <div class="flex-1">
-                    <input type="number" placeholder="KG" value="${safeNumberInputValue(log.weight, 0, 1000)}" id="w-${tid}-${idx}" 
+                    <input type="number" placeholder="KG" value="${safeNumberInputValue(log.weight, 0, 1000)}" id="w-${tid}-${idx}"
+                        ${Utils.actionAttrs('saveSet', [tid, idx, false], { event: 'change' })}
                         class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
-                        onchange="Actions.saveSet('${tid}', ${idx}, false)">
+                        >
                 </div>
                 <span class="text-gray-500 text-xl font-bold">×</span>
                 <div class="flex-1">
-                    <input type="number" placeholder="REP" value="${safeNumberInputValue(log.reps, 0, 500)}" id="r-${tid}-${idx}" 
+                    <input type="number" placeholder="REP" value="${safeNumberInputValue(log.reps, 0, 500)}" id="r-${tid}-${idx}"
+                        ${Utils.actionAttrs('saveSet', [tid, idx, false], { event: 'change' })}
                         class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
-                        onchange="Actions.saveSet('${tid}', ${idx}, false)">
+                        >
                 </div>
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveSet('${tid}', ${idx}, true)" 
+            <button ${Utils.actionAttrs('saveSet', [tid, idx, true])}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -235,7 +238,7 @@ const Components = window.Components = {
     timedSetRow: (tid, idx, log, isSetDone) => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
             <!-- Set Number Badge (Interactive Delete v8.3.0) -->
-            <button onclick="Actions.removeSet('${tid}', ${idx})" 
+            <button ${Utils.actionAttrs('removeSet', [tid, idx])}
                 class="group flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black hover:bg-red-900/80' : 'bg-gray-700 text-white hover:bg-red-900/80'} font-black text-lg md:text-xl flex items-center justify-center relative transition-all duration-200 hover:border-2 hover:border-red-500/50"
                 title="Set Sil">
                 <span class="group-hover:opacity-20 transition-opacity duration-200">${idx + 1}</span>
@@ -249,7 +252,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveTimedSet('${tid}', ${idx})" 
+            <button ${Utils.actionAttrs('saveTimedSet', [tid, idx])}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -260,7 +263,7 @@ const Components = window.Components = {
      * Simple task toggle button
      */
     simpleTaskBtn: (tid, isDone) => `
-        <button onclick="Actions.toggleSimpleTask('${tid}')" 
+        <button ${Utils.actionAttrs('toggleSimpleTask', [tid])}
             class="w-full py-4 rounded-xl font-bold text-lg transition-all ${isDone ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green border-2 border-gray-600'}">
             <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
             ${isDone ? 'TAMAMLANDI ✓' : 'TAMAMLA'}

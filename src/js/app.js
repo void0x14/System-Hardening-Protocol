@@ -11,19 +11,50 @@
     // v8.1.0: Stealth/Sanitize Mode
     if (typeof Stealth !== 'undefined') Stealth.init();
 
-    // --- v6.3.0: EVENT DELEGATION ---
-    document.getElementById('view-container').addEventListener('click', async (e) => {
+    // --- v8.3.1 Security Hardening: Centralized Event Delegation ---
+    const delegateAction = async (e) => {
         const actionEl = e.target.closest('[data-action]');
         if (!actionEl) return;
 
-        const action = actionEl.dataset.action;
-        const params = actionEl.dataset.params ? JSON.parse(actionEl.dataset.params) : [];
+        const expectedEvent = actionEl.dataset.event || 'click';
+        if (expectedEvent !== e.type) return;
 
-        if (Actions[action]) {
-            e.preventDefault();
-            await Actions[action](...params);
+        if (actionEl.dataset.stopPropagation === 'true') {
+            e.stopPropagation();
         }
-    });
+
+        let params = [];
+        if (actionEl.dataset.params) {
+            try {
+                params = JSON.parse(actionEl.dataset.params);
+            } catch {
+                params = [];
+            }
+        }
+
+        if (actionEl.dataset.passElement === 'true') {
+            params.unshift(actionEl);
+        }
+
+        const action = actionEl.dataset.action;
+        if (typeof Actions[action] !== 'function') return;
+
+        if (e.type === 'click') {
+            e.preventDefault();
+        }
+        await Actions[action](...params);
+    };
+
+    document.addEventListener('click', delegateAction);
+    document.addEventListener('change', delegateAction);
+    document.addEventListener('input', delegateAction);
+
+    const modal = document.getElementById('universal-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) UI.modal.close();
+        });
+    }
 
     // Auto Backup Reminder
     const backupStatus = await Store.checkBackupStatus();

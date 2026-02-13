@@ -38,6 +38,37 @@ const Utils = window.Utils = {
     ),
 
     /**
+     * data-params attribute için güvenli JSON string üretir.
+     * @param {Array<any>} params - Action param listesi
+     * @returns {string}
+     */
+    encodeActionParams: (params = []) => {
+        try {
+            return Utils.escapeHtml(JSON.stringify(Array.isArray(params) ? params : []));
+        } catch {
+            return '[]';
+        }
+    },
+
+    /**
+     * Delegated action attribute string üretir.
+     * @param {string} action - Actions üzerindeki method adı
+     * @param {Array<any>} params - Method param listesi
+     * @param {Object} [opts]
+     * @param {('click'|'change'|'input')} [opts.event='click']
+     * @param {boolean} [opts.passElement=false] - true ise element ilk parametre olarak geçirilir
+     * @param {boolean} [opts.stopPropagation=false] - true ise event propagation durdurulur
+     * @returns {string}
+     */
+    actionAttrs: (action, params = [], opts = {}) => {
+        const eventType = opts.event || 'click';
+        const passElement = opts.passElement === true ? 'true' : 'false';
+        const stopPropagation = opts.stopPropagation === true ? 'true' : 'false';
+        const safeAction = typeof action === 'string' ? action : '';
+        return `data-action="${safeAction}" data-event="${eventType}" data-params='${Utils.encodeActionParams(params)}' data-pass-element="${passElement}" data-stop-propagation="${stopPropagation}"`;
+    },
+
+    /**
      * Storage adapter - localStorage veya window.storage API kullanır.
      */
     storage: {
