@@ -5,13 +5,17 @@
 const Actions = window.Actions = {
     // v7.1.0: Video modal
     playVideo(videoId) {
+        if (!Utils.isValidYouTubeId(videoId)) {
+            UI.showToast("Geçersiz video kimliği", "error");
+            return;
+        }
         const html = `<div class="aspect-video w-full"><iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-        UI.modal.open('Video Eğitimi', html);
+        UI.modal.openHtml('Video Eğitimi', html);
     },
 
     // v8.3.0: Fixed Error 153 by removing Data URI wrapper
     playVideoInline(el, videoId) {
-        const safeVideoId = (typeof videoId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(videoId))
+        const safeVideoId = Utils.isValidYouTubeId(videoId)
             ? videoId
             : null;
         if (!safeVideoId) {
@@ -239,7 +243,7 @@ const Actions = window.Actions = {
 
     openMealModal() {
         const foods = Store.getAllFoods();
-        UI.modal.open("YAKIT EKLE", `
+        UI.modal.openHtml("YAKIT EKLE", `
             <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
                 <button onclick="document.getElementById('tab-exist').style.display='block';document.getElementById('tab-new').style.display='none'" class="text-xs text-neon-green font-bold hover:underline">LİSTEDEN SEÇ</button>
                 <button onclick="document.getElementById('tab-exist').style.display='none';document.getElementById('tab-new').style.display='block'" class="text-xs text-gray-500 font-bold hover:text-white hover:underline">YENİ TANIMLA</button>
@@ -383,7 +387,7 @@ const Actions = window.Actions = {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
             return value.split('-')[2];
         };
-        const safeVideoId = (typeof ex.videoId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(ex.videoId))
+        const safeVideoId = Utils.isValidYouTubeId(ex.videoId)
             ? ex.videoId
             : null;
 
@@ -488,7 +492,7 @@ const Actions = window.Actions = {
             </div>
         `;
 
-        UI.modal.open(ex.title, modalContent);
+        UI.modal.openHtml(ex.title, modalContent);
     },
 
     async showPhase(id) {
@@ -577,7 +581,7 @@ const Actions = window.Actions = {
             </div>
         `;
 
-        UI.modal.open(p.title, modalContent);
+        UI.modal.openHtml(p.title, modalContent);
     },
 
     // Mental progress actions
@@ -630,7 +634,7 @@ const Actions = window.Actions = {
         }
 
         if (alertMsg !== "") {
-            UI.alert.show(alertMsg);
+            UI.alert.showHtml(alertMsg);
             const nutBtn = document.getElementById('badge-nutrition');
             if (nutBtn && meals.length === 0) nutBtn.classList.remove('hidden');
         }
@@ -672,7 +676,7 @@ const Actions = window.Actions = {
                 </div>
             </div>
         `;
-        UI.modal.open("SYSTEM BOOT (ISINMA)", warmupRoutine);
+        UI.modal.openHtml("SYSTEM BOOT (ISINMA)", warmupRoutine);
     },
 
     startWorkout() {
@@ -693,7 +697,7 @@ const Actions = window.Actions = {
 
     // --- SETTINGS & DATA ---
     openSettings() {
-        UI.modal.open("VERİ YÖNETİMİ", `
+        UI.modal.openHtml("VERİ YÖNETİMİ", `
             <div class="space-y-6">
                 <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
                     <div class="flex items-center gap-3 mb-3">
@@ -858,7 +862,7 @@ const Actions = window.Actions = {
 
     openWeightModal() {
         const current = Store.state.weight;
-        UI.modal.open("SENSÖR KALİBRASYONU", `
+        UI.modal.openHtml("SENSÖR KALİBRASYONU", `
             <div class="space-y-4">
                 <div class="text-center">
                     <div class="text-[10px] text-gray-500 mb-2 tracking-widest">MEVCUT SİSTEM YÜKÜ</div>
@@ -879,7 +883,7 @@ const Actions = window.Actions = {
     },
 
     completeDailyMission() {
-        UI.modal.open("SİSTEM KONTROLÜ", `
+        UI.modal.openHtml("SİSTEM KONTROLÜ", `
             <div class="text-center space-y-4">
                 <i class="fas fa-exclamation-triangle text-5xl text-neon-green animate-pulse"></i>
                 <div>

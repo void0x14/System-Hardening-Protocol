@@ -29,6 +29,15 @@ const Utils = window.Utils = {
     },
 
     /**
+     * YouTube video ID format doğrulaması.
+     * @param {string} value - Kontrol edilecek video ID
+     * @returns {boolean} ID formatı geçerliyse true
+     */
+    isValidYouTubeId: (value) => (
+        typeof value === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(value)
+    ),
+
+    /**
      * Storage adapter - localStorage veya window.storage API kullanır.
      */
     storage: {

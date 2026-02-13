@@ -330,6 +330,39 @@ const Store = window.Store = {
             .slice(0, 128);
     },
 
+    _sanitizeWorkoutSetEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+        return {
+            weight: this._toSafeNumber(entry.weight, 0, 0, 1000),
+            reps: this._toSafeNumber(entry.reps, 0, 0, 1000),
+            duration: this._toSafeNumber(entry.duration, 0, 0, 86400),
+            timestamp: this._sanitizeTimestampString(entry.timestamp) || new Date().toISOString(),
+            completed: entry.completed === true
+        };
+    },
+
+    _sanitizeWorkoutDataLog(workoutData) {
+        if (!workoutData || typeof workoutData !== 'object') return {};
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        const out = {};
+
+        for (const [taskId, entries] of Object.entries(workoutData)) {
+            if (allowedIds.size > 0 && !allowedIds.has(taskId)) continue;
+            if (!Array.isArray(entries)) continue;
+
+            const safeEntries = entries
+                .map(entry => this._sanitizeWorkoutSetEntry(entry))
+                .filter(Boolean)
+                .slice(0, 64);
+
+            if (safeEntries.length > 0) {
+                out[taskId] = safeEntries;
+            }
+        }
+
+        return out;
+    },
+
     _sanitizeWeightHistory(historyData) {
         if (!historyData || typeof historyData !== 'object') return {};
         const out = {};
@@ -591,6 +624,8 @@ const Store = window.Store = {
                 safeData[key] = this._sanitizeDateString(importData[key]) || null;
             } else if (key.startsWith(CONFIG.KEYS.WORKOUT)) {
                 safeData[key] = this._sanitizeWorkoutLog(importData[key]);
+            } else if (key.startsWith(CONFIG.KEYS.WORKOUT_DATA)) {
+                safeData[key] = this._sanitizeWorkoutDataLog(importData[key]);
             } else if (key.startsWith(CONFIG.KEYS.SLEEP)) {
                 safeData[key] = this._toSafeNumber(importData[key], 0, 0, 24);
             } else if (key.startsWith(CONFIG.KEYS.WATER)) {

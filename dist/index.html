@@ -733,6 +733,7 @@ const CONFIG = window.CONFIG = {
         WEIGHT: 'monk_weight',
         FUEL: 'monk_fuel_date',
         WORKOUT: 'monk_workout_log_',
+        WORKOUT_DATA: 'monk_workout_data_',
         MEAL: 'monk_meal_log_',
         MEASURE: 'monk_body_stats',
         WEIGHT_HISTORY: 'monk_weight_history',
@@ -1262,6 +1263,15 @@ const Utils = window.Utils = {
     },
 
     /**
+     * YouTube video ID format doğrulaması.
+     * @param {string} value - Kontrol edilecek video ID
+     * @returns {boolean} ID formatı geçerliyse true
+     */
+    isValidYouTubeId: (value) => (
+        typeof value === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(value)
+    ),
+
+    /**
      * Storage adapter - localStorage veya window.storage API kullanır.
      */
     storage: {
@@ -1689,6 +1699,39 @@ const Store = window.Store = {
             .slice(0, 128);
     },
 
+    _sanitizeWorkoutSetEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+        return {
+            weight: this._toSafeNumber(entry.weight, 0, 0, 1000),
+            reps: this._toSafeNumber(entry.reps, 0, 0, 1000),
+            duration: this._toSafeNumber(entry.duration, 0, 0, 86400),
+            timestamp: this._sanitizeTimestampString(entry.timestamp) || new Date().toISOString(),
+            completed: entry.completed === true
+        };
+    },
+
+    _sanitizeWorkoutDataLog(workoutData) {
+        if (!workoutData || typeof workoutData !== 'object') return {};
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        const out = {};
+
+        for (const [taskId, entries] of Object.entries(workoutData)) {
+            if (allowedIds.size > 0 && !allowedIds.has(taskId)) continue;
+            if (!Array.isArray(entries)) continue;
+
+            const safeEntries = entries
+                .map(entry => this._sanitizeWorkoutSetEntry(entry))
+                .filter(Boolean)
+                .slice(0, 64);
+
+            if (safeEntries.length > 0) {
+                out[taskId] = safeEntries;
+            }
+        }
+
+        return out;
+    },
+
     _sanitizeWeightHistory(historyData) {
         if (!historyData || typeof historyData !== 'object') return {};
         const out = {};
@@ -1950,6 +1993,8 @@ const Store = window.Store = {
                 safeData[key] = this._sanitizeDateString(importData[key]) || null;
             } else if (key.startsWith(CONFIG.KEYS.WORKOUT)) {
                 safeData[key] = this._sanitizeWorkoutLog(importData[key]);
+            } else if (key.startsWith(CONFIG.KEYS.WORKOUT_DATA)) {
+                safeData[key] = this._sanitizeWorkoutDataLog(importData[key]);
             } else if (key.startsWith(CONFIG.KEYS.SLEEP)) {
                 safeData[key] = this._toSafeNumber(importData[key], 0, 0, 24);
             } else if (key.startsWith(CONFIG.KEYS.WATER)) {
@@ -2364,12 +2409,23 @@ const UI = window.UI = {
      */
     modal: {
         _escHandler: null,
-        open(t, c) {
+        _openInternal(t, c, allowHtml) {
             document.getElementById('modal-title').innerText = t;
-            document.getElementById('modal-body').innerHTML = c;
+            const body = document.getElementById('modal-body');
+            if (allowHtml) {
+                body.innerHTML = String(c ?? '');
+            } else {
+                body.textContent = String(c ?? '');
+            }
             document.getElementById('universal-modal').classList.add('active');
             this._escHandler = (e) => { if (e.key === 'Escape') UI.modal.close(); };
             document.addEventListener('keydown', this._escHandler);
+        },
+        open(t, c = '') {
+            this._openInternal(t, c, false);
+        },
+        openHtml(t, c = '') {
+            this._openInternal(t, c, true);
         },
         close() {
             document.getElementById('universal-modal').classList.remove('active');
@@ -2385,7 +2441,11 @@ const UI = window.UI = {
      */
     alert: {
         show(msg) {
-            document.getElementById('alert-message').innerHTML = msg;
+            document.getElementById('alert-message').textContent = String(msg ?? '');
+            document.getElementById('alert-modal').classList.add('active');
+        },
+        showHtml(msg) {
+            document.getElementById('alert-message').innerHTML = String(msg ?? '');
             document.getElementById('alert-modal').classList.add('active');
         },
         close() {
@@ -2474,13 +2534,19 @@ const UI = window.UI = {
     showEpicOverlay(emoji, text, sub, color = '#00ff41') {
         // Sanitize modda overlay gösterme
         if (typeof Stealth !== 'undefined' && Stealth.active) return;
+        const safeEmoji = Utils.escapeHtml(typeof emoji === 'string' ? emoji.slice(0, 12) : '');
+        const safeText = Utils.escapeHtml(typeof text === 'string' ? text.slice(0, 160) : '');
+        const safeSub = Utils.escapeHtml(typeof sub === 'string' ? sub.slice(0, 220) : '');
+        const safeColor = (typeof color === 'string' && /^#[0-9a-fA-F]{6}$/.test(color.trim()))
+            ? color.trim()
+            : '#00ff41';
         const overlay = document.createElement('div');
         overlay.id = 'epic-overlay-' + Date.now();
         overlay.innerHTML = `
             <div style="
                 position: fixed;
                 inset: 0;
-                background: radial-gradient(ellipse at center, ${color}15 0%, rgba(10,10,15,0.98) 70%);
+                background: radial-gradient(ellipse at center, ${safeColor}15 0%, rgba(10,10,15,0.98) 70%);
                 z-index: 9999;
                 display: flex;
                 flex-direction: column;
@@ -2491,19 +2557,19 @@ const UI = window.UI = {
                 <div style="
                     font-size: 120px;
                     animation: emojiPulse 0.5s ease-out;
-                    text-shadow: 0 0 60px ${color}80;
-                ">${emoji}</div>
+                    text-shadow: 0 0 60px ${safeColor}80;
+                ">${safeEmoji}</div>
                 <div style="
                     font-family: 'Orbitron', sans-serif;
                     font-size: clamp(28px, 8vw, 64px);
                     font-weight: 900;
-                    color: ${color};
+                    color: ${safeColor};
                     text-align: center;
                     margin-top: 20px;
-                    text-shadow: 0 0 30px ${color}80, 0 0 60px ${color}50;
+                    text-shadow: 0 0 30px ${safeColor}80, 0 0 60px ${safeColor}50;
                     animation: textSlideUp 0.4s ease-out 0.1s both;
                     letter-spacing: 4px;
-                ">${text}</div>
+                ">${safeText}</div>
                 <div style="
                     font-size: clamp(14px, 3vw, 20px);
                     color: #6b7280;
@@ -2511,7 +2577,7 @@ const UI = window.UI = {
                     text-align: center;
                     animation: textSlideUp 0.4s ease-out 0.2s both;
                     max-width: 80%;
-                ">${sub}</div>
+                ">${safeSub}</div>
                 <div style="
                     margin-top: 40px;
                     width: 200px;
@@ -2524,7 +2590,7 @@ const UI = window.UI = {
                     <div style="
                         width: 100%;
                         height: 100%;
-                        background: linear-gradient(90deg, ${color}, #00f3ff);
+                        background: linear-gradient(90deg, ${safeColor}, #00f3ff);
                         animation: progressFill 1.5s ease-out forwards;
                         transform-origin: left;
                     "></div>
@@ -2549,7 +2615,6 @@ const UI = window.UI = {
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[UI] UI helpers loaded');
 }
-
 
 
 // ============================================
@@ -3776,13 +3841,17 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 const Actions = window.Actions = {
     // v7.1.0: Video modal
     playVideo(videoId) {
+        if (!Utils.isValidYouTubeId(videoId)) {
+            UI.showToast("Geçersiz video kimliği", "error");
+            return;
+        }
         const html = `<div class="aspect-video w-full"><iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-        UI.modal.open('Video Eğitimi', html);
+        UI.modal.openHtml('Video Eğitimi', html);
     },
 
     // v8.3.0: Fixed Error 153 by removing Data URI wrapper
     playVideoInline(el, videoId) {
-        const safeVideoId = (typeof videoId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(videoId))
+        const safeVideoId = Utils.isValidYouTubeId(videoId)
             ? videoId
             : null;
         if (!safeVideoId) {
@@ -4010,7 +4079,7 @@ const Actions = window.Actions = {
 
     openMealModal() {
         const foods = Store.getAllFoods();
-        UI.modal.open("YAKIT EKLE", `
+        UI.modal.openHtml("YAKIT EKLE", `
             <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
                 <button onclick="document.getElementById('tab-exist').style.display='block';document.getElementById('tab-new').style.display='none'" class="text-xs text-neon-green font-bold hover:underline">LİSTEDEN SEÇ</button>
                 <button onclick="document.getElementById('tab-exist').style.display='none';document.getElementById('tab-new').style.display='block'" class="text-xs text-gray-500 font-bold hover:text-white hover:underline">YENİ TANIMLA</button>
@@ -4154,7 +4223,7 @@ const Actions = window.Actions = {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
             return value.split('-')[2];
         };
-        const safeVideoId = (typeof ex.videoId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(ex.videoId))
+        const safeVideoId = Utils.isValidYouTubeId(ex.videoId)
             ? ex.videoId
             : null;
 
@@ -4259,7 +4328,7 @@ const Actions = window.Actions = {
             </div>
         `;
 
-        UI.modal.open(ex.title, modalContent);
+        UI.modal.openHtml(ex.title, modalContent);
     },
 
     async showPhase(id) {
@@ -4348,7 +4417,7 @@ const Actions = window.Actions = {
             </div>
         `;
 
-        UI.modal.open(p.title, modalContent);
+        UI.modal.openHtml(p.title, modalContent);
     },
 
     // Mental progress actions
@@ -4401,7 +4470,7 @@ const Actions = window.Actions = {
         }
 
         if (alertMsg !== "") {
-            UI.alert.show(alertMsg);
+            UI.alert.showHtml(alertMsg);
             const nutBtn = document.getElementById('badge-nutrition');
             if (nutBtn && meals.length === 0) nutBtn.classList.remove('hidden');
         }
@@ -4443,7 +4512,7 @@ const Actions = window.Actions = {
                 </div>
             </div>
         `;
-        UI.modal.open("SYSTEM BOOT (ISINMA)", warmupRoutine);
+        UI.modal.openHtml("SYSTEM BOOT (ISINMA)", warmupRoutine);
     },
 
     startWorkout() {
@@ -4464,7 +4533,7 @@ const Actions = window.Actions = {
 
     // --- SETTINGS & DATA ---
     openSettings() {
-        UI.modal.open("VERİ YÖNETİMİ", `
+        UI.modal.openHtml("VERİ YÖNETİMİ", `
             <div class="space-y-6">
                 <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
                     <div class="flex items-center gap-3 mb-3">
@@ -4629,7 +4698,7 @@ const Actions = window.Actions = {
 
     openWeightModal() {
         const current = Store.state.weight;
-        UI.modal.open("SENSÖR KALİBRASYONU", `
+        UI.modal.openHtml("SENSÖR KALİBRASYONU", `
             <div class="space-y-4">
                 <div class="text-center">
                     <div class="text-[10px] text-gray-500 mb-2 tracking-widest">MEVCUT SİSTEM YÜKÜ</div>
@@ -4650,7 +4719,7 @@ const Actions = window.Actions = {
     },
 
     completeDailyMission() {
-        UI.modal.open("SİSTEM KONTROLÜ", `
+        UI.modal.openHtml("SİSTEM KONTROLÜ", `
             <div class="text-center space-y-4">
                 <i class="fas fa-exclamation-triangle text-5xl text-neon-green animate-pulse"></i>
                 <div>

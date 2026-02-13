@@ -9,6 +9,7 @@ const CONFIG = window.CONFIG = {
         WEIGHT: 'monk_weight',
         FUEL: 'monk_fuel_date',
         WORKOUT: 'monk_workout_log_',
+        WORKOUT_DATA: 'monk_workout_data_',
         MEAL: 'monk_meal_log_',
         MEASURE: 'monk_body_stats',
         WEIGHT_HISTORY: 'monk_weight_history',
