@@ -504,10 +504,14 @@ const Renderers = window.Renderers = {
         }
 
         const labels = { chest: 'GÖĞÜS', arm: 'KOL', waist: 'BEL', leg: 'BACAK' };
+        const safeStatValue = (value) => {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? String(parsed) : '';
+        };
         const measurementInputs = ['chest', 'arm', 'waist', 'leg'].map(k => `
             <div class="bg-surface-raised p-3 rounded-lg">
                 <label class="text-[10px] text-gray-500 font-bold uppercase block mb-2">${labels[k]}</label>
-                <input type="number" id="stat-${k}" value="${stats[k] || ''}" placeholder="cm" class="${THEME.input} text-center text-lg font-bold">
+                <input type="number" id="stat-${k}" value="${safeStatValue(stats[k])}" placeholder="cm" class="${THEME.input} text-center text-lg font-bold">
             </div>
         `).join('');
 
@@ -759,4 +763,3 @@ const Renderers = window.Renderers = {
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[Renderers] All tab renderers loaded');
 }
-

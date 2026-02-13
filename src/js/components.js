@@ -83,7 +83,7 @@ const Components = window.Components = {
                 <div>
                     <div class="text-white font-bold text-sm">${Utils.escapeHtml(meal.name)}</div>
                     <div class="flex gap-2 text-[10px] text-gray-500 mt-0.5">
-                        ${meal.portionLabel ? `<span>${meal.portionLabel}</span>` : ''}
+                        ${meal.portionLabel ? `<span>${Utils.escapeHtml(meal.portionLabel)}</span>` : ''}
                     </div>
                 </div>
             </div>

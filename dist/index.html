@@ -1657,10 +1657,103 @@ const Store = window.Store = {
         return true;
     },
 
+    _toSafeNumber(value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return fallback;
+        return Math.min(max, Math.max(min, parsed));
+    },
+
+    _sanitizeMealEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        return {
+            name: typeof entry.name === 'string' ? entry.name.slice(0, 120) : '',
+            amount: this._toSafeNumber(entry.amount, 0, 0, 10000),
+            unit: typeof entry.unit === 'string' ? entry.unit.slice(0, 32) : 'custom',
+            portionLabel: typeof entry.portionLabel === 'string' ? entry.portionLabel.slice(0, 80) : '',
+            cal: this._toSafeNumber(entry.cal, 0, 0, 20000),
+            prot: this._toSafeNumber(entry.prot, 0, 0, 1000),
+            carb: this._toSafeNumber(entry.carb, 0, 0, 1000),
+            fat: this._toSafeNumber(entry.fat, 0, 0, 1000)
+        };
+    },
+
+    _sanitizeMealLog(logData) {
+        if (!Array.isArray(logData)) return [];
+        return logData
+            .map(entry => this._sanitizeMealEntry(entry))
+            .filter(Boolean);
+    },
+
+    _sanitizeMeasureEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        const chest = this._toSafeNumber(entry.chest, NaN, 0, 300);
+        const arm = this._toSafeNumber(entry.arm, NaN, 0, 300);
+        const waist = this._toSafeNumber(entry.waist, NaN, 0, 300);
+        const leg = this._toSafeNumber(entry.leg, NaN, 0, 300);
+        const out = {};
+
+        if (Number.isFinite(chest)) out.chest = chest;
+        if (Number.isFinite(arm)) out.arm = arm;
+        if (Number.isFinite(waist)) out.waist = waist;
+        if (Number.isFinite(leg)) out.leg = leg;
+        if (typeof entry.savedAt === 'string') out.savedAt = entry.savedAt.slice(0, 32);
+        if (typeof entry.date === 'string') out.date = entry.date.slice(0, 32);
+
+        return out;
+    },
+
+    _sanitizeMeasureData(measureData) {
+        if (!measureData || typeof measureData !== 'object') {
+            return { current: {}, history: [] };
+        }
+
+        if (!measureData.current && !measureData.history) {
+            return {
+                current: this._sanitizeMeasureEntry(measureData) || {},
+                history: []
+            };
+        }
+
+        return {
+            current: this._sanitizeMeasureEntry(measureData.current) || {},
+            history: Array.isArray(measureData.history)
+                ? measureData.history
+                    .map(item => this._sanitizeMeasureEntry(item))
+                    .filter(item => item && Object.keys(item).length > 0)
+                    .slice(-30)
+                : []
+        };
+    },
+
+    _sanitizeImportedData(importData) {
+        const safeData = { meta: importData.meta };
+
+        for (const key in importData) {
+            if (key === 'meta') continue;
+
+            if (key.startsWith(CONFIG.KEYS.MEAL)) {
+                safeData[key] = this._sanitizeMealLog(importData[key]);
+            } else if (key === CONFIG.KEYS.MEASURE) {
+                safeData[key] = this._sanitizeMeasureData(importData[key]);
+            } else {
+                safeData[key] = importData[key];
+            }
+        }
+
+        return safeData;
+    },
+
     async importData(jsonContent) {
         try {
-            const data = JSON.parse(jsonContent);
-            if (!data.meta) throw new Error("Geçersiz yedek dosyası");
+            const parsed = JSON.parse(jsonContent);
+            const validation = Utils.validateImportData(parsed);
+            if (!validation.valid) {
+                throw new Error(validation.error || "Geçersiz yedek dosyası");
+            }
+
+            const data = this._sanitizeImportedData(validation.data);
             const prefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
             const keysToRemove = [];
             for (let i = 0; i < localStorage.length; i++) {
@@ -1976,7 +2069,6 @@ const Store = window.Store = {
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[Store] State management loaded');
 }
-
 
 
 // ============================================
@@ -2321,7 +2413,7 @@ const Components = window.Components = {
                 <div>
                     <div class="text-white font-bold text-sm">${Utils.escapeHtml(meal.name)}</div>
                     <div class="flex gap-2 text-[10px] text-gray-500 mt-0.5">
-                        ${meal.portionLabel ? `<span>${meal.portionLabel}</span>` : ''}
+                        ${meal.portionLabel ? `<span>${Utils.escapeHtml(meal.portionLabel)}</span>` : ''}
                     </div>
                 </div>
             </div>
@@ -3162,10 +3254,14 @@ const Renderers = window.Renderers = {
         }
 
         const labels = { chest: 'GÖĞÜS', arm: 'KOL', waist: 'BEL', leg: 'BACAK' };
+        const safeStatValue = (value) => {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? String(parsed) : '';
+        };
         const measurementInputs = ['chest', 'arm', 'waist', 'leg'].map(k => `
             <div class="bg-surface-raised p-3 rounded-lg">
                 <label class="text-[10px] text-gray-500 font-bold uppercase block mb-2">${labels[k]}</label>
-                <input type="number" id="stat-${k}" value="${stats[k] || ''}" placeholder="cm" class="${THEME.input} text-center text-lg font-bold">
+                <input type="number" id="stat-${k}" value="${safeStatValue(stats[k])}" placeholder="cm" class="${THEME.input} text-center text-lg font-bold">
             </div>
         `).join('');
 
@@ -3417,7 +3513,6 @@ const Renderers = window.Renderers = {
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[Renderers] All tab renderers loaded');
 }
-
 
 
 // ============================================
