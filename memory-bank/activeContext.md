@@ -1,29 +1,31 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**Full Project Orchestration & pnpm Migration** - ✅ COMPLETED
+**Security Documentation Reconciliation (memory-bank + README)** - ✅ COMPLETED
 
-### Son Güncelleme (10 Şubat 2026)
+### Son Güncelleme (13 Şubat 2026)
 
 #### Durum
-3 ajanlı orkestrasyon analizi tamamlandı:
-- Explorer: Tam codebase yapı haritası çıkarıldı
-- Security-Auditor: Mevcut güvenlik dokümantasyonu doğrulandı (progress.md'de kayıtlı)
-- Frontend-Specialist: Kod kalitesi ve UI değerlendirmesi yapıldı
+Kod tabanlı güvenlik/doğruluk doğrulaması yapıldı ve dokümantasyon güncellendi.
 
 #### Yapılan İşlemler
-1. **pnpm Migration**: `package.json` oluşturuldu, `pnpm run build` aktif
-2. **Build Doğrulama**: 15 JS modülü başarıyla bundle edildi (208.38 KB)
-3. **Memory-bank Güncelleme**: Tüm context dosyaları güncel duruma getirildi
-4. **Git Ops**: Main branch'e atomik commit, workspace branch'e meta-dosyalar push edildi
+1. **Kod Gerçekliği Kontrolü**: XSS, global namespace ve video runtime akışları doğrudan kaynak koddan doğrulandı.
+2. **XSS Durum Düzeltmesi**:
+   - Eski `createCustomFood` kaynaklı doğrudan injection paterninin mitigated olduğu netleştirildi.
+   - Import kaynaklı residual risklerin (`portionLabel`, `stats` attribute context) hâlâ açık olduğu notlandı.
+3. **Namespace Durumu Düzeltmesi**: Modüllerin `window.*` export pattern'i ile hâlâ global olduğu açıkça dokümante edildi.
+4. **Video Runtime Kuralı**: YouTube embed için `localhost/http(s)` gereksinimi netleştirildi; `file://` davranışı sınırlı olarak işaretlendi.
+5. **Dokümantasyon Temizliği**: Aktif memory-bank içindeki Windows-absolute URI linkleri kaldırıldı.
 
 #### Proje Durumu
 - **Versiyon**: v8.3.1
 - **Build**: `pnpm run build` → `dist/index.html`
 - **Mimari**: State-Renderer-Actions (15 modüler JS dosyası)
 - **Veri**: localStorage (tarayıcı yerel depolama)
+- **Not**: Bu güncelleme docs-only; runtime kodu değiştirilmedi.
 
 ## Tamamlanan Sürümler
+- ✅ v8.3.1: Security documentation reconciliation (docs-only, version bump yok)
 - ✅ v8.3.1: Documentation finalize, pnpm migration
 - ✅ v8.3.0: Dynamic Set Management
 - ✅ v8.2.0: Nutrition Tab Redesign

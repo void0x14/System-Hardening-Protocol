@@ -30,6 +30,11 @@ Layer 6: actions.js
 Layer 7: app.js
 ```
 
+## Namespace Modeli
+- Modüller çalışma zamanında `window.*` üzerinden erişilebilir olacak şekilde export edilir.
+- Örnekler: `window.CONFIG`, `window.Store`, `window.UI`, `window.Actions`, `window.Renderers`, `window.DB`.
+- Bu yaklaşım geliştirme/bundle sırası açısından pratik olsa da global yüzeyi büyütür (isim çakışması ve script etkileşimi riski).
+
 ## Veri Depolama
 - **localStorage**: Tüm veriler tarayıcıda
 - **Anahtar Yapısı**:
@@ -38,6 +43,11 @@ Layer 7: app.js
   - `monk_workout_data_YYYY-MM-DD` - Set/tekrar detayları
   - `monk_meal_log_YYYY-MM-DD` - Günlük öğünler
   - `monk_exercise_history` - Tüm zamanların egzersiz geçmişi
+
+## Runtime Ortam Varsayımı
+- Temel tracking özellikleri `file://` üzerinden çalışabilir.
+- YouTube embed özelliği için güvenilir çalışma ortamı: `http://localhost` veya `https`.
+- `file://` altında YouTube Error 153 görülebilir; bu platform/policy kısıtıdır.
 
 ## Kısıtlamalar
 - Tek dosya olmalı (bağımsız çalışma)

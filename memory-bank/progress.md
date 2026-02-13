@@ -26,48 +26,32 @@
   - Çözüm: Pre-build veya fallback ekle
 - ❌ **localStorage Limiti**: 5-10MB, QuotaExceededError riski
   - Çözüm: Auto-cleanup (6 ay), LZ-string sıkıştırma
-- ❌ **Global Namespace**: Tüm değişkenler global, çakışma riski
-  - Çözüm: IIFE ile kapsülle
+- ⚠️ **Global Namespace Pattern**: Modüller bilinçli olarak `window.*` üzerinden export ediliyor (`window.Actions`, `window.Store`, `window.Renderers`, vb.)
+  - Durum: **Henüz çözülmedi** (IIFE/ESM kapsülleme uygulanmadı)
+  - Risk: İsim çakışması ve third-party script etkisi
+  - Çözüm: IIFE/ESM kapsülleme + global export yüzeyini daraltma
 
 ### ORTA
-- ⚠️ **Video Popup**: Popup blocker'lara takılır
-  - Çözüm: Modal iframe embed (v7.1.0: VideoPlayer fallback sistemi ile çözüldü)
+- ⚠️ **YouTube Çalışma Ortamı**: Embed oynatma `file://` altında güvenilir değil
+  - Çözüm: Uygulamayı `http://localhost`/`https` altında çalıştır
 - ⚠️ **Silent Error**: Hatalar sessizce yutuluyor
   - Çözüm: console.error + UI.showToast (v7.1.0: kısmen çözüldü)
 - ⚠️ Bazı inline onclick'ler hala var
 
-## Çözülemeyen/Ertelenen Sorunlar
+## Çözülenler / Operasyonel Notlar
 
-### YouTube Error 153 (Video Oynatıcı) 🔴 ERTELENDİ
-**Durum**: `file://` protokolü üzerinden çalıştığında YouTube embed videoları Error 153 veriyor.
+### YouTube Embed Runtime (Localhost Zorunlu) ✅
+**Durum (13 Şubat 2026 kod doğrulaması)**:
+- `Actions.playVideoInline(...)` ile inline embed akışı aktif.
+- `video-player.js` içindeki eski popup yaklaşımı deprecated durumda.
+- `http://localhost` veya `https` altında video oynatma çalışır.
 
-**Denenen Çözümler**:
-1. ❌ `youtube-nocookie.com` + `referrerpolicy="no-referrer"` → Başarısız
-2. ❌ Data URI wrapper (iframe in iframe) → Başarısız  
-3. ✅ `VideoPlayer.openVideo()` fallback sistemi → **Kısmi Çözüm**
-   - Popup pencere açılıyor ama içinde yine Error 153
-   - Fallback: 3 saniye sonra normal YouTube sayfasına yönlendiriyor
+**Önemli Not**:
+- `file://` protokolünde Error 153 platform/policy kaynaklıdır; uygulama bug'ı olarak değerlendirilmemelidir.
 
-**Neden Çözülemedi**:
-- YouTube'un güvenlik politikası `file://` origin'lerden embed oynatmaya izin vermiyor
-- Chrome/Firefox güvenlik kısıtlamaları bypass edilemiyor
-- Data URI sandbox yöntemi de YouTube tarafından engelleniyor
-
-**Geçici Çalışma Yöntemi** (v7.1.0):
-```javascript
-// Popup aç (Error 153 görünür ama kullanıcı manuel tıklayabilir)
-// VEYA fallback ile YouTube.com'da aç
-VideoPlayer.openVideo(videoId);
-```
-
-**Kalıcı Çözüm Gereksinimleri**:
-- [ ] Uygulamayı yerel web sunucusu üzerinde çalıştırmak (`http://localhost`)
-- [ ] Video dosyalarını local olarak barındırmak
-- [ ] Alternatif video platformları (Vimeo, self-hosted) kullanmak
-
-**Erteleme Kararı**: 13 Aralık 2025
-- Kullanıcı: "Bu sorunu geçici olarak erteliyoruz"
-- Sebep: `file://` protokol kısıtlaması aşılamıyor
+**Dağıtım Kuralı**:
+- ✅ Desteklenen: `http://localhost:*`, `https://...`
+- ⚠️ Garantisiz: `file://...`
 
 ## Technical Debt (v7.1.0 Detaylı Analiz)
 
@@ -87,9 +71,12 @@ VideoPlayer.openVideo(videoId);
 - ⚠️ Düşük-end cihazlarda yavaşlama riski
 - **Çözüm**: `@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }`
 
-### 4. Security: XSS Risk
-- ⚠️ `innerHTML = userContent` → XSS açığı (createCustomFood)
-- **Çözüm**: `textContent` veya DOM API kullan
+### 4. Security: XSS Durumu (13 Şubat 2026 Kod İncelemesi)
+- ✅ Eski `createCustomFood` tabanlı doğrudan `innerHTML = userContent` paterni kaldırıldı.
+- ⚠️ **Import kaynaklı kalıntı riskler devam ediyor**:
+  - `Store.importData` sonrası gelen `meal.portionLabel` değeri HTML içinde escape edilmeden render edilebiliyor.
+  - `stats[k]` değerleri progress render sırasında attribute context'ine ham basılıyor.
+- **Çözüm**: import sonrası schema validation + render katmanında context-aware escaping.
 
 ### 5. Data Validation Eksik
 - ⚠️ `Store.saveWeight` NaN kontrolü yok
@@ -234,7 +221,7 @@ window.onbeforeunload = () =>
 
 📋 **Kapsamlı 9-Phase Gelişmiş Özellikler Yol Haritası**
 
-Detaylı roadmap için: [`roadmap.md`](file:///c:/Users/uzgunpalyaco/Desktop/System-Hardening/memory-bank/roadmap.md)
+Detaylı roadmap için: [`roadmap.md`](roadmap.md)
 
 **Highlights**:
 1. **Core Stability** (2 hafta): Auto-backup, crash recovery
@@ -257,7 +244,7 @@ Detaylı roadmap için: [`roadmap.md`](file:///c:/Users/uzgunpalyaco/Desktop/Sys
 
 📋 **Build-time Bundling Approach** (Monolithic → Maintainable)
 
-Detaylı strateji için: [`modularization_strategy.md`](file:///C:/Users/uzgunpalyaco/.gemini/antigravity/brain/c86f8f2c-f53d-4a09-af48-d74cac6b9919/modularization_strategy.md)
+Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (repo içinde bulunmuyor).
 
 **Yaklaşım**:
 - Modüler `src/` yapısı (CSS, JS dosyaları ayrı)
@@ -283,10 +270,11 @@ Detaylı strateji için: [`modularization_strategy.md`](file:///C:/Users/uzgunpa
   - `pnpm run build` artık aktif - 15 JS modülü, 208.38 KB bundle.
   - Memory-bank dosyaları güncel duruma getirildi.
   - 3 ajanlı analiz: Explorer + Security + Frontend.
-- **[2025-12-30]**: Fixed **YouTube Error 153**.
-  - Analyzed "Ghost Bug" (Dead Code).
-  - Wired UI buttons to correct inline player (`Actions.playVideoInline`).
-  - Deprecated legacy Popup logic in `video-player.js`.
+- **[2025-12-30]**: YouTube embed akışı inline player'a geçirildi.
+  - "Ghost Bug" (dead wiring) analizi yapıldı.
+  - UI butonları `Actions.playVideoInline` ile eşlendi.
+  - Eski popup logic `video-player.js` içinde deprecated bırakıldı.
+  - Operasyonel not: Tam uyumluluk `localhost/http(s)` altında.
 - **[2025-12-30]**: Dynamic Set Management Refinement completed.
 - **[2025-12-25]**: Repaired Spinner API usage (GTK4/Adw mismatch resolved).n
 - **v8.2.0**: Nutrition Tab Redesign - Macro rings, quick-add

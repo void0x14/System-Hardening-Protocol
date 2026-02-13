@@ -31,6 +31,11 @@
 - Store'u günceller
 - Tab'ı yeniden render eder
 
+### Global Export Kalıbı
+- Modüller runtime'da global olarak paylaşılır (`window.Actions`, `window.Store`, `window.UI`, `window.Renderers`, `window.DB`).
+- Bu kalıp bağımlılık sırasını basitleştirir ancak namespace izolasyonu sağlamaz.
+- Güvenlik/izolasyon açısından orta vadede IIFE veya ESM kapsülleme değerlendirilmelidir.
+
 ## Önemli Kalıplar
 
 ### Veri Kalıcılığı
@@ -49,6 +54,13 @@ UI.modal.close();
 ```javascript
 UI.showToast("Mesaj", "success|error|warning");
 ```
+
+### Video Runtime Kuralı
+```javascript
+Actions.playVideoInline(element, videoId);
+```
+- YouTube embed akışı inline çalışır.
+- Güvenilir oynatma için uygulama `http://localhost`/`https` altında servis edilmelidir.
 
 ## Renk Paleti (Tailwind Özel)
 - `neon-green`: #00ff41 (Başarı, ilerleme)

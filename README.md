@@ -129,15 +129,21 @@ cd System-Hardening-Protocol
 # Build the application
 pnpm run build
 
-# Open the app
-open dist/index.html   # macOS
-xdg-open dist/index.html  # Linux
-start dist/index.html  # Windows
+# Serve dist/ on localhost (recommended, required for reliable YouTube embeds)
+python3 -m http.server 4173 --directory dist
+# then open: http://localhost:4173
+
+# Direct file-open fallback (core tracking works, YouTube may fail on file://)
+open dist/index.html         # macOS
+xdg-open dist/index.html     # Linux
+start dist/index.html        # Windows
 ```
 
 ### Or Simply
 
-Download `dist/index.html` and open it in any modern browser. That's it. No install needed.
+Download `dist/index.html` and open it in any modern browser. That's it for core tracking features.
+
+**Video note:** YouTube embeds are supported reliably when served over `http://localhost` / `https`, not guaranteed on `file://`.
 
 ---
 
