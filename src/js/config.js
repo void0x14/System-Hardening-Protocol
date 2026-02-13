@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 631-664
 
 // Global scope assignments
-const CONFIG = window.CONFIG = {
+const CONFIG = {
     VERSION: '8.3.1',
     DEBUG_MODE: false, // Set to true for development debug logs
     KEYS: {
@@ -40,7 +40,7 @@ const CONFIG = window.CONFIG = {
     ]
 };
 
-const THEME = window.THEME = {
+const THEME = {
     card: "bg-surface-card rounded-xl p-6 md:p-8 shadow-2xl transition-all card-hover-lift",
     btn: "bg-surface-raised hover:bg-neon-green hover:text-gunmetal text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2",
     input: "bg-surface-raised border-0 text-white rounded-lg p-3 focus:ring-2 focus:ring-neon-green/30 outline-none w-full transition-all",

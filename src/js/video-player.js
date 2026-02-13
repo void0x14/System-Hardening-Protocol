@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 3015-3036
 
 // Global scope assignment
-const VideoPlayer = window.VideoPlayer = {
+const VideoPlayer = {
     openVideo(videoId) {
         console.warn('VideoPlayer.openVideo deprecated. Use Actions.playVideoInline instead.');
     }

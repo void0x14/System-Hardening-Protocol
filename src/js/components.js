@@ -8,7 +8,7 @@ const safeNumberInputValue = (value, min = 0, max = 10000) => {
     return String(Math.min(max, Math.max(min, parsed)));
 };
 
-const Components = window.Components = {
+const Components = {
     /**
      * Standard card wrapper with optional accent border
      * @param {string} label - Card header label (emoji + text)
@@ -224,7 +224,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button ${Utils.actionAttrs('saveSet', [tid, idx, true])}
+            <button ${Utils.actionAttrs('saveSet', [tid, idx, true], { passElement: true })}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -252,7 +252,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button ${Utils.actionAttrs('saveTimedSet', [tid, idx])}
+            <button ${Utils.actionAttrs('saveTimedSet', [tid, idx], { passElement: true })}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>

@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 1202-1316
 
 // Global scope assignment
-const Utils = window.Utils = {
+const Utils = {
     /**
      * Bugünün tarihini YYYY-MM-DD formatında döndürür.
      * Client Local Time kullanır (kullanıcının timezone'una göre).

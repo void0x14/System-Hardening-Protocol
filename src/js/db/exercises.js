@@ -1,7 +1,7 @@
 // exercises.js - Exercise Database
 // Extracted from original index.html
 
-const DB = window.DB || {};
+const DB = {};
 
 DB.EXERCISES = {
     "stomach_vacuum": {
@@ -207,8 +207,6 @@ DB.FOODS = [
     { id: 90, cat: "SNACK", name: "Kuru Kayısı", type: "piece", vals: { cal: 25, prot: 0.3, carb: 6, fat: 0 }, unitName: "Adet" }
 ];
 
-window.DB = DB;
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log(`[DB] ${Object.keys(DB.EXERCISES).length} exercises loaded`);
 }
-

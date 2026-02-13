@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 1340-1963
 
 // Global scope assignment
-const Store = window.Store = {
+const Store = {
     state: {
         weight: 45.0,
         fuelDate: null,

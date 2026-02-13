@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 1985-2236
 
 // Global scope assignment
-const UI = window.UI = {
+const UI = {
     activeView: 'front',
 
     async init() {

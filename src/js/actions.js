@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 3038-3973
 
 // Using window. for global scope access
-const Actions = window.Actions = {
+const Actions = {
     // v7.1.0: Video modal
     playVideo(videoId) {
         if (!Utils.isValidYouTubeId(videoId)) {
@@ -800,7 +800,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveSet(taskId, setIdx, isDoneBtn) {
+    async saveSet(taskId, setIdx, isDoneBtn, sourceEl = null) {
         const wInput = document.getElementById(`w-${taskId}-${setIdx}`);
         const rInput = document.getElementById(`r-${taskId}-${setIdx}`);
         const weight = wInput ? wInput.value : 0;
@@ -817,8 +817,7 @@ const Actions = window.Actions = {
         const result = await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
 
         if (isDoneBtn) {
-            const evt = window.event;
-            const btn = evt ? (evt.currentTarget || evt.target.closest('button')) : null;
+            const btn = sourceEl ? sourceEl.closest('button') : null;
             if (btn) {
                 btn.classList.remove('bg-gray-700', 'text-gray-400', 'hover:bg-gray-600');
                 btn.classList.add('bg-neon-green', 'text-black');
@@ -842,7 +841,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveTimedSet(taskId, setIdx) {
+    async saveTimedSet(taskId, setIdx, sourceEl = null) {
         const dInput = document.getElementById(`d-${taskId}-${setIdx}`);
         const duration = dInput ? parseFloat(dInput.value) || 0 : 0;
 
@@ -864,7 +863,7 @@ const Actions = window.Actions = {
             dInput.classList.replace('border-gray-600', 'border-neon-green');
             dInput.classList.add('text-neon-green');
         }
-        const btn = event.currentTarget || event.target.closest('button');
+        const btn = sourceEl ? sourceEl.closest('button') : null;
         if (btn) {
             btn.classList.remove('bg-gray-700', 'text-gray-400');
             btn.classList.add('bg-neon-green', 'text-black');

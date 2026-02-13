@@ -1,7 +1,7 @@
 // stealth.js - Sanitize Mode for Privacy Protection
 // Hides sensitive content while keeping app fully functional
 
-const Stealth = window.Stealth = {
+const Stealth = {
     active: false,
 
     origTitle: null, // Will be set dynamically using CONFIG.VERSION

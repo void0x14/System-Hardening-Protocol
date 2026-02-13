@@ -718,14 +718,16 @@
     </div>
 
     <script nonce="systemhardening-v831">
-        // ============================================
+        (() => {
+            'use strict';
+            // ============================================
 // config.js
 // ============================================
 // config.js - Configuration and Theme Constants
 // Extracted from original index.html lines 631-664
 
 // Global scope assignments
-const CONFIG = window.CONFIG = {
+const CONFIG = {
     VERSION: '8.3.1',
     DEBUG_MODE: false, // Set to true for development debug logs
     KEYS: {
@@ -763,7 +765,7 @@ const CONFIG = window.CONFIG = {
     ]
 };
 
-const THEME = window.THEME = {
+const THEME = {
     card: "bg-surface-card rounded-xl p-6 md:p-8 shadow-2xl transition-all card-hover-lift",
     btn: "bg-surface-raised hover:bg-neon-green hover:text-gunmetal text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2",
     input: "bg-surface-raised border-0 text-white rounded-lg p-3 focus:ring-2 focus:ring-neon-green/30 outline-none w-full transition-all",
@@ -781,7 +783,7 @@ if (CONFIG.DEBUG_MODE) {
 // exercises.js - Exercise Database
 // Extracted from original index.html
 
-const DB = window.DB || {};
+const DB = {};
 
 DB.EXERCISES = {
     "stomach_vacuum": {
@@ -987,11 +989,9 @@ DB.FOODS = [
     { id: 90, cat: "SNACK", name: "Kuru Kayısı", type: "piece", vals: { cal: 25, prot: 0.3, carb: 6, fat: 0 }, unitName: "Adet" }
 ];
 
-window.DB = DB;
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log(`[DB] ${Object.keys(DB.EXERCISES).length} exercises loaded`);
 }
-
 
 
 // ============================================
@@ -1080,7 +1080,7 @@ const MEAL_PLAN_DB = {
 };
 
 // Add to DB namespace (exercises.js already declared DB)
-window.DB.MEAL_PLAN_DB = MEAL_PLAN_DB;
+DB.MEAL_PLAN_DB = MEAL_PLAN_DB;
 
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[DB] Meal plan database loaded');
@@ -1095,7 +1095,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html
 
 // Global scope assignment
-const WEEKLY_PLAN = window.WEEKLY_PLAN = {
+const WEEKLY_PLAN = {
     1: { name: "PAZARTESİ", title: "FULL BODY START", tasks: ["squat", "pushup", "one_arm_row", "plank"] },
     2: { name: "SALI", title: "BESLENME & RECOVERY", tasks: ["eat_bulk", "stretch", "farmers_walk"] },
     3: { name: "ÇARŞAMBA", title: "CORE & KERNEL", tasks: ["lying_leg_raise", "mountain_climber", "stomach_vacuum", "kegel", "bottle_curl"] },
@@ -1118,7 +1118,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html
 
 // Global scope assignment
-const MENTAL_PHASES = window.MENTAL_PHASES = [
+const MENTAL_PHASES = [
     {
         id: 1,
         title: "FAZ 1: JAGUAR TEORİSİ",
@@ -1194,7 +1194,7 @@ const MENTAL_PHASES = window.MENTAL_PHASES = [
 ];
 
 // Add to DB namespace (exercises.js already declared DB)
-window.DB.MENTAL_PHASES = MENTAL_PHASES;
+DB.MENTAL_PHASES = MENTAL_PHASES;
 
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[DB] Mental phases loaded');
@@ -1208,8 +1208,8 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // anatomy.js - Anatomy Database
 // Extracted from original index.html
 
-// Use window.DB directly (exercises.js already declared it)
-window.DB.ANATOMY_DB = {
+// Use DB namespace directly (exercises.js already declared it)
+DB.ANATOMY_DB = {
     "chest": { name: "Pectoralis Major", function: "İtme kuvveti.", system: "Üst Gövde İtiş", action: "Push-up, Floor Press", recovery: "48-72 Saat" },
     "abs": { name: "Rectus Abdominis", function: "Core gücü, cinsel dayanıklılık.", system: "Merkezi Denge", action: "Plank, Leg Raise, Vacuum", recovery: "24-48 Saat" },
     "quads": { name: "Quadriceps", function: "Vücudu taşıma, piston gücü.", system: "Lokomotor", action: "Squat", recovery: "72 Saat" },
@@ -1235,7 +1235,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 1202-1316
 
 // Global scope assignment
-const Utils = window.Utils = {
+const Utils = {
     /**
      * Bugünün tarihini YYYY-MM-DD formatında döndürür.
      * Client Local Time kullanır (kullanıcının timezone'una göre).
@@ -1401,7 +1401,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 1340-1963
 
 // Global scope assignment
-const Store = window.Store = {
+const Store = {
     state: {
         weight: 45.0,
         fuelDate: null,
@@ -2380,7 +2380,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 1985-2236
 
 // Global scope assignment
-const UI = window.UI = {
+const UI = {
     activeView: 'front',
 
     async init() {
@@ -2676,7 +2676,7 @@ const safeNumberInputValue = (value, min = 0, max = 10000) => {
     return String(Math.min(max, Math.max(min, parsed)));
 };
 
-const Components = window.Components = {
+const Components = {
     /**
      * Standard card wrapper with optional accent border
      * @param {string} label - Card header label (emoji + text)
@@ -2892,7 +2892,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button ${Utils.actionAttrs('saveSet', [tid, idx, true])}
+            <button ${Utils.actionAttrs('saveSet', [tid, idx, true], { passElement: true })}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -2920,7 +2920,7 @@ const Components = window.Components = {
             </div>
             
             <!-- Save Button -->
-            <button ${Utils.actionAttrs('saveTimedSet', [tid, idx])}
+            <button ${Utils.actionAttrs('saveTimedSet', [tid, idx], { passElement: true })}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -2957,7 +2957,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 3015-3036
 
 // Global scope assignment
-const VideoPlayer = window.VideoPlayer = {
+const VideoPlayer = {
     openVideo(videoId) {
         console.warn('VideoPlayer.openVideo deprecated. Use Actions.playVideoInline instead.');
     }
@@ -2974,7 +2974,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // stealth.js - Sanitize Mode for Privacy Protection
 // Hides sensitive content while keeping app fully functional
 
-const Stealth = window.Stealth = {
+const Stealth = {
     active: false,
 
     origTitle: null, // Will be set dynamically using CONFIG.VERSION
@@ -3113,7 +3113,7 @@ const toSafeText = (value, maxLength = 160) => {
 
 const isIsoDateKey = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 
-const Renderers = window.Renderers = {
+const Renderers = {
     async dashboard() {
         const today = Utils.dateStr();
 
@@ -3887,7 +3887,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 3038-3973
 
 // Using window. for global scope access
-const Actions = window.Actions = {
+const Actions = {
     // v7.1.0: Video modal
     playVideo(videoId) {
         if (!Utils.isValidYouTubeId(videoId)) {
@@ -4685,7 +4685,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveSet(taskId, setIdx, isDoneBtn) {
+    async saveSet(taskId, setIdx, isDoneBtn, sourceEl = null) {
         const wInput = document.getElementById(`w-${taskId}-${setIdx}`);
         const rInput = document.getElementById(`r-${taskId}-${setIdx}`);
         const weight = wInput ? wInput.value : 0;
@@ -4702,8 +4702,7 @@ const Actions = window.Actions = {
         const result = await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
 
         if (isDoneBtn) {
-            const evt = window.event;
-            const btn = evt ? (evt.currentTarget || evt.target.closest('button')) : null;
+            const btn = sourceEl ? sourceEl.closest('button') : null;
             if (btn) {
                 btn.classList.remove('bg-gray-700', 'text-gray-400', 'hover:bg-gray-600');
                 btn.classList.add('bg-neon-green', 'text-black');
@@ -4727,7 +4726,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveTimedSet(taskId, setIdx) {
+    async saveTimedSet(taskId, setIdx, sourceEl = null) {
         const dInput = document.getElementById(`d-${taskId}-${setIdx}`);
         const duration = dInput ? parseFloat(dInput.value) || 0 : 0;
 
@@ -4749,7 +4748,7 @@ const Actions = window.Actions = {
             dInput.classList.replace('border-gray-600', 'border-neon-green');
             dInput.classList.add('text-neon-green');
         }
-        const btn = event.currentTarget || event.target.closest('button');
+        const btn = sourceEl ? sourceEl.closest('button') : null;
         if (btn) {
             btn.classList.remove('bg-gray-700', 'text-gray-400');
             btn.classList.add('bg-neon-green', 'text-black');
@@ -4991,6 +4990,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 
 
 
+        })();
     </script>
 </body>
 

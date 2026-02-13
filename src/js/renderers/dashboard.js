@@ -16,7 +16,7 @@ const toSafeText = (value, maxLength = 160) => {
 
 const isIsoDateKey = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 
-const Renderers = window.Renderers = {
+const Renderers = {
     async dashboard() {
         const today = Utils.dateStr();
 
