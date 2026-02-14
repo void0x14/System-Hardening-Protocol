@@ -1,8 +1,21 @@
 # İlerleme Durumu
 
-## Refactoring Projesi - Phase 2: Configuration Extraction ✅
+## Refactoring Projesi - Phase 3: Storage Abstraction ✅
 
 ### Tamamlanan Görevler (14 Şubat 2026)
+- ✅ `src/js/infrastructure/` dizini oluşturuldu
+  - StorageAdapter.js - Abstract storage interface
+  - LocalStorageAdapter.js - Browser localStorage implementation
+  - MemoryStorageAdapter.js - In-memory storage for testing
+  - index.js - Module exports
+- ✅ `src/js/repositories/` dizini oluşturuldu
+  - BaseRepository.js - Base class with common CRUD operations
+  - WeightRepository.js - Weight data access (history, current weight)
+  - WorkoutRepository.js - Workout data access (logs, exercise history, PRs)
+  - MealRepository.js - Meal/nutrition data access
+  - index.js - Module exports
+
+### Önceki Aşama: Phase 2 - Configuration Extraction ✅
 - ✅ `src/js/config/` dizini oluşturuldu
 - ✅ Storage keys extraction (`keys.js`)
   - 15 localStorage key constants
@@ -44,11 +57,11 @@
 - ✅ Test reporter implement edildi (`tests/reporter.js`)
 - ✅ Mock storage adapter implement edildi (`tests/mocks/storage.js`)
 
-### Sonraki Adımlar (Phase 3: Store Module Extraction)
-- [ ] `src/js/store/` dizini oluşturulması
-- [ ] State management extraction
-- [ ] Data operations extraction
-- [ ] Validation integration with config module
+### Sonraki Adımlar (Phase 4: State Management)
+- [ ] `src/js/services/StateManager.js` oluşturulması
+- [ ] State extraction from Store
+- [ ] Reducers implementation
+- [ ] State subscriptions
 
 ---
 
@@ -318,6 +331,16 @@ Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (
 **Output**: Maintainable codebase, same single-file deployment
 
 ## Recent Updates
+- **[2026-02-14]**: Phase 3 - Storage Abstraction completed.
+  - Created `src/js/infrastructure/` directory with storage adapters
+  - StorageAdapter.js: Abstract interface for storage operations
+  - LocalStorageAdapter.js: Browser localStorage implementation
+  - MemoryStorageAdapter.js: In-memory storage for testing
+  - Created `src/js/repositories/` directory with data access layer
+  - BaseRepository.js: Base class with common CRUD operations
+  - WeightRepository.js: Weight data access (history, current weight)
+  - WorkoutRepository.js: Workout data access (logs, exercise history, PRs)
+  - MealRepository.js: Meal/nutrition data access
 - **[2026-02-14]**: Phase 2 - Configuration Extraction completed.
   - Created `src/js/config/` directory with 5 modules
   - keys.js: 15 localStorage key constants

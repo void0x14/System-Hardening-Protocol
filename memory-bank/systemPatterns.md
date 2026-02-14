@@ -4,7 +4,7 @@
 
 System Hardening Protocol, modüler bir mimariye geçiş yapmaktadır. Aşağıdaki desenler, refactoring sürecinde uygulanan ve uygulanacak olan tasarım desenlerini açıklamaktadır.
 
-## Mevcut Desenler (Phase 1 Sonrası)
+## Mevcut Desenler (Phase 3 Sonrası)
 
 ### 1. Dependency Injection (DI) Container
 
@@ -114,28 +114,96 @@ export { EventBus } from './EventBus.js';
 import { Container, EventBus } from './core/index.js';
 ```
 
-## Hedef Desenler (Gelecek Phases)
+### 5. Repository Pattern ✅ NEW (Phase 3)
 
-### 5. Repository Pattern
+**Amaç**: Veri erişim katmanını soyutlamak ve business logic'den ayırmak.
 
-**Amaç**: Veri erişim katmanını soyutlamak.
-
-**Planlanan Uygulama**: Phase 3
+**Uygulama**: `src/js/repositories/`
 
 ```javascript
-// Repository interface
-class MealRepository {
-    async getByDate(date) { ... }
-    async add(date, meal) { ... }
-    async delete(date, index) { ... }
+// Base Repository
+class BaseRepository {
+    constructor(storage, keyPrefix) { ... }
+    async get(key) { ... }
+    async set(key, value) { ... }
+    async delete(key) { ... }
+    async getAll() { ... }
+    async find(predicate) { ... }
+}
+
+// Concrete Repository
+class WeightRepository extends BaseRepository {
+    async getCurrentWeight() { ... }
+    async saveWeight(weight, date) { ... }
+    async getHistory() { ... }
+    async getStatistics() { ... }
 }
 
 // Usage
-const mealRepo = container.get('mealRepository');
-const meals = await mealRepo.getByDate('2026-02-14');
+const weightRepo = new WeightRepository(storage);
+await weightRepo.saveWeight(75.5, '2026-02-14');
+const history = await weightRepo.getHistory();
 ```
 
-### 6. State Manager Pattern
+**Mevcut Repository'ler**:
+- `WeightRepository` - Kilo verisi (history, current weight, statistics)
+- `WorkoutRepository` - Antrenman verisi (logs, exercise history, PRs)
+- `MealRepository` - Beslenme verisi (meals, custom foods, daily plan)
+
+**Avantajlar**:
+- Single Responsibility Principle
+- Test edilebilirlik (mock repository)
+- Storage backend değişikliği kolaylığı
+- Query logic merkezi yönetim
+
+### 6. Storage Adapter Pattern ✅ NEW (Phase 3)
+
+**Amaç**: Farklı storage backend'leri için tutarlı API sağlamak.
+
+**Uygulama**: `src/js/infrastructure/`
+
+```javascript
+// Abstract Interface
+class StorageAdapter {
+    async get(key) { throw new Error('Not implemented'); }
+    async set(key, value) { throw new Error('Not implemented'); }
+    async remove(key) { throw new Error('Not implemented'); }
+    async clear() { throw new Error('Not implemented'); }
+    async keys() { throw new Error('Not implemented'); }
+    async has(key) { throw new Error('Not implemented'); }
+}
+
+// Concrete Implementation
+class LocalStorageAdapter extends StorageAdapter {
+    async get(key) {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+    }
+    async set(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    }
+}
+
+// Usage
+const storage = new LocalStorageAdapter({ prefix: 'monk_' });
+await storage.set('weight', 75.5);
+const weight = await storage.get('weight');
+```
+
+**Mevcut Adapter'ler**:
+- `LocalStorageAdapter` - Browser localStorage (production)
+- `MemoryStorageAdapter` - In-memory storage (testing)
+
+**Avantajlar**:
+- Dependency Inversion Principle
+- Easy testing (MemoryStorage)
+- Future extensibility (IndexedDB, Cloud)
+- Consistent error handling
+
+## Hedef Desenler (Gelecek Phases)
+
+### 7. State Manager Pattern
 
 **Amaç**: Merkezi state yönetimi ve change detection.
 
@@ -153,7 +221,7 @@ const stateMgr = container.get('stateManager');
 stateMgr.setState({ weight: 75 });
 ```
 
-### 7. Service Layer Pattern
+### 8. Service Layer Pattern
 
 **Amaç**: Business logic'i UI'dan ayırmak.
 
@@ -177,7 +245,7 @@ class StatisticsService {
 }
 ```
 
-### 8. View Component Pattern
+### 9. View Component Pattern
 
 **Amaç**: UI render logic'ini modüler hale getirmek.
 
@@ -213,8 +281,11 @@ class DashboardView extends View {
 │           Service Layer                  │
 │  (Validation, Backup, Statistics)       │
 ├─────────────────────────────────────────┤
-│         Repository Layer                 │
-│  (MealRepo, WorkoutRepo, etc.)          │
+│         Repository Layer ✅ NEW          │
+│  (WeightRepo, WorkoutRepo, MealRepo)    │
+├─────────────────────────────────────────┤
+│        Infrastructure Layer ✅ NEW       │
+│  (StorageAdapter, LocalStorage, Memory) │
 ├─────────────────────────────────────────┤
 │           Core Layer                     │
 │  (Container, EventBus, StateMgr)        │
@@ -229,6 +300,8 @@ Container
 EventBus ←→ StateManager
     ↓           ↓
 Services ←→ Repositories
+    ↓           ↓
+    └─────→ Infrastructure (Storage)
     ↓
 Views/Actions
 ```
@@ -251,8 +324,9 @@ tests/
 ├── core/           # Core module tests
 │   ├── Container.test.js
 │   └── EventBus.test.js
-├── services/       # Service tests (future)
+├── infrastructure/ # Infrastructure tests (future)
 ├── repositories/   # Repository tests (future)
+├── services/       # Service tests (future)
 └── views/          # View tests (future)
 ```
 
@@ -306,4 +380,63 @@ const sanitized = sanitize(userInput);
 ```javascript
 // Schema validation on import
 validateImportedData(data);
+```
+
+## Repository-Storage İlişkisi
+
+```
+┌──────────────────────────────────────────────────────┐
+│                   Application                         │
+├──────────────────────────────────────────────────────┤
+│                                                      │
+│  ┌─────────────────┐  ┌─────────────────┐          │
+│  │ WeightRepo      │  │ WorkoutRepo     │          │
+│  │ - saveWeight()  │  │ - addExercise() │          │
+│  │ - getHistory()  │  │ - getPRs()      │          │
+│  └────────┬────────┘  └────────┬────────┘          │
+│           │                    │                    │
+│           └──────────┬─────────┘                    │
+│                      │                              │
+│              ┌───────▼───────┐                      │
+│              │ StorageAdapter │ (Interface)         │
+│              └───────┬───────┘                      │
+│                      │                              │
+│         ┌────────────┼────────────┐                 │
+│         │            │            │                 │
+│  ┌──────▼──────┐ ┌───▼────┐ ┌────▼─────┐          │
+│  │LocalStorage │ │ Memory │ │ IndexedDB│          │
+│  │  Adapter    │ │Adapter │ │ (future) │          │
+│  └─────────────┘ └────────┘ └──────────┘          │
+│                                                      │
+└──────────────────────────────────────────────────────┘
+```
+
+## Dosya Organizasyonu
+
+```
+src/js/
+├── core/                    # Core infrastructure
+│   ├── Container.js         # DI Container
+│   ├── EventBus.js          # Event Bus
+│   └── index.js             # Exports
+├── config/                  # Configuration
+│   ├── keys.js              # Storage keys
+│   ├── validation.js        # Validation limits
+│   ├── targets.js           # Fitness targets
+│   ├── theme.js             # UI theme
+│   └── index.js             # ConfigService
+├── infrastructure/          # Storage layer ✅ NEW
+│   ├── StorageAdapter.js    # Abstract interface
+│   ├── LocalStorageAdapter.js
+│   ├── MemoryStorageAdapter.js
+│   └── index.js             # Exports
+├── repositories/            # Data access layer ✅ NEW
+│   ├── BaseRepository.js    # Base class
+│   ├── WeightRepository.js  # Weight data
+│   ├── WorkoutRepository.js # Workout data
+│   ├── MealRepository.js    # Meal data
+│   └── index.js             # Exports
+├── services/                # Business logic (Phase 5)
+├── views/                   # UI components (Phase 6)
+└── actions/                 # Event handlers (Phase 6)
 ```
