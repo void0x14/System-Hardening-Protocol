@@ -1,75 +1,79 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**Phase 4: State Management** - ✅ COMPLETED
+**Phase 5: Service Layer** - ✅ COMPLETED
 
 ### Son Güncelleme (14 Şubat 2026)
 
 #### Durum
-Phase 4 tamamlandı. Zero-dependency state management sistemi implement edildi.
+Phase 5 tamamlandı. Service Layer implement edildi ve store.js'den business logic çıkarıldı.
 
 #### Yapılan İşlemler
-1. **State Dizin Yapısı**: `src/js/state/` dizini oluşturuldu
-   - **StateManager.js** - Core state container
-     - `getState()` - Immutable state copy döner
-     - `dispatch(action)` - Action dispatch eder
-     - `subscribe(listener)` - State değişikliklerini dinler
-     - `select(selector)` - Selector ile state'den değer alır
-     - `subscribeTo(selector, callback)` - Specific state değişikliklerini dinler
-     - `addMiddleware(middleware)` - Middleware ekler
-     - Private fields (`#state`, `#listeners`, `#reducer`, `#middleware`)
-   - **initialState.js** - Default state values
-     - Tüm state property'leri merkezi olarak tanımlandı
-     - `createInitialState()` - Factory function
-     - `validateState()` - State validation
-     - `mergeState()` - State merge helper
-   - **reducers.js** - State transformation functions
-     - `rootReducer` - Combines all reducers
-     - `weightReducer` - Weight state changes
-     - `mealReducer` - Meal/food state changes
-     - `workoutReducer` - Workout/exercise state changes
-     - `mentalReducer` - Mental progress state changes
-     - `statsReducer` - Statistics state changes
-     - `uiReducer` - UI state changes
-     - `systemReducer` - System state changes
-     - `ActionTypes` - 30+ action type constants
-     - `actions` - Action creator functions
-   - **middleware.js** - Cross-cutting concerns
-     - `loggingMiddleware` - Development logging
-     - `silentLoggingMiddleware` - Production error logging
-     - `persistenceMiddleware` - Auto-save to storage
-     - `throttleMiddleware` - Rate limiting
-     - `debounceMiddleware` - Debounce rapid updates
-     - `validationMiddleware` - Action validation
-     - `errorMiddleware` - Error handling
-     - `transformMiddleware` - Action transformation
-     - `timingMiddleware` - Performance monitoring
-     - `batchMiddleware` - Batch multiple actions
-     - `composeMiddleware` - Combine middlewares
-   - **index.js** - Module exports
-     - `createStore()` - Factory function for quick setup
-     - `bindActionCreators()` - Bind action creators to store
-     - `combineReducers()` - Combine multiple reducers
+1. **Service Dizin Yapısı**: `src/js/services/` dizini oluşturuldu
+   - **ValidationService.js** - Data validation and sanitization
+     - `toSafeNumber()` - Number validation with bounds
+     - `isIsoDateKey()` - ISO date format validation
+     - `sanitizeDateString()` - Date string sanitization
+     - `sanitizeWorkoutLog()` - Workout log sanitization
+     - `sanitizeWeightHistory()` - Weight history sanitization
+     - `sanitizeStreakData()` - Streak data sanitization
+     - `sanitizeDailyPlanData()` - Daily plan sanitization
+     - `sanitizeCustomFood()` - Custom food sanitization
+     - `sanitizeExerciseHistoryEntry()` - Exercise history sanitization
+     - `sanitizeMealEntry()` - Meal entry sanitization
+     - `sanitizeImportedData()` - Full import data sanitization
+   - **BackupService.js** - Export/import functionality
+     - `exportData()` - Export all data to JSON file
+     - `importData()` - Import data from JSON content
+     - `validateImportData()` - Validate import structure
+     - `checkBackupStatus()` - Check backup status (OK/WARNING/NEVER)
+   - **StatisticsService.js** - Metrics and analytics
+     - `getVolumeStats()` - Weekly/monthly workout volume
+     - `getTodayProgress()` - Today's task and calorie progress
+     - `getSleepStats()` - Sleep tracking statistics
+     - `getWaterStats()` - Water intake statistics
+     - `getWeeklySummary()` - 4-week summary data
+     - `getDailyNutrition()` - Daily nutrition summary
+     - `getProgressData()` - Progress data for charts
+   - **ExerciseHistoryService.js** - Exercise history tracking
+     - `saveToHistory()` - Save exercise set to history
+     - `getHistory()` - Get exercise history
+     - `getPersonalBest()` - Get PR for exercise
+     - `getExerciseStats()` - Comprehensive exercise statistics
+     - `checkForPR()` - Check if new PR was set
+   - **StreakService.js** - Streak management
+     - `getStreak()` - Get current streak count
+     - `updateStreak()` - Update streak based on workout
+     - `calculateStreak()` - Calculate streak from dates
+     - `getStreakHistory()` - Streak history and statistics
+     - `checkStreakRisk()` - Check if streak is at risk
+     - `getStreakMilestones()` - Streak milestone progress
+   - **index.js** - Module exports and factories
+     - `createServices()` - Factory function for quick setup
+     - `ServiceContainer` - DI container for services
+     - `createServiceContainer()` - Pre-registered container setup
 
 #### Proje Durumu
-- **Versiyon**: v8.3.2-dev
+- **Versiyon**: v8.3.3-dev
 - **Build**: `pnpm run build` → `dist/index.html`
-- **Mimari**: State-Renderer-Actions (15 modüler JS dosyası)
+- **Mimari**: Service-Oriented Architecture (20 modüler JS dosyası)
 - **Core**: DI Container + Event Bus
 - **Config**: Modular configuration (5 modules)
 - **Infrastructure**: Storage adapters (3 implementations)
 - **Repositories**: Data access layer (4 repositories)
 - **State**: StateManager + Reducers + Middleware
+- **Services**: Business logic layer (5 services)
 - **Veri**: localStorage (tarayıcı yerel depolama)
 - **Test**: Custom test framework + Core unit tests ✅
 
-### Sonraki Adımlar (Phase 5: Service Layer)
-1. `ValidationService.js` oluşturulması
-2. `BackupService.js` oluşturulması
-3. `StatisticsService.js` oluşturulması
-4. `ExerciseHistoryService.js` oluşturulması
+### Sonraki Adımlar (Phase 6: UI Components)
+1. View Component Architecture oluşturulması
+2. DashboardView oluşturulması
+3. TrainingView oluşturulması
+4. NutritionView oluşturulması
 
 ## Tamamlanan Sürümler
+- ✅ Phase 5: Service Layer (14 Şubat 2026) - Validation, Backup, Statistics, ExerciseHistory, Streak services
 - ✅ Phase 4: State Management (14 Şubat 2026) - StateManager, Reducers, Middleware
 - ✅ Phase 3: Storage Abstraction (14 Şubat 2026) - Storage adapters, Repository pattern
 - ✅ Phase 2: Configuration Extraction (14 Şubat 2026) - keys, validation, targets, theme, ConfigService
@@ -260,6 +264,41 @@ eventBus.emit('user:login', { id: 1, name: 'John' });
 unsubscribe();
 ```
 
+### Service Layer Kullanım Deseni
+```javascript
+// Import services
+import { createServices } from './services/index.js';
+
+// Create services with dependencies
+const services = createServices({
+    storage: localStorageAdapter,
+    config: appConfig,
+    weeklyPlan: WEEKLY_PLAN
+});
+
+// Use services
+const streak = await services.streak.getStreak();
+const stats = await services.statistics.getVolumeStats();
+const pr = await services.exerciseHistory.getPersonalBest('squat');
+await services.backup.exportData();
+```
+
+### ValidationService Kullanım Deseni
+```javascript
+import { ValidationService } from './services/ValidationService.js';
+
+const validation = new ValidationService({ limits: config.validation });
+
+// Number validation
+const safeWeight = validation.toSafeNumber(userInput, 45, 20, 500);
+
+// Date validation
+const safeDate = validation.sanitizeDateString(userDate);
+
+// Complex object sanitization
+const safeMeal = validation.sanitizeMealEntry(mealData);
+```
+
 ### Öğrenilen Dersler
 1. **Private Fields**: ES2022 private fields (`#`) kullanımı modern browser'larda çalışır
 2. **Factory Pattern**: Factory functions container'ı alarak dependency resolution yapabilir
@@ -273,5 +312,8 @@ unsubscribe();
 10. **Immutable State**: State her zaman immutable copy olarak dönmeli - mutation bug'larını önler
 11. **Middleware Chain**: Middleware chain pattern'i cross-cutting concerns'ları ayırmayı sağlar
 12. **Action Creators**: Action creator functions action type safety sağlar
+13. **Service Layer**: Business logic'i UI'dan ayırmak test edilebilirliği ve bakım kolaylığını artırır
+14. **Dependency Injection**: Service'ler dependency'lerini constructor'dan almalı - test edilebilirlik
+15. **Single Responsibility**: Her service tek bir sorumluluk alanına odaklanmalı
 
 ---

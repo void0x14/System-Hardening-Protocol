@@ -356,29 +356,67 @@ store.addMiddleware(persistenceMiddleware(localStorage));
 
 ## Hedef Desenler (Gelecek Phases)
 
-### 10. Service Layer Pattern
+### 10. Service Layer Pattern ✅ COMPLETED (Phase 5)
 
 **Amaç**: Business logic'i UI'dan ayırmak.
 
-**Planlanan Uygulama**: Phase 5
+**Uygulama**: `src/js/services/`
 
 ```javascript
-// Services
+// ValidationService - Data validation and sanitization
 class ValidationService {
-    validateWeight(value) { ... }
-    sanitizeInput(input) { ... }
+    toSafeNumber(value, fallback, min, max) { ... }
+    sanitizeDateString(value) { ... }
+    sanitizeMealEntry(entry) { ... }
+    sanitizeImportedData(data) { ... }
 }
 
+// BackupService - Export/import functionality
 class BackupService {
     async exportData() { ... }
     async importData(data) { ... }
+    async checkBackupStatus() { ... }
 }
 
+// StatisticsService - Metrics and analytics
 class StatisticsService {
-    getVolumeStats(exerciseId) { ... }
-    getWeeklySummary() { ... }
+    async getVolumeStats() { ... }
+    async getWeeklySummary() { ... }
+    async getProgressData() { ... }
 }
+
+// ExerciseHistoryService - Exercise history tracking
+class ExerciseHistoryService {
+    async saveToHistory(exerciseId, weight, reps) { ... }
+    async getPersonalBest(exerciseId) { ... }
+    async checkForPR(exerciseId, weight, reps) { ... }
+}
+
+// StreakService - Streak management
+class StreakService {
+    async getStreak() { ... }
+    async updateStreak() { ... }
+    calculateStreak(dates) { ... }
+}
+
+// Usage with ServiceContainer
+import { createServices } from './services/index.js';
+
+const services = createServices({
+    storage: localStorageAdapter,
+    config: appConfig,
+    weeklyPlan: WEEKLY_PLAN
+});
+
+await services.streak.getStreak();
+await services.statistics.getVolumeStats();
 ```
+
+**Avantajlar**:
+- Single Responsibility Principle
+- Test edilebilirlik (mock services)
+- Business logic isolation
+- Dependency injection support
 
 ### 11. View Component Pattern
 
@@ -413,10 +451,10 @@ class DashboardView extends View {
 │            Action Layer                  │
 │  (MealActions, WorkoutActions, etc.)    │
 ├─────────────────────────────────────────┤
-│           Service Layer                  │
+│           Service Layer ✅ NEW           │
 │  (Validation, Backup, Statistics)       │
 ├─────────────────────────────────────────┤
-│         State Layer ✅ NEW               │
+│         State Layer ✅                   │
 │  (StateManager, Reducers, Middleware)   │
 ├─────────────────────────────────────────┤
 │         Repository Layer                 │
@@ -442,6 +480,45 @@ Services ←→ Repositories
     └─────→ Infrastructure (Storage)
     ↓
 Views/Actions
+```
+
+## Service Layer Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Service Layer                          │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌─────────────────┐  ┌─────────────────┐               │
+│  │ValidationService│  │  BackupService  │               │
+│  │ - toSafeNumber  │  │ - exportData    │               │
+│  │ - sanitizeDate  │  │ - importData    │               │
+│  │ - sanitizeMeal  │  │ - validateImport│               │
+│  └────────┬────────┘  └────────┬────────┘               │
+│           │                    │                         │
+│  ┌────────▼────────┐  ┌───────▼─────────┐               │
+│  │StatisticsService│  │ExerciseHistory  │               │
+│  │ - getVolumeStats│  │    Service      │               │
+│  │ - getSleepStats │  │ - saveToHistory │               │
+│  │ - getWeeklySum  │  │ - getPersonalBest│              │
+│  └────────┬────────┘  └───────┬─────────┘               │
+│           │                    │                         │
+│           └──────────┬─────────┘                         │
+│                      │                                   │
+│              ┌───────▼───────┐                           │
+│              │ StreakService │                           │
+│              │ - getStreak   │                           │
+│              │ - updateStreak│                           │
+│              │ - calcStreak  │                           │
+│              └───────┬───────┘                           │
+│                      │                                   │
+│                      ▼                                   │
+│              ┌───────────────┐                           │
+│              │  Repositories │                           │
+│              │  & Storage    │                           │
+│              └───────────────┘                           │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ## State Flow Diagram
@@ -606,7 +683,7 @@ src/js/
 │   ├── targets.js           # Fitness targets
 │   ├── theme.js             # UI theme
 │   └── index.js             # ConfigService
-├── state/                   # State management ✅ NEW
+├── state/                   # State management
 │   ├── StateManager.js      # Core state container
 │   ├── initialState.js      # Default state values
 │   ├── reducers.js          # State transformation
@@ -623,7 +700,13 @@ src/js/
 │   ├── WorkoutRepository.js # Workout data
 │   ├── MealRepository.js    # Meal data
 │   └── index.js             # Exports
-├── services/                # Business logic (Phase 5)
+├── services/                # Business logic layer ✅ NEW
+│   ├── ValidationService.js # Data validation
+│   ├── BackupService.js     # Export/import
+│   ├── StatisticsService.js # Metrics/analytics
+│   ├── ExerciseHistoryService.js # History tracking
+│   ├── StreakService.js     # Streak management
+│   └── index.js             # Exports & factories
 ├── views/                   # UI components (Phase 6)
 └── actions/                 # Event handlers (Phase 6)
 ```

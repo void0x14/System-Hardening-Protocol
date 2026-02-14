@@ -1,8 +1,17 @@
 # İlerleme Durumu
 
-## Refactoring Projesi - Phase 4: State Management ✅
+## Refactoring Projesi - Phase 5: Service Layer ✅
 
 ### Tamamlanan Görevler (14 Şubat 2026)
+- ✅ `src/js/services/` dizini oluşturuldu
+  - ValidationService.js - Data validation and sanitization (20+ methods)
+  - BackupService.js - Export/import functionality
+  - StatisticsService.js - Metrics and analytics
+  - ExerciseHistoryService.js - Exercise history tracking and PRs
+  - StreakService.js - Streak calculation and management
+  - index.js - Module exports, ServiceContainer, factory functions
+
+### Önceki Aşama: Phase 4 - State Management ✅
 - ✅ `src/js/state/` dizini oluşturuldu
   - StateManager.js - Core state container with dispatch/subscribe pattern
   - initialState.js - Default state values and helpers
@@ -65,11 +74,14 @@
 - ✅ Test reporter implement edildi (`tests/reporter.js`)
 - ✅ Mock storage adapter implement edildi (`tests/mocks/storage.js`)
 
-### Sonraki Adımlar (Phase 5: Service Layer)
-- [ ] `ValidationService.js` oluşturulması
-- [ ] `BackupService.js` oluşturulması
-- [ ] `StatisticsService.js` oluşturulması
-- [ ] `ExerciseHistoryService.js` oluşturulması
+### Sonraki Adımlar (Phase 6: UI Components)
+- [ ] View Component Architecture oluşturulması
+- [ ] DashboardView oluşturulması
+- [ ] TrainingView oluşturulması
+- [ ] NutritionView oluşturulması
+- [ ] ProgressView oluşturulması
+- [ ] AnatomyView oluşturulması
+- [ ] MentalView oluşturulması
 
 ---
 
@@ -339,6 +351,15 @@ Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (
 **Output**: Maintainable codebase, same single-file deployment
 
 ## Recent Updates
+- **[2026-02-14]**: Phase 5 - Service Layer completed.
+  - Created `src/js/services/` directory with 5 service modules
+  - ValidationService.js: 20+ sanitization methods extracted from store.js
+  - BackupService.js: Export/import functionality with validation
+  - StatisticsService.js: Volume stats, sleep/water tracking, weekly summary
+  - ExerciseHistoryService.js: History tracking, PR management
+  - StreakService.js: Streak calculation, milestones, risk detection
+  - index.js: ServiceContainer for DI, createServices factory
+  - Commits: caeb2a9, ffd494f, 6b2fe9c, 938e54b, 9cb3aa3, e174145
 - **[2026-02-14]**: Phase 4 - State Management completed.
   - Created `src/js/state/` directory with state management system
   - StateManager.js: Core state container with dispatch/subscribe pattern
