@@ -4,7 +4,7 @@
 
 System Hardening Protocol, modüler bir mimariye geçiş yapmaktadır. Aşağıdaki desenler, refactoring sürecinde uygulanan ve uygulanacak olan tasarım desenlerini açıklamaktadır.
 
-## Mevcut Desenler (Phase 3 Sonrası)
+## Mevcut Desenler (Phase 4 Sonrası)
 
 ### 1. Dependency Injection (DI) Container
 
@@ -114,7 +114,7 @@ export { EventBus } from './EventBus.js';
 import { Container, EventBus } from './core/index.js';
 ```
 
-### 5. Repository Pattern ✅ NEW (Phase 3)
+### 5. Repository Pattern (Phase 3)
 
 **Amaç**: Veri erişim katmanını soyutlamak ve business logic'den ayırmak.
 
@@ -156,7 +156,7 @@ const history = await weightRepo.getHistory();
 - Storage backend değişikliği kolaylığı
 - Query logic merkezi yönetim
 
-### 6. Storage Adapter Pattern ✅ NEW (Phase 3)
+### 6. Storage Adapter Pattern (Phase 3)
 
 **Amaç**: Farklı storage backend'leri için tutarlı API sağlamak.
 
@@ -201,27 +201,162 @@ const weight = await storage.get('weight');
 - Future extensibility (IndexedDB, Cloud)
 - Consistent error handling
 
-## Hedef Desenler (Gelecek Phases)
+### 7. State Manager Pattern ✅ NEW (Phase 4)
 
-### 7. State Manager Pattern
+**Amaç**: Merkezi state yönetimi, change detection ve predictable state updates.
 
-**Amaç**: Merkezi state yönetimi ve change detection.
-
-**Planlanan Uygulama**: Phase 4
+**Uygulama**: `src/js/state/StateManager.js`
 
 ```javascript
-class StateManager {
-    getState() { ... }
-    setState(updates) { ... }
-    subscribe(callback) { ... }
-}
+import { StateManager, initialState, rootReducer } from './state/index.js';
 
-// Usage
-const stateMgr = container.get('stateManager');
-stateMgr.setState({ weight: 75 });
+// Create store
+const store = new StateManager(initialState, rootReducer);
+
+// Get state (immutable copy)
+const state = store.getState();
+const weight = store.select(state => state.weight);
+
+// Subscribe to all changes
+const unsubscribe = store.subscribe((prev, next, action) => {
+    console.log('State changed:', action.type);
+});
+
+// Subscribe to specific state changes
+store.subscribeTo(
+    state => state.weight,
+    (newWeight, oldWeight) => console.log('Weight:', oldWeight, '->', newWeight)
+);
+
+// Dispatch actions
+store.dispatch({ type: 'SET_WEIGHT', payload: 75.5 });
+
+// Cleanup
+unsubscribe();
 ```
 
-### 8. Service Layer Pattern
+**Özellikler**:
+- Immutable state (deep cloning)
+- Middleware support
+- Selectors for derived state
+- Subscription management
+- Action dispatch pattern
+
+**Avantajlar**:
+- Predictable state changes
+- Time-travel debugging (future)
+- Easy testing
+- Decoupled UI updates
+
+### 8. Reducer Pattern ✅ NEW (Phase 4)
+
+**Amaç**: State transformation logic'ini kapsüllemek ve test edilebilir kılmak.
+
+**Uygulama**: `src/js/state/reducers.js`
+
+```javascript
+// Action Types
+const ActionTypes = {
+    SET_WEIGHT: 'SET_WEIGHT',
+    ADD_MEAL: 'ADD_MEAL',
+    TOGGLE_TASK: 'TOGGLE_TASK',
+    // ... 30+ action types
+};
+
+// Reducer Function
+export function weightReducer(state, action) {
+    switch (action.type) {
+        case ActionTypes.SET_WEIGHT:
+            return { ...state, weight: action.payload };
+        case ActionTypes.SAVE_WEIGHT:
+            return {
+                ...state,
+                weight: action.payload.weight,
+                weightHistory: {
+                    ...state.weightHistory,
+                    [action.payload.date]: action.payload.weight
+                }
+            };
+        default:
+            return state;
+    }
+}
+
+// Root Reducer combines all
+export function rootReducer(state, action) {
+    let newState = state;
+    newState = weightReducer(newState, action);
+    newState = mealReducer(newState, action);
+    newState = workoutReducer(newState, action);
+    // ...
+    return newState;
+}
+```
+
+**Mevcut Reducer'lar**:
+- `weightReducer` - Weight state changes
+- `mealReducer` - Meal/food state changes
+- `workoutReducer` - Workout/exercise state changes
+- `mentalReducer` - Mental progress state changes
+- `statsReducer` - Statistics state changes
+- `uiReducer` - UI state changes
+- `systemReducer` - System state changes
+
+**Avantajlar**:
+- Pure functions (testable)
+- Predictable state changes
+- Easy to add new features
+- Separation of concerns
+
+### 9. Middleware Pattern ✅ NEW (Phase 4)
+
+**Amaç**: Cross-cutting concerns'ları action processing'den ayırmak.
+
+**Uygulama**: `src/js/state/middleware.js`
+
+```javascript
+// Logging middleware
+const loggingMiddleware = (store, next, action) => {
+    console.log('Dispatching:', action.type);
+    const result = next(action);
+    console.log('New state:', store.getState());
+    return result;
+};
+
+// Persistence middleware
+const persistenceMiddleware = (storage) => (store, next, action) => {
+    const result = next(action);
+    storage.set('state', store.getState());
+    return result;
+};
+
+// Add to store
+store.addMiddleware(loggingMiddleware);
+store.addMiddleware(persistenceMiddleware(localStorage));
+```
+
+**Mevcut Middleware'ler**:
+- `loggingMiddleware` - Development logging
+- `silentLoggingMiddleware` - Production error logging
+- `persistenceMiddleware` - Auto-save to storage
+- `throttleMiddleware` - Rate limiting
+- `debounceMiddleware` - Debounce rapid updates
+- `validationMiddleware` - Action validation
+- `errorMiddleware` - Error handling
+- `transformMiddleware` - Action transformation
+- `timingMiddleware` - Performance monitoring
+- `batchMiddleware` - Batch multiple actions
+- `composeMiddleware` - Combine middlewares
+
+**Avantajlar**:
+- Cross-cutting concerns isolation
+- Easy to add/remove features
+- Testable independently
+- Flexible composition
+
+## Hedef Desenler (Gelecek Phases)
+
+### 10. Service Layer Pattern
 
 **Amaç**: Business logic'i UI'dan ayırmak.
 
@@ -245,7 +380,7 @@ class StatisticsService {
 }
 ```
 
-### 9. View Component Pattern
+### 11. View Component Pattern
 
 **Amaç**: UI render logic'ini modüler hale getirmek.
 
@@ -281,14 +416,17 @@ class DashboardView extends View {
 │           Service Layer                  │
 │  (Validation, Backup, Statistics)       │
 ├─────────────────────────────────────────┤
-│         Repository Layer ✅ NEW          │
+│         State Layer ✅ NEW               │
+│  (StateManager, Reducers, Middleware)   │
+├─────────────────────────────────────────┤
+│         Repository Layer                 │
 │  (WeightRepo, WorkoutRepo, MealRepo)    │
 ├─────────────────────────────────────────┤
-│        Infrastructure Layer ✅ NEW       │
+│        Infrastructure Layer              │
 │  (StorageAdapter, LocalStorage, Memory) │
 ├─────────────────────────────────────────┤
 │           Core Layer                     │
-│  (Container, EventBus, StateMgr)        │
+│  (Container, EventBus)                  │
 └─────────────────────────────────────────┘
 ```
 
@@ -304,6 +442,48 @@ Services ←→ Repositories
     └─────→ Infrastructure (Storage)
     ↓
 Views/Actions
+```
+
+## State Flow Diagram
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    State Flow                             │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│   Action ──→ Middleware ──→ Reducer ──→ New State       │
+│     │            │             │            │            │
+│     │            │             │            │            │
+│     │            ▼             │            │            │
+│     │      ┌─────────┐        │            │            │
+│     │      │ Logging │        │            │            │
+│     │      │Persist. │        │            │            │
+│     │      │Validate │        │            │            │
+│     │      └─────────┘        │            │            │
+│     │                         │            │            │
+│     │                         ▼            │            │
+│     │                   ┌──────────┐       │            │
+│     │                   │ Reducers │       │            │
+│     │                   │  weight  │       │            │
+│     │                   │  meal    │       │            │
+│     │                   │ workout  │       │            │
+│     │                   └──────────┘       │            │
+│     │                                      │            │
+│     └──────────────────────────────────────┘            │
+│                                     │                    │
+│                                     ▼                    │
+│                              ┌───────────┐              │
+│                              │  Notify   │              │
+│                              │ Listeners │              │
+│                              └───────────┘              │
+│                                     │                    │
+│                                     ▼                    │
+│                              ┌───────────┐              │
+│                              │    UI     │              │
+│                              │  Updates  │              │
+│                              └───────────┘              │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ## Test Desenleri
@@ -324,6 +504,7 @@ tests/
 ├── core/           # Core module tests
 │   ├── Container.test.js
 │   └── EventBus.test.js
+├── state/          # State module tests (future)
 ├── infrastructure/ # Infrastructure tests (future)
 ├── repositories/   # Repository tests (future)
 ├── services/       # Service tests (future)
@@ -425,12 +606,18 @@ src/js/
 │   ├── targets.js           # Fitness targets
 │   ├── theme.js             # UI theme
 │   └── index.js             # ConfigService
-├── infrastructure/          # Storage layer ✅ NEW
+├── state/                   # State management ✅ NEW
+│   ├── StateManager.js      # Core state container
+│   ├── initialState.js      # Default state values
+│   ├── reducers.js          # State transformation
+│   ├── middleware.js        # Cross-cutting concerns
+│   └── index.js             # Exports
+├── infrastructure/          # Storage layer
 │   ├── StorageAdapter.js    # Abstract interface
 │   ├── LocalStorageAdapter.js
 │   ├── MemoryStorageAdapter.js
 │   └── index.js             # Exports
-├── repositories/            # Data access layer ✅ NEW
+├── repositories/            # Data access layer
 │   ├── BaseRepository.js    # Base class
 │   ├── WeightRepository.js  # Weight data
 │   ├── WorkoutRepository.js # Workout data
