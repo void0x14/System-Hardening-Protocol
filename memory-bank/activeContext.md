@@ -1,78 +1,93 @@
 # Aktif Bağlam
 
 ## Şu Anki Çalışma
-**Phase 5: Service Layer** - ✅ COMPLETED
+**Phase 6: UI Components** - ✅ COMPLETED
 
 ### Son Güncelleme (14 Şubat 2026)
 
 #### Durum
-Phase 5 tamamlandı. Service Layer implement edildi ve store.js'den business logic çıkarıldı.
+Phase 6 tamamlandı. View ve Component katmanları modüler hale getirildi.
 
 #### Yapılan İşlemler
-1. **Service Dizin Yapısı**: `src/js/services/` dizini oluşturuldu
-   - **ValidationService.js** - Data validation and sanitization
-     - `toSafeNumber()` - Number validation with bounds
-     - `isIsoDateKey()` - ISO date format validation
-     - `sanitizeDateString()` - Date string sanitization
-     - `sanitizeWorkoutLog()` - Workout log sanitization
-     - `sanitizeWeightHistory()` - Weight history sanitization
-     - `sanitizeStreakData()` - Streak data sanitization
-     - `sanitizeDailyPlanData()` - Daily plan sanitization
-     - `sanitizeCustomFood()` - Custom food sanitization
-     - `sanitizeExerciseHistoryEntry()` - Exercise history sanitization
-     - `sanitizeMealEntry()` - Meal entry sanitization
-     - `sanitizeImportedData()` - Full import data sanitization
-   - **BackupService.js** - Export/import functionality
-     - `exportData()` - Export all data to JSON file
-     - `importData()` - Import data from JSON content
-     - `validateImportData()` - Validate import structure
-     - `checkBackupStatus()` - Check backup status (OK/WARNING/NEVER)
-   - **StatisticsService.js** - Metrics and analytics
-     - `getVolumeStats()` - Weekly/monthly workout volume
-     - `getTodayProgress()` - Today's task and calorie progress
-     - `getSleepStats()` - Sleep tracking statistics
-     - `getWaterStats()` - Water intake statistics
-     - `getWeeklySummary()` - 4-week summary data
-     - `getDailyNutrition()` - Daily nutrition summary
-     - `getProgressData()` - Progress data for charts
-   - **ExerciseHistoryService.js** - Exercise history tracking
-     - `saveToHistory()` - Save exercise set to history
-     - `getHistory()` - Get exercise history
-     - `getPersonalBest()` - Get PR for exercise
-     - `getExerciseStats()` - Comprehensive exercise statistics
-     - `checkForPR()` - Check if new PR was set
-   - **StreakService.js** - Streak management
-     - `getStreak()` - Get current streak count
-     - `updateStreak()` - Update streak based on workout
-     - `calculateStreak()` - Calculate streak from dates
-     - `getStreakHistory()` - Streak history and statistics
-     - `checkStreakRisk()` - Check if streak is at risk
-     - `getStreakMilestones()` - Streak milestone progress
-   - **index.js** - Module exports and factories
-     - `createServices()` - Factory function for quick setup
-     - `ServiceContainer` - DI container for services
-     - `createServiceContainer()` - Pre-registered container setup
+1. **Views Dizin Yapısı**: `src/js/views/` dizini oluşturuldu
+   - **DashboardView.js** - Main dashboard rendering
+     - System integrity (circular progress)
+     - Uptime streak with heatmap
+     - Daily protocol status
+     - Hydration and fuel tracking
+   - **TrainingView.js** - Training tab
+     - Exercise list with progress tracking
+     - Weighted/timed set rows
+     - Simple task buttons
+   - **NutritionView.js** - Nutrition tab
+     - Macro rings visualization
+     - Meal list with cards
+     - Daily plan display
+   - **ProgressView.js** - Progress tab
+     - Weight history chart
+     - Volume analysis
+     - Weekly summary table
+     - Measurement inputs
+   - **AnatomyView.js** - Anatomy lab
+     - Interactive muscle diagrams (front/back)
+     - Muscle info panel
+   - **MentalView.js** - Mental health tab
+     - Phase cards grid
+     - Daily practice tracking
+     - Progress bar
+
+2. **Components Dizin Yapısı**: `src/js/components/` dizini oluşturuldu
+   - **Card.js** - Card container component
+     - `Card()` - Standard card wrapper
+     - `StatCard()` - Centered value with label
+     - `StatMini()` - Mini stat for grids
+   - **ProgressBar.js** - Progress indicators
+     - `ProgressBar()` - Linear progress bar
+     - `ProgressRow()` - Labeled progress row
+     - `CircularProgress()` - SVG circular progress
+   - **MacroRing.js** - Nutrition visualization
+     - `MacroRing()` - Single macro ring
+     - `MacroRings()` - All macros together
+   - **Modal.js** - Modal dialogs
+     - `Modal` class - Modal manager
+     - `AlertModal` class - Alert modal
+   - **Toast.js** - Notifications
+     - `Toast` class - Toast manager
+     - `showToast()` - Quick function
+   - **MealCard.js** - Meal display
+     - `MealCard()` - Full meal card
+     - `MealCardCompact()` - Compact variant
+     - `EmptyMealList()` - Empty state
+   - **SetRow.js** - Exercise sets
+     - `WeightedSetRow()` - Weight x Reps input
+     - `TimedSetRow()` - Duration input
+     - `SimpleTaskBtn()` - Toggle button
+     - `AddSetButton()` - Add set button
 
 #### Proje Durumu
-- **Versiyon**: v8.3.3-dev
+- **Versiyon**: v8.3.4-dev
 - **Build**: `pnpm run build` → `dist/index.html`
-- **Mimari**: Service-Oriented Architecture (20 modüler JS dosyası)
+- **Mimari**: Service-Oriented Architecture (30+ modüler JS dosyası)
 - **Core**: DI Container + Event Bus
 - **Config**: Modular configuration (5 modules)
 - **Infrastructure**: Storage adapters (3 implementations)
 - **Repositories**: Data access layer (4 repositories)
 - **State**: StateManager + Reducers + Middleware
 - **Services**: Business logic layer (5 services)
+- **Views**: UI view layer (6 views)
+- **Components**: Reusable UI (7 components)
 - **Veri**: localStorage (tarayıcı yerel depolama)
 - **Test**: Custom test framework + Core unit tests ✅
 
-### Sonraki Adımlar (Phase 6: UI Components)
-1. View Component Architecture oluşturulması
-2. DashboardView oluşturulması
-3. TrainingView oluşturulması
-4. NutritionView oluşturulması
+### Sonraki Adımlar (Phase 7: Testing Infrastructure)
+1. Custom test framework enhancement
+2. Service tests (80%+ coverage)
+3. Repository tests
+4. View tests
+5. Integration tests
 
 ## Tamamlanan Sürümler
+- ✅ Phase 6: UI Components (14 Şubat 2026) - Views, Components, modular UI layer
 - ✅ Phase 5: Service Layer (14 Şubat 2026) - Validation, Backup, Statistics, ExerciseHistory, Streak services
 - ✅ Phase 4: State Management (14 Şubat 2026) - StateManager, Reducers, Middleware
 - ✅ Phase 3: Storage Abstraction (14 Şubat 2026) - Storage adapters, Repository pattern

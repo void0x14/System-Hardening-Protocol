@@ -700,13 +700,29 @@ src/js/
 │   ├── WorkoutRepository.js # Workout data
 │   ├── MealRepository.js    # Meal data
 │   └── index.js             # Exports
-├── services/                # Business logic layer ✅ NEW
+├── services/                # Business logic layer
 │   ├── ValidationService.js # Data validation
 │   ├── BackupService.js     # Export/import
 │   ├── StatisticsService.js # Metrics/analytics
 │   ├── ExerciseHistoryService.js # History tracking
 │   ├── StreakService.js     # Streak management
 │   └── index.js             # Exports & factories
-├── views/                   # UI components (Phase 6)
+├── views/                   # UI view layer ✅ NEW (Phase 6)
+│   ├── DashboardView.js     # Main dashboard
+│   ├── TrainingView.js      # Training tab
+│   ├── NutritionView.js     # Nutrition tab
+│   ├── ProgressView.js      # Progress tab
+│   ├── AnatomyView.js       # Anatomy lab
+│   ├── MentalView.js        # Mental health tab
+│   └── index.js             # Exports & factories
+├── components/              # Reusable UI components ✅ NEW (Phase 6)
+│   ├── Card.js              # Card container
+│   ├── ProgressBar.js       # Progress indicators
+│   ├── MacroRing.js         # Nutrition rings
+│   ├── Modal.js             # Modal dialogs
+│   ├── Toast.js             # Notifications
+│   ├── MealCard.js          # Meal display
+│   ├── SetRow.js            # Exercise sets
+│   └── index.js             # Exports & factories
 └── actions/                 # Event handlers (Phase 6)
 ```

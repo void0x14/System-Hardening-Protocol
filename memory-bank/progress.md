@@ -1,6 +1,27 @@
 # İlerleme Durumu
 
-## Refactoring Projesi - Phase 5: Service Layer ✅
+## Refactoring Projesi - Phase 6: UI Components ✅
+
+### Tamamlanan Görevler (14 Şubat 2026)
+- ✅ `src/js/views/` dizini oluşturuldu
+  - DashboardView.js - Main dashboard rendering with system status, streak, heatmap
+  - TrainingView.js - Training tab with exercise list and set tracking
+  - NutritionView.js - Nutrition tab with macro rings and meal management
+  - ProgressView.js - Progress tab with weight history and volume stats
+  - AnatomyView.js - Anatomy lab with interactive muscle diagrams
+  - MentalView.js - Mental health tab with phases and daily practices
+  - index.js - Module exports, createViews factory, createRenderersNamespace
+- ✅ `src/js/components/` dizini oluşturuldu
+  - Card.js - Card container, StatCard, StatMini components
+  - ProgressBar.js - Progress bar, ProgressRow, CircularProgress components
+  - MacroRing.js - SVG-based macro nutrient ring visualization
+  - Modal.js - Modal dialog manager with ESC/backdrop close
+  - Toast.js - Toast notification system with success/error/warning/info
+  - MealCard.js - Meal card with macro breakdown, compact variant
+  - SetRow.js - WeightedSetRow, TimedSetRow, SimpleTaskBtn, AddSetButton
+  - index.js - Module exports, createComponents factory
+
+### Önceki Aşama: Phase 5 - Service Layer ✅
 
 ### Tamamlanan Görevler (14 Şubat 2026)
 - ✅ `src/js/services/` dizini oluşturuldu
@@ -74,14 +95,12 @@
 - ✅ Test reporter implement edildi (`tests/reporter.js`)
 - ✅ Mock storage adapter implement edildi (`tests/mocks/storage.js`)
 
-### Sonraki Adımlar (Phase 6: UI Components)
-- [ ] View Component Architecture oluşturulması
-- [ ] DashboardView oluşturulması
-- [ ] TrainingView oluşturulması
-- [ ] NutritionView oluşturulması
-- [ ] ProgressView oluşturulması
-- [ ] AnatomyView oluşturulması
-- [ ] MentalView oluşturulması
+### Sonraki Adımlar (Phase 7: Testing Infrastructure)
+- [ ] Custom test framework enhancement (async support, hooks)
+- [ ] Service tests (80%+ coverage)
+- [ ] Repository tests
+- [ ] View tests
+- [ ] Integration tests
 
 ---
 
@@ -351,6 +370,22 @@ Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (
 **Output**: Maintainable codebase, same single-file deployment
 
 ## Recent Updates
+- **[2026-02-14]**: Phase 6 - UI Components completed.
+  - Created `src/js/views/` directory with 6 view modules
+  - DashboardView.js: Main dashboard with system status, streak, heatmap
+  - TrainingView.js: Training tab with exercise list and set tracking
+  - NutritionView.js: Nutrition tab with macro rings and meal management
+  - ProgressView.js: Progress tab with weight history and volume stats
+  - AnatomyView.js: Anatomy lab with interactive muscle diagrams
+  - MentalView.js: Mental health tab with phases and daily practices
+  - Created `src/js/components/` directory with 7 component modules
+  - Card.js: Card container, StatCard, StatMini components
+  - ProgressBar.js: Progress bar, ProgressRow, CircularProgress
+  - MacroRing.js: SVG-based macro nutrient ring visualization
+  - Modal.js: Modal dialog manager with ESC/backdrop close
+  - Toast.js: Toast notification system
+  - MealCard.js: Meal card with macro breakdown
+  - SetRow.js: WeightedSetRow, TimedSetRow, SimpleTaskBtn, AddSetButton
 - **[2026-02-14]**: Phase 5 - Service Layer completed.
   - Created `src/js/services/` directory with 5 service modules
   - ValidationService.js: 20+ sanitization methods extracted from store.js
