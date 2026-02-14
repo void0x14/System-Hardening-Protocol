@@ -1,6 +1,6 @@
 # System Hardening Protocol - Implementation Plan
 
-**Document Version:** 1.0  
+**Document Version:** 2.0  
 **Created:** 2026-02-14  
 **Status:** Draft for Review  
 **Target Codebase Version:** 8.3.1 → 9.0.0
@@ -19,7 +19,9 @@ This document provides a highly granular, phased implementation plan for refacto
 | Tight Coupling | High | No dependency injection |
 | Hardcoded Configuration | Medium | Magic strings/numbers throughout |
 | No Testing | Critical | 0% test coverage |
-| Security Gaps | Medium | No storage encryption, no CSP |
+
+**IMPORTANT: Zero Dependencies Requirement**
+This project maintains a strict zero-dependency policy. All solutions must be pure vanilla JavaScript with no external npm packages. Testing will use a custom-built test framework.
 
 ---
 
@@ -124,22 +126,102 @@ graph TD
 
 ## Phase 0: Preparation
 
-**Objective:** Establish tooling, documentation, and analysis infrastructure before any code changes.
+**Objective:** Establish documentation and analysis infrastructure before any code changes.
 
 ### 0.1 Development Environment Setup
 
 | Task | Description | Files Affected |
 |------|-------------|----------------|
-| 0.1.1 | Install Node.js dependencies for testing | `package.json` |
-| 0.1.2 | Configure ESLint with strict rules | `.eslintrc.json` (new) |
-| 0.1.3 | Configure Prettier for code formatting | `.prettierrc` (new) |
-| 0.1.4 | Set up Jest testing framework | `jest.config.js` (new) |
-| 0.1.5 | Configure Vite for ES module builds | `vite.config.js` (new) |
+| 0.1.1 | Verify Node.js version compatibility | `package.json` |
+| 0.1.2 | Create custom test runner framework | `tests/runner.js` (new) |
+| 0.1.3 | Create assertion library | `tests/assert.js` (new) |
+| 0.1.4 | Create test reporter | `tests/reporter.js` (new) |
+
+**Custom Test Framework (Zero Dependencies):**
+```javascript
+// tests/assert.js - Simple assertion library
+export function assertEqual(actual, expected, message = '') {
+    if (actual !== expected) {
+        throw new Error(`Assertion failed: ${message}\n  Expected: ${expected}\n  Actual: ${actual}`);
+    }
+}
+
+export function assertTrue(value, message = '') {
+    if (!value) {
+        throw new Error(`Assertion failed: ${message}\n  Expected truthy value`);
+    }
+}
+
+export function assertDeepEqual(actual, expected, message = '') {
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        throw new Error(`Assertion failed: ${message}\n  Expected: ${JSON.stringify(expected)}\n  Actual: ${JSON.stringify(actual)}`);
+    }
+}
+
+export function assertThrows(fn, message = '') {
+    let threw = false;
+    try {
+        fn();
+    } catch (e) {
+        threw = true;
+    }
+    if (!threw) {
+        throw new Error(`Assertion failed: ${message}\n  Expected function to throw`);
+    }
+}
+```
+
+```javascript
+// tests/runner.js - Custom test runner
+import { readFileSync, readdirSync } from 'fs';
+import { join } from 'path';
+
+class TestRunner {
+    constructor() {
+        this.tests = [];
+        this.results = { passed: 0, failed: 0, errors: [] };
+    }
+    
+    describe(name, fn) {
+        console.log(`\n=== ${name} ===`);
+        try {
+            fn();
+        } catch (e) {
+            console.error(`Suite error: ${e.message}`);
+        }
+    }
+    
+    it(name, fn) {
+        this.tests.push({ name, fn });
+    }
+    
+    async run() {
+        for (const test of this.tests) {
+            try {
+                await test.fn();
+                this.results.passed++;
+                console.log(`  ✓ ${test.name}`);
+            } catch (e) {
+                this.results.failed++;
+                this.results.errors.push({ name: test.name, error: e.message });
+                console.log(`  ✗ ${test.name}\n    ${e.message}`);
+            }
+        }
+        
+        console.log(`\nResults: ${this.results.passed} passed, ${this.results.failed} failed`);
+        return this.results.failed === 0;
+    }
+}
+
+export const runner = new TestRunner();
+export const describe = runner.describe.bind(runner);
+export const it = runner.it.bind(runner);
+```
 
 **Validation Criteria:**
-- [ ] `npm run lint` executes without errors
-- [ ] `npm test` runs Jest successfully
-- [ ] `npm run build` produces output in `dist/`
+- [ ] Custom test runner executes successfully
+- [ ] Assertion library provides core assertions
+- [ ] `npm test` runs custom test framework
 
 ### 0.2 Documentation Infrastructure
 
@@ -159,7 +241,7 @@ graph TD
 
 | Task | Description | Files Affected |
 |------|-------------|----------------|
-| 0.3.1 | Generate cyclomatic complexity report | All `.js` files |
+| 0.3.1 | Generate cyclomatic complexity report (manual) | All `.js` files |
 | 0.3.2 | Identify all global scope declarations | All `.js` files |
 | 0.3.3 | Map all cross-file dependencies | All `.js` files |
 | 0.3.4 | Document all magic numbers/strings | `store.js`, `actions.js` |
@@ -179,6 +261,41 @@ graph TD
 | 0.4.3 | Create mock DOM utilities | `tests/mocks/dom.js` (new) |
 | 0.4.4 | Create test fixtures for sample data | `tests/fixtures/` (new) |
 | 0.4.5 | Write smoke tests for current functionality | `tests/smoke/` (new) |
+
+**Mock Storage Adapter (Zero Dependencies):**
+```javascript
+// tests/mocks/storage.js
+export class MockStorage {
+    constructor() {
+        this.data = new Map();
+    }
+    
+    getItem(key) {
+        return this.data.has(key) ? this.data.get(key) : null;
+    }
+    
+    setItem(key, value) {
+        this.data.set(key, value);
+    }
+    
+    removeItem(key) {
+        this.data.delete(key);
+    }
+    
+    clear() {
+        this.data.clear();
+    }
+    
+    get length() {
+        return this.data.size;
+    }
+    
+    key(index) {
+        const keys = Array.from(this.data.keys());
+        return keys[index] || null;
+    }
+}
+```
 
 **Validation Criteria:**
 - [ ] Test infrastructure operational
@@ -224,29 +341,59 @@ graph TD
 | 1.2.5 | Add singleton lifecycle management | `src/js/core/Container.js` |
 | 1.2.6 | Write unit tests for Container | `tests/core/Container.test.js` (new) |
 
-**Container Implementation:**
+**Container Implementation (Pure Vanilla JS):**
 ```javascript
 // src/js/core/Container.js
+/**
+ * Simple Dependency Injection Container
+ * Zero external dependencies
+ */
 export class Container {
     constructor() {
         this.services = new Map();
         this.factories = new Map();
     }
     
+    /**
+     * Register a service factory
+     * @param {string} name - Service name
+     * @param {Function} factory - Factory function that receives container
+     */
     register(name, factory) {
         this.factories.set(name, factory);
     }
     
+    /**
+     * Get a service instance (singleton)
+     * @param {string} name - Service name
+     * @returns {*} Service instance
+     */
     get(name) {
         if (!this.services.has(name)) {
             const factory = this.factories.get(name);
+            if (!factory) {
+                throw new Error(`Service not found: ${name}`);
+            }
             this.services.set(name, factory(this));
         }
         return this.services.get(name);
     }
     
+    /**
+     * Check if service is registered
+     * @param {string} name - Service name
+     * @returns {boolean}
+     */
     has(name) {
         return this.factories.has(name);
+    }
+    
+    /**
+     * Clear all registered services (for testing)
+     */
+    clear() {
+        this.services.clear();
+        this.factories.clear();
     }
 }
 ```
@@ -265,6 +412,69 @@ export class Container {
 | 1.3.3 | Implement event dispatch | `src/js/core/EventBus.js` |
 | 1.3.4 | Implement event subscription/unsubscription | `src/js/core/EventBus.js` |
 | 1.3.5 | Write unit tests for EventBus | `tests/core/EventBus.test.js` (new) |
+
+**EventBus Implementation (Pure Vanilla JS):**
+```javascript
+// src/js/core/EventBus.js
+/**
+ * Simple Event Bus for decoupled communication
+ * Zero external dependencies
+ */
+export class EventBus {
+    constructor() {
+        this.listeners = new Map();
+    }
+    
+    /**
+     * Subscribe to an event
+     * @param {string} event - Event name
+     * @param {Function} callback - Event handler
+     * @returns {Function} Unsubscribe function
+     */
+    on(event, callback) {
+        if (!this.listeners.has(event)) {
+            this.listeners.set(event, new Set());
+        }
+        this.listeners.get(event).add(callback);
+        return () => this.off(event, callback);
+    }
+    
+    /**
+     * Unsubscribe from an event
+     * @param {string} event - Event name
+     * @param {Function} callback - Event handler
+     */
+    off(event, callback) {
+        if (this.listeners.has(event)) {
+            this.listeners.get(event).delete(callback);
+        }
+    }
+    
+    /**
+     * Emit an event
+     * @param {string} event - Event name
+     * @param {*} data - Event data
+     */
+    emit(event, data) {
+        if (this.listeners.has(event)) {
+            this.listeners.get(event).forEach(callback => {
+                try {
+                    callback(data);
+                } catch (e) {
+                    console.error(`Event handler error for ${event}:`, e);
+                }
+            });
+        }
+    }
+    
+    /**
+     * Clear all listeners (for testing)
+     */
+    clear() {
+        this.listeners.clear();
+    }
+}
+```
 
 **Validation Criteria:**
 - [ ] EventBus class implemented
@@ -413,7 +623,7 @@ export const VALIDATION_LIMITS = {
 | 3.1.4 | Implement `WindowStorageAdapter` | `src/js/services/StorageAdapter.js` |
 | 3.1.5 | Write unit tests for adapters | `tests/services/StorageAdapter.test.js` (new) |
 
-**Storage Adapter Interface:**
+**Storage Adapter Interface (Pure Vanilla JS):**
 ```javascript
 // src/js/services/StorageAdapter.js
 /**
@@ -424,6 +634,10 @@ export const VALIDATION_LIMITS = {
  * @property {function(): Promise<string[]>} keys - Get all keys
  */
 
+/**
+ * LocalStorage Adapter
+ * Zero external dependencies
+ */
 export class LocalStorageAdapter {
     async get(key) {
         const value = localStorage.getItem(key);
@@ -462,11 +676,16 @@ export class LocalStorageAdapter {
 | 3.2.5 | Create `StatsRepository.js` | `src/js/services/repositories/StatsRepository.js` (new) |
 | 3.2.6 | Create `index.js` for exports | `src/js/services/repositories/index.js` (new) |
 
-**MealRepository Example:**
+**MealRepository Example (Pure Vanilla JS):**
 ```javascript
 // src/js/services/repositories/MealRepository.js
 import { STORAGE_KEYS } from '../../config/keys.js';
 
+/**
+ * Meal Repository
+ * Handles meal data persistence
+ * Zero external dependencies
+ */
 export class MealRepository {
     constructor(storageAdapter, dateUtils) {
         this.storage = storageAdapter;
@@ -533,9 +752,13 @@ export class MealRepository {
 | 4.1.4 | Implement state selectors | `src/js/services/StateManager.js` |
 | 4.1.5 | Write unit tests | `tests/services/StateManager.test.js` (new) |
 
-**StateManager Implementation:**
+**StateManager Implementation (Pure Vanilla JS):**
 ```javascript
 // src/js/services/StateManager.js
+/**
+ * Simple State Manager
+ * Zero external dependencies
+ */
 export class StateManager {
     constructor(initialState = {}) {
         this.state = initialState;
@@ -724,9 +947,13 @@ state: {
 | 6.1.3 | Create base View class | `src/js/views/View.js` (new) |
 | 6.1.4 | Define View interface | `src/js/views/View.js` |
 
-**Base View Class:**
+**Base View Class (Pure Vanilla JS):**
 ```javascript
 // src/js/views/View.js
+/**
+ * Base View Class
+ * Zero external dependencies
+ */
 export class View {
     constructor(store, components, eventBus) {
         this.store = store;
@@ -857,19 +1084,82 @@ export class View {
 
 ## Phase 7: Testing Infrastructure
 
-**Objective:** Achieve 80% test coverage across all modules.
+**Objective:** Achieve 80% test coverage across all modules using custom test framework.
 
-### 7.1 Unit Test Setup
+### 7.1 Custom Test Framework Enhancement
 
 | Task | Description | Files Affected |
 |------|-------------|----------------|
-| 7.1.1 | Configure Jest for ES modules | `jest.config.js` |
-| 7.1.2 | Create test utilities | `tests/utils/` (new) |
-| 7.1.3 | Create mock factories | `tests/factories/` (new) |
-| 7.1.4 | Create test fixtures | `tests/fixtures/` (new) |
+| 7.1.1 | Enhance test runner with async support | `tests/runner.js` |
+| 7.1.2 | Add beforeEach/afterEach hooks | `tests/runner.js` |
+| 7.1.3 | Create test utilities | `tests/utils/` (new) |
+| 7.1.4 | Create mock factories | `tests/factories/` (new) |
+| 7.1.5 | Create test fixtures | `tests/fixtures/` (new) |
+
+**Enhanced Test Runner (Pure Vanilla JS):**
+```javascript
+// tests/runner.js - Enhanced with hooks
+class TestRunner {
+    constructor() {
+        this.tests = [];
+        this.results = { passed: 0, failed: 0, errors: [] };
+        this.beforeEachFns = [];
+        this.afterEachFns = [];
+    }
+    
+    beforeEach(fn) {
+        this.beforeEachFns.push(fn);
+    }
+    
+    afterEach(fn) {
+        this.afterEachFns.push(fn);
+    }
+    
+    describe(name, fn) {
+        console.log(`\n=== ${name} ===`);
+        try {
+            fn();
+        } catch (e) {
+            console.error(`Suite error: ${e.message}`);
+        }
+    }
+    
+    it(name, fn) {
+        this.tests.push({ name, fn });
+    }
+    
+    async run() {
+        for (const test of this.tests) {
+            try {
+                // Run beforeEach hooks
+                for (const hook of this.beforeEachFns) {
+                    await hook();
+                }
+                
+                await test.fn();
+                this.results.passed++;
+                console.log(`  ✓ ${test.name}`);
+                
+                // Run afterEach hooks
+                for (const hook of this.afterEachFns) {
+                    await hook();
+                }
+            } catch (e) {
+                this.results.failed++;
+                this.results.errors.push({ name: test.name, error: e.message });
+                console.log(`  ✗ ${test.name}\n    ${e.message}`);
+            }
+        }
+        
+        console.log(`\nResults: ${this.results.passed} passed, ${this.results.failed} failed`);
+        return this.results.failed === 0;
+    }
+}
+```
 
 **Validation Criteria:**
-- [ ] Jest configured for ES modules
+- [ ] Test runner supports async tests
+- [ ] Hooks implemented
 - [ ] Test utilities created
 
 ### 7.2 Service Tests
@@ -930,143 +1220,116 @@ export class View {
 
 ---
 
-## Phase 8: Security Hardening
+## Phase 8: Performance Optimization
 
-**Objective:** Address security vulnerabilities and implement best practices.
+**Objective:** Optimize performance for better user experience.
 
-### 8.1 Content Security Policy
-
-| Task | Description | Files Affected |
-|------|-------------|----------------|
-| 8.1.1 | Add CSP meta tag to template | `src/template.html` |
-| 8.1.2 | Configure script-src | `src/template.html` |
-| 8.1.3 | Configure style-src | `src/template.html` |
-| 8.1.4 | Configure frame-src for YouTube | `src/template.html` |
-| 8.1.5 | Test CSP doesn't break functionality | All files |
-
-**CSP Implementation:**
-```html
-<meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; 
-               script-src 'self' 'unsafe-inline'; 
-               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-               font-src https://fonts.gstatic.com;
-               frame-src https://www.youtube-nocookie.com;
-               img-src 'self' https://i.ytimg.com data:;">
-```
-
-**Validation Criteria:**
-- [ ] CSP implemented
-- [ ] No console violations
-- [ ] All functionality working
-
-### 8.2 Input Validation Enhancement
+### 8.1 Caching Layer
 
 | Task | Description | Files Affected |
 |------|-------------|----------------|
-| 8.2.1 | Audit all user inputs | All `.js` files |
-| 8.2.2 | Add length validation to all text inputs | `ValidationService.js` |
-| 8.2.3 | Add type validation to all numeric inputs | `ValidationService.js` |
-| 8.2.4 | Add XSS prevention to all rendered content | `Utils.js` |
-| 8.2.5 | Add CSRF tokens for storage operations | New middleware |
+| 8.1.1 | Create `CacheService.js` | `src/js/services/CacheService.js` (new) |
+| 8.1.2 | Implement in-memory cache | `src/js/services/CacheService.js` |
+| 8.1.3 | Add cache invalidation | `src/js/services/CacheService.js` |
+| 8.1.4 | Apply to statistics calculations | `StatisticsService.js` |
+| 8.1.5 | Apply to exercise history | `ExerciseHistoryService.js` |
 
-**Validation Criteria:**
-- [ ] All inputs validated
-- [ ] XSS tests passing
-- [ ] No injection vulnerabilities
-
-### 8.3 Storage Encryption
-
-| Task | Description | Files Affected |
-|------|-------------|----------------|
-| 8.3.1 | Create `EncryptedStorageAdapter.js` | `src/js/services/EncryptedStorageAdapter.js` (new) |
-| 8.3.2 | Implement encryption/decryption | `src/js/services/EncryptedStorageAdapter.js` |
-| 8.3.3 | Add key derivation function | `src/js/services/EncryptedStorageAdapter.js` |
-| 8.3.4 | Update sensitive data storage | `src/js/store.js` |
-| 8.3.5 | Write security tests | `tests/security/` (new) |
-
-**Validation Criteria:**
-- [ ] Encryption implemented
-- [ ] Sensitive data encrypted at rest
-- [ ] Decryption working correctly
-
-### 8.4 Rate Limiting
-
-| Task | Description | Files Affected |
-|------|-------------|----------------|
-| 8.4.1 | Create `RateLimiter.js` | `src/js/core/RateLimiter.js` (new) |
-| 8.4.2 | Implement sliding window algorithm | `src/js/core/RateLimiter.js` |
-| 8.4.3 | Apply to storage operations | `src/js/services/` |
-| 8.4.4 | Apply to action handlers | `src/js/actions/` |
-| 8.4.5 | Write unit tests | `tests/core/RateLimiter.test.js` (new) |
-
-**RateLimiter Implementation:**
+**CacheService Implementation (Pure Vanilla JS):**
 ```javascript
-// src/js/core/RateLimiter.js
-export class RateLimiter {
-    constructor(maxActions, windowMs) {
-        this.maxActions = maxActions;
-        this.windowMs = windowMs;
-        this.actions = [];
+// src/js/services/CacheService.js
+/**
+ * Simple In-Memory Cache Service
+ * Zero external dependencies
+ */
+export class CacheService {
+    constructor(defaultTTL = 60000) {
+        this.cache = new Map();
+        this.defaultTTL = defaultTTL;
     }
     
-    canProceed() {
-        const now = Date.now();
-        this.actions = this.actions.filter(t => t > now - this.windowMs);
-        if (this.actions.length >= this.maxActions) return false;
-        this.actions.push(now);
+    get(key) {
+        const item = this.cache.get(key);
+        if (!item) return null;
+        if (Date.now() > item.expiry) {
+            this.cache.delete(key);
+            return null;
+        }
+        return item.value;
+    }
+    
+    set(key, value, ttl = this.defaultTTL) {
+        this.cache.set(key, {
+            value,
+            expiry: Date.now() + ttl
+        });
+    }
+    
+    delete(key) {
+        this.cache.delete(key);
+    }
+    
+    clear() {
+        this.cache.clear();
+    }
+    
+    has(key) {
+        const item = this.cache.get(key);
+        if (!item) return false;
+        if (Date.now() > item.expiry) {
+            this.cache.delete(key);
+            return false;
+        }
         return true;
     }
 }
 ```
 
 **Validation Criteria:**
-- [ ] Rate limiting implemented
-- [ ] Brute force protection working
-- [ ] Unit tests passing
-
----
-
-## Phase 9: Performance Optimization
-
-**Objective:** Optimize performance for better user experience.
-
-### 9.1 Caching Layer
-
-| Task | Description | Files Affected |
-|------|-------------|----------------|
-| 9.1.1 | Create `CacheService.js` | `src/js/services/CacheService.js` (new) |
-| 9.1.2 | Implement in-memory cache | `src/js/services/CacheService.js` |
-| 9.1.3 | Add cache invalidation | `src/js/services/CacheService.js` |
-| 9.1.4 | Apply to statistics calculations | `StatisticsService.js` |
-| 9.1.5 | Apply to exercise history | `ExerciseHistoryService.js` |
-
-**Validation Criteria:**
 - [ ] Cache implemented
 - [ ] Cache hit/miss metrics
 - [ ] Performance improvement measured
 
-### 9.2 Memoization
+### 8.2 Memoization
 
 | Task | Description | Files Affected |
 |------|-------------|----------------|
-| 9.2.1 | Create `memoize.js` utility | `src/js/utils/memoize.js` (new) |
-| 9.2.2 | Apply to expensive calculations | `StatisticsService.js` |
-| 9.2.3 | Apply to view rendering | `src/js/views/` |
-| 9.2.4 | Add cache key generation | `src/js/utils/memoize.js` |
+| 8.2.1 | Create `memoize.js` utility | `src/js/utils/memoize.js` (new) |
+| 8.2.2 | Apply to expensive calculations | `StatisticsService.js` |
+| 8.2.3 | Apply to view rendering | `src/js/views/` |
+| 8.2.4 | Add cache key generation | `src/js/utils/memoize.js` |
 
-**Memoize Implementation:**
+**Memoize Implementation (Pure Vanilla JS):**
 ```javascript
 // src/js/utils/memoize.js
+/**
+ * Simple Memoization Utility
+ * Zero external dependencies
+ */
 export function memoize(fn, keyGenerator) {
     const cache = new Map();
-    return (...args) => {
-        const key = keyGenerator ? keyGenerator(...args) : JSON.stringify(args);
-        if (cache.has(key)) return cache.get(key);
-        const result = fn(...args);
+    
+    return function memoized(...args) {
+        const key = keyGenerator 
+            ? keyGenerator(...args) 
+            : JSON.stringify(args);
+        
+        if (cache.has(key)) {
+            return cache.get(key);
+        }
+        
+        const result = fn.apply(this, args);
         cache.set(key, result);
         return result;
     };
+}
+
+/**
+ * Clear memoize cache (for testing)
+ */
+export function clearMemoizeCache(fn) {
+    if (fn.cache) {
+        fn.cache.clear();
+    }
 }
 ```
 
@@ -1074,42 +1337,139 @@ export function memoize(fn, keyGenerator) {
 - [ ] Memoization implemented
 - [ ] Performance improvement measured
 
-### 9.3 Lazy Loading
+### 8.3 Lazy Loading
 
 | Task | Description | Files Affected |
 |------|-------------|----------------|
-| 9.3.1 | Implement dynamic imports for views | `src/js/views/` |
-| 9.3.2 | Lazy load MentalView | `src/js/views/MentalView.js` |
-| 9.3.3 | Lazy load AnatomyView | `src/js/views/AnatomyView.js` |
-| 9.3.4 | Add loading states | `src/js/ui.js` |
+| 8.3.1 | Implement dynamic imports for views | `src/js/views/` |
+| 8.3.2 | Lazy load MentalView | `src/js/views/MentalView.js` |
+| 8.3.3 | Lazy load AnatomyView | `src/js/views/AnatomyView.js` |
+| 8.3.4 | Add loading states | `src/js/ui.js` |
 
 **Validation Criteria:**
 - [ ] Views lazy loaded
 - [ ] Initial bundle size reduced
 - [ ] Loading states working
 
-### 9.4 Virtual Scrolling
+### 8.4 Virtual Scrolling
 
 | Task | Description | Files Affected |
 |------|-------------|----------------|
-| 9.4.1 | Create `VirtualList.js` component | `src/js/views/components/VirtualList.js` (new) |
-| 9.4.2 | Apply to exercise history list | `ProgressView.js` |
-| 9.4.3 | Apply to meal log list | `NutritionView.js` |
-| 9.4.4 | Write performance tests | `tests/performance/` (new) |
+| 8.4.1 | Create `VirtualList.js` component | `src/js/views/components/VirtualList.js` (new) |
+| 8.4.2 | Apply to exercise history list | `ProgressView.js` |
+| 8.4.3 | Apply to meal log list | `NutritionView.js` |
+| 8.4.4 | Write performance tests | `tests/performance/` (new) |
+
+**VirtualList Implementation (Pure Vanilla JS):**
+```javascript
+// src/js/views/components/VirtualList.js
+/**
+ * Virtual List Component for efficient rendering of large lists
+ * Zero external dependencies
+ */
+export class VirtualList {
+    constructor(options = {}) {
+        this.itemHeight = options.itemHeight || 40;
+        this.containerHeight = options.containerHeight || 400;
+        this.buffer = options.buffer || 5;
+        this.items = [];
+        this.container = null;
+        this.scrollTop = 0;
+    }
+    
+    setItems(items) {
+        this.items = items;
+        this.render();
+    }
+    
+    attach(container) {
+        this.container = container;
+        this.container.style.height = `${this.containerHeight}px`;
+        this.container.style.overflowY = 'auto';
+        this.container.addEventListener('scroll', this.onScroll.bind(this));
+    }
+    
+    onScroll() {
+        this.scrollTop = this.container.scrollTop;
+        this.render();
+    }
+    
+    getVisibleRange() {
+        const start = Math.floor(this.scrollTop / this.itemHeight);
+        const visibleCount = Math.ceil(this.containerHeight / this.itemHeight);
+        return {
+            start: Math.max(0, start - this.buffer),
+            end: Math.min(this.items.length, start + visibleCount + this.buffer)
+        };
+    }
+    
+    render() {
+        if (!this.container) return;
+        
+        const { start, end } = this.getVisibleRange();
+        const visibleItems = this.items.slice(start, end);
+        
+        // Create spacer elements
+        const topSpacer = start * this.itemHeight;
+        const bottomSpacer = (this.items.length - end) * this.itemHeight;
+        
+        this.container.innerHTML = `
+            <div style="height: ${topSpacer}px;"></div>
+            ${visibleItems.map((item, i) => 
+                `<div style="height: ${this.itemHeight}px;" data-index="${start + i}">
+                    ${this.renderItem(item, start + i)}
+                </div>`
+            ).join('')}
+            <div style="height: ${bottomSpacer}px;"></div>
+        `;
+    }
+    
+    renderItem(item, index) {
+        // Override in subclass
+        return item;
+    }
+}
+```
 
 **Validation Criteria:**
 - [ ] Virtual scrolling implemented
 - [ ] Long lists render efficiently
 - [ ] Memory usage optimized
 
-### 9.5 Service Worker
+### 8.5 Service Worker
 
 | Task | Description | Files Affected |
 |------|-------------|----------------|
-| 9.5.1 | Create `service-worker.js` | `public/service-worker.js` (new) |
-| 9.5.2 | Implement cache strategies | `public/service-worker.js` |
-| 9.5.3 | Register service worker | `src/js/app.js` |
-| 9.5.4 | Add offline support | `public/service-worker.js` |
+| 8.5.1 | Create `service-worker.js` | `public/service-worker.js` (new) |
+| 8.5.2 | Implement cache strategies | `public/service-worker.js` |
+| 8.5.3 | Register service worker | `src/js/app.js` |
+| 8.5.4 | Add offline support | `public/service-worker.js` |
+
+**Service Worker Implementation (Pure Vanilla JS):**
+```javascript
+// public/service-worker.js
+const CACHE_NAME = 'system-hardening-v1';
+const ASSETS_TO_CACHE = [
+    '/',
+    '/index.html',
+    '/styles.css',
+    '/app.js'
+];
+
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(ASSETS_TO_CACHE))
+    );
+});
+
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => response || fetch(event.request))
+    );
+});
+```
 
 **Validation Criteria:**
 - [ ] Service worker registered
@@ -1125,8 +1485,7 @@ src/
 ├── index.js                    # Application entry point
 ├── core/
 │   ├── Container.js            # DI Container
-│   ├── EventBus.js             # Event delegation
-│   └── RateLimiter.js          # Action rate limiting
+│   └── EventBus.js             # Event delegation
 ├── config/
 │   ├── index.js
 │   ├── keys.js
@@ -1140,7 +1499,6 @@ src/
 │   ├── StatisticsService.js
 │   ├── ExerciseHistoryService.js
 │   ├── CacheService.js
-│   ├── EncryptedStorageAdapter.js
 │   ├── StorageAdapter.js
 │   └── repositories/
 │       ├── MealRepository.js
@@ -1189,6 +1547,20 @@ src/
     ├── base.css
     ├── components.css
     └── overrides.css
+
+tests/
+├── runner.js                   # Custom test runner
+├── assert.js                   # Assertion library
+├── reporter.js                 # Test reporter
+├── mocks/
+│   ├── storage.js
+│   └── dom.js
+├── fixtures/
+├── core/
+├── services/
+├── repositories/
+├── views/
+└── integration/
 ```
 
 ---
@@ -1196,7 +1568,7 @@ src/
 ## Migration Checklist Summary
 
 ### Phase 0: Preparation
-- [ ] Development environment configured
+- [ ] Custom test framework created
 - [ ] Documentation infrastructure created
 - [ ] Code analysis complete
 - [ ] Test infrastructure operational
@@ -1234,17 +1606,12 @@ src/
 - [ ] Shared components extracted
 
 ### Phase 7: Testing
+- [ ] Custom test framework enhanced
 - [ ] Unit tests written (80%+ coverage)
 - [ ] Integration tests written
 - [ ] All tests passing
 
-### Phase 8: Security
-- [ ] CSP implemented
-- [ ] Input validation enhanced
-- [ ] Storage encryption implemented
-- [ ] Rate limiting implemented
-
-### Phase 9: Performance
+### Phase 8: Performance
 - [ ] Caching layer implemented
 - [ ] Memoization applied
 - [ ] Lazy loading implemented
@@ -1260,8 +1627,32 @@ src/
 | Breaking existing functionality | High | Critical | Comprehensive test suite before refactoring |
 | Scope creep | Medium | High | Strict phase boundaries |
 | Performance regression | Low | Medium | Benchmark before/after each phase |
-| Dependency conflicts | Low | Low | Use Vite's native ES module support |
 | Data migration issues | Medium | High | Backward compatibility layer |
+
+---
+
+## Zero Dependencies Guarantee
+
+This implementation plan maintains a strict zero-dependency policy:
+
+| Component | Solution | External Dependencies |
+|-----------|----------|----------------------|
+| Testing | Custom test runner + assertion library | None |
+| Build | Existing `build.js` | None |
+| DI Container | Custom vanilla JS implementation | None |
+| Event Bus | Custom vanilla JS implementation | None |
+| State Management | Custom vanilla JS implementation | None |
+| Caching | Custom vanilla JS implementation | None |
+| Virtual Scrolling | Custom vanilla JS implementation | None |
+| Service Worker | Native browser API | None |
+
+**package.json dependencies will remain:**
+```json
+{
+    "dependencies": {},
+    "devDependencies": {}
+}
+```
 
 ---
 
