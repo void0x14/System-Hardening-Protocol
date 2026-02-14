@@ -19,23 +19,52 @@
 - **Çıktı**: `dist/index.html` (~208 KB)
 - **Bağımlılık**: Sadece Node.js runtime (harici npm paketi yok)
 
-## Test Altyapısı (Phase 0)
+## Test Altyapısı (Phase 0-7)
 
 ### Test Framework
 - **Yaklaşım**: Custom-built test framework (Zero Dependencies)
 - **Test Runner**: `tests/runner.js` - describe/it pattern
 - **Assertion Library**: `tests/assert.js` - 18 assertion fonksiyonu
 - **Reporter**: `tests/reporter.js` - Console output formatting
+- **Entry Point**: `tests/run-all.js` - Runs all tests with CLI options
 
 ### Test Dizin Yapısı
 ```
 tests/
-├── runner.js      # Custom test runner (describe/it pattern)
-├── assert.js      # Assertion library (assertEqual, assertTrue, etc.)
-├── reporter.js    # Test reporter (console output)
-└── mocks/
-    └── storage.js # Mock localStorage adapter
+├── runner.js           # Custom test runner (describe/it pattern)
+├── assert.js           # Assertion library (18 functions)
+├── reporter.js         # Test reporter (console output)
+├── run-all.js          # Test runner entry point
+├── core/
+│   ├── Container.test.js    # DI Container tests
+│   └── EventBus.test.js     # Event Bus tests
+├── mocks/
+│   └── storage.js      # Mock localStorage adapter
+├── services/
+│   ├── ValidationService.test.js  # Validation tests (60+ cases)
+│   ├── BackupService.test.js      # Backup/restore tests
+│   └── StatisticsService.test.js  # Statistics tests
+├── repositories/
+│   ├── WeightRepository.test.js   # Weight data tests
+│   ├── WorkoutRepository.test.js  # Workout data tests
+│   └── MealRepository.test.js     # Meal data tests
+├── state/
+│   ├── StateManager.test.js       # State management tests
+│   ├── reducers.test.js           # Reducer tests
+│   └── middleware.test.js         # Middleware tests
+├── infrastructure/
+│   ├── LocalStorageAdapter.test.js  # localStorage tests
+│   └── MemoryStorageAdapter.test.js # Memory storage tests
+└── views/              # View tests (placeholder)
 ```
+
+### Test Coverage (Phase 7)
+- **Core Tests**: Container, EventBus (Phase 1)
+- **Service Tests**: ValidationService, BackupService, StatisticsService
+- **Repository Tests**: WeightRepository, WorkoutRepository, MealRepository
+- **State Tests**: StateManager, reducers, middleware
+- **Infrastructure Tests**: LocalStorageAdapter, MemoryStorageAdapter
+- **Total Test Cases**: 200+
 
 ### Assertion Fonksiyonları
 - `assertEqual(actual, expected)` - Strict equality (===)
@@ -62,10 +91,15 @@ tests/
 
 ### Test Komutu
 ```bash
-node tests/runner.js
+node tests/run-all.js
 # veya
 pnpm test
 ```
+
+### CLI Options
+- `--verbose` - Detailed output
+- `--filter=X` - Run only tests matching pattern X
+- `--parallel` - Run tests in parallel
 
 ## Core Modül Yapısı (Phase 1)
 
@@ -135,16 +169,120 @@ src/js/config/
 - **Breakpoints**: SM (640px) to XXL (1536px)
 - **Helper functions**: `getClasses()`, `getButtonVariant()`
 
+## Infrastructure Modül Yapısı (Phase 3)
+
+### Dizin Yapısı
+```
+src/js/infrastructure/
+├── index.js              # Module exports
+├── StorageAdapter.js     # Abstract interface
+├── LocalStorageAdapter.js # Browser localStorage
+└── MemoryStorageAdapter.js # In-memory storage
+```
+
+### Storage Adapters
+- **StorageAdapter**: Abstract base class with interface definition
+- **LocalStorageAdapter**: Browser localStorage implementation with prefix support
+- **MemoryStorageAdapter**: In-memory storage for testing with deep cloning
+
+## Repository Modül Yapısı (Phase 3)
+
+### Dizin Yapısı
+```
+src/js/repositories/
+├── index.js           # Module exports
+├── BaseRepository.js  # Base class with CRUD
+├── WeightRepository.js # Weight data access
+├── WorkoutRepository.js # Workout data access
+└── MealRepository.js  # Meal data access
+```
+
+### Repository Pattern
+- **BaseRepository**: Common CRUD operations, date handling
+- **WeightRepository**: Weight history, current weight, statistics
+- **WorkoutRepository**: Workout logs, exercise history, personal records
+- **MealRepository**: Meal CRUD, daily nutrition, custom foods
+
+## State Modül Yapısı (Phase 4)
+
+### Dizin Yapısı
+```
+src/js/state/
+├── index.js        # Module exports
+├── StateManager.js # Core state container
+├── initialState.js # Default state values
+├── reducers.js     # State transformation functions
+└── middleware.js   # Cross-cutting concerns
+```
+
+### State Management
+- **StateManager**: Redux-inspired state container with dispatch/subscribe
+- **Reducers**: 7 reducers (weight, meal, workout, mental, stats, ui, system)
+- **Middleware**: 10 middleware types (logging, persistence, throttle, debounce, etc.)
+- **Action Types**: 30+ action types
+
+## Service Modül Yapısı (Phase 5)
+
+### Dizin Yapısı
+```
+src/js/services/
+├── index.js                  # Module exports, ServiceContainer
+├── ValidationService.js      # Data validation/sanitization
+├── BackupService.js          # Export/import functionality
+├── StatisticsService.js      # Metrics and analytics
+├── ExerciseHistoryService.js # Exercise history tracking
+└── StreakService.js          # Streak calculation
+```
+
+### Service Layer
+- **ValidationService**: 20+ sanitization methods
+- **BackupService**: Export/import with validation
+- **StatisticsService**: Volume stats, sleep/water tracking, weekly summary
+- **ExerciseHistoryService**: History tracking, PR management
+- **StreakService**: Streak calculation, milestones, risk detection
+
+## Views Modül Yapısı (Phase 6)
+
+### Dizin Yapısı
+```
+src/js/views/
+├── index.js         # Module exports
+├── DashboardView.js # Main dashboard
+├── TrainingView.js  # Training tab
+├── NutritionView.js # Nutrition tab
+├── ProgressView.js  # Progress tab
+├── AnatomyView.js   # Anatomy lab
+└── MentalView.js    # Mental health tab
+```
+
+## Components Modül Yapısı (Phase 6)
+
+### Dizin Yapısı
+```
+src/js/components/
+├── index.js        # Module exports
+├── Card.js         # Card components
+├── ProgressBar.js  # Progress indicators
+├── MacroRing.js    # Nutrition visualization
+├── Modal.js        # Modal dialogs
+├── Toast.js        # Notifications
+├── MealCard.js     # Meal display
+└── SetRow.js       # Exercise sets
+```
+
 ## Modül Yapısı (Dependency Order)
 ```
 Layer 0: core/ (Container, EventBus)
 Layer 1: config/ (keys, validation, targets, theme), db/ (exercises, foods, weekly-plan, mental-phases, anatomy)
-Layer 2: utils.js
-Layer 3: store.js
-Layer 4: ui.js, components.js, video-player.js, stealth.js
-Layer 5: renderers/dashboard.js
-Layer 6: actions.js
-Layer 7: app.js
+Layer 2: infrastructure/ (Storage adapters)
+Layer 3: repositories/ (Weight, Workout, Meal)
+Layer 4: state/ (StateManager, reducers, middleware)
+Layer 5: services/ (Validation, Backup, Statistics, ExerciseHistory, Streak)
+Layer 6: components/ (Card, ProgressBar, MacroRing, Modal, Toast, MealCard, SetRow)
+Layer 7: views/ (Dashboard, Training, Nutrition, Progress, Anatomy, Mental)
+Layer 8: utils.js, store.js, ui.js
+Layer 9: renderers/dashboard.js, actions.js
+Layer 10: app.js
 ```
 
 ## Namespace Modeli
@@ -171,3 +309,4 @@ Layer 7: app.js
 - İnternet kesilse de çalışmalı (localStorage)
 - Build adımı: `pnpm run build`
 - Test framework: Custom-built (Zero Dependencies)
+- Test coverage: 200+ test cases across all modules
