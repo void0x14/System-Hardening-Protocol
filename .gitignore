@@ -1,5 +1,3 @@
-memory-bank/
-
 # Build artifacts
 node_modules/
 *.log
