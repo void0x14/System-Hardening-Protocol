@@ -4,17 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'nonce-systemhardening-v831' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data: https://cdnjs.cloudflare.com; img-src 'self' data: https://img.youtube.com https://i.ytimg.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';">
     <title>SYSTEM HARDENING PROTOCOL | v8.3.1</title>
     <!-- v8.3.1: Nutrition Tab Redesign + Security Fix -->
     <script src="https://cdn.tailwindcss.com"
-        onerror="console.error('Tailwind CDN failed'); document.body.innerHTML='<div style=\'padding:2rem;color:#ff003c;font-family:monospace\'>⚠️ CDN OFFLINE - Internet bağlantısı gerekli</div>';"></script>
+        integrity="sha384-igm5BeiBt36UU4gqwWS7imYmelpTsZlQ45FZf+XBn9MuJbn4nQr7yx1yFydocC/K"
+        crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"
-        onerror="console.error('FontAwesome CDN failed')">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700;800&family=Orbitron:wght@500;700&display=swap"
-        rel="stylesheet">
+        integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0"
+        crossorigin="anonymous">
 
-    <script>
+    <script nonce="systemhardening-v831">
         tailwind.config = {
             theme: {
                 extend: {
@@ -659,11 +660,11 @@
             <div class="flex items-center gap-6">
                 <div id="clock-display" class="hidden md:block font-mono text-text-muted font-bold text-sm">--:--:--
                 </div>
-                <button onclick="Actions.openSettings()" id="btn-settings"
+                <button data-action="openSettings" data-event="click" data-params="[]" data-pass-element="false" data-stop-propagation="false" id="btn-settings"
                     class="bg-gray-800 text-gray-400 px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition">
                     <i class="fas fa-cog"></i>
                 </button>
-                <button onclick="Actions.toggleOverride()" id="btn-override"
+                <button data-action="toggleOverride" data-event="click" data-params="[]" data-pass-element="false" data-stop-propagation="false" id="btn-override"
                     class="bg-neon-red/10 text-neon-red px-4 py-2 rounded-lg hover:bg-neon-red hover:text-white transition text-xs font-bold tracking-widest">
                     <i class="fas fa-power-off mr-2"></i> OVERRIDE
                 </button>
@@ -680,13 +681,12 @@
 
     <!-- MODAL -->
     <div id="universal-modal"
-        class="modal fixed inset-0 z-50 flex items-center justify-center p-6 bg-gunmetal/90 backdrop-blur-md"
-        onclick="if(event.target === this) UI.modal.close()">
+        class="modal fixed inset-0 z-50 flex items-center justify-center p-6 bg-gunmetal/90 backdrop-blur-md">
         <div
             class="modal-content bg-surface-card w-full max-w-2xl rounded-2xl shadow-2xl relative max-h-[85vh] flex flex-col">
             <div class="p-6 border-b border-white/5 flex justify-between items-center">
                 <h3 id="modal-title" class="font-header text-xl font-bold text-neon-green">INFO</h3>
-                <button onclick="UI.modal.close()" class="text-text-muted hover:text-white transition p-2"><i
+                <button data-action="closeModal" data-event="click" data-params="[]" data-pass-element="false" data-stop-propagation="false" class="text-text-muted hover:text-white transition p-2"><i
                         class="fas fa-times text-xl"></i></button>
             </div>
             <div id="modal-body" class="p-8 overflow-y-auto custom-scrollbar"></div>
@@ -701,7 +701,7 @@
             <i class="fas fa-exclamation-triangle text-6xl text-neon-red mb-6"></i>
             <h2 class="text-3xl font-header font-bold text-white mb-3">SİSTEM UYARISI</h2>
             <p id="alert-message" class="text-gray-300 mb-8 text-base leading-relaxed"></p>
-            <button onclick="UI.alert.close()"
+            <button data-action="closeAlert" data-event="click" data-params="[]" data-pass-element="false" data-stop-propagation="false"
                 class="bg-neon-red text-white font-bold py-4 px-8 rounded-xl hover:bg-white hover:text-neon-red transition w-full text-lg">ANLAŞILDI
                 KOMUTANIM</button>
         </div>
@@ -713,26 +713,29 @@
     <div id="override-panel">
         <div id="override-timer">00:00</div>
         <div id="override-mission">GÖREV: TAMAMLANMAMIŞ İŞLER</div>
-        <button onclick="Actions.exitOverride()"
+        <button data-action="exitOverride" data-event="click" data-params="[]" data-pass-element="false" data-stop-propagation="false"
             class="mt-3 text-xs text-gray-500 hover:text-white border border-gray-700 px-3 py-1 rounded">ÇIKIŞ
             (ESC)</button>
     </div>
 
-    <script>
-        // ============================================
+    <script nonce="systemhardening-v831">
+        (() => {
+            'use strict';
+            // ============================================
 // config.js
 // ============================================
 // config.js - Configuration and Theme Constants
 // Extracted from original index.html lines 631-664
 
 // Global scope assignments
-const CONFIG = window.CONFIG = {
+const CONFIG = {
     VERSION: '8.3.1',
     DEBUG_MODE: false, // Set to true for development debug logs
     KEYS: {
         WEIGHT: 'monk_weight',
         FUEL: 'monk_fuel_date',
         WORKOUT: 'monk_workout_log_',
+        WORKOUT_DATA: 'monk_workout_data_',
         MEAL: 'monk_meal_log_',
         MEASURE: 'monk_body_stats',
         WEIGHT_HISTORY: 'monk_weight_history',
@@ -763,7 +766,7 @@ const CONFIG = window.CONFIG = {
     ]
 };
 
-const THEME = window.THEME = {
+const THEME = {
     card: "bg-surface-card rounded-xl p-6 md:p-8 shadow-2xl transition-all card-hover-lift",
     btn: "bg-surface-raised hover:bg-neon-green hover:text-gunmetal text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2",
     input: "bg-surface-raised border-0 text-white rounded-lg p-3 focus:ring-2 focus:ring-neon-green/30 outline-none w-full transition-all",
@@ -781,7 +784,7 @@ if (CONFIG.DEBUG_MODE) {
 // exercises.js - Exercise Database
 // Extracted from original index.html
 
-const DB = window.DB || {};
+const DB = {};
 
 DB.EXERCISES = {
     "stomach_vacuum": {
@@ -987,11 +990,9 @@ DB.FOODS = [
     { id: 90, cat: "SNACK", name: "Kuru Kayısı", type: "piece", vals: { cal: 25, prot: 0.3, carb: 6, fat: 0 }, unitName: "Adet" }
 ];
 
-window.DB = DB;
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log(`[DB] ${Object.keys(DB.EXERCISES).length} exercises loaded`);
 }
-
 
 
 // ============================================
@@ -1080,7 +1081,7 @@ const MEAL_PLAN_DB = {
 };
 
 // Add to DB namespace (exercises.js already declared DB)
-window.DB.MEAL_PLAN_DB = MEAL_PLAN_DB;
+DB.MEAL_PLAN_DB = MEAL_PLAN_DB;
 
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[DB] Meal plan database loaded');
@@ -1095,7 +1096,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html
 
 // Global scope assignment
-const WEEKLY_PLAN = window.WEEKLY_PLAN = {
+const WEEKLY_PLAN = {
     1: { name: "PAZARTESİ", title: "FULL BODY START", tasks: ["squat", "pushup", "one_arm_row", "plank"] },
     2: { name: "SALI", title: "BESLENME & RECOVERY", tasks: ["eat_bulk", "stretch", "farmers_walk"] },
     3: { name: "ÇARŞAMBA", title: "CORE & KERNEL", tasks: ["lying_leg_raise", "mountain_climber", "stomach_vacuum", "kegel", "bottle_curl"] },
@@ -1118,7 +1119,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html
 
 // Global scope assignment
-const MENTAL_PHASES = window.MENTAL_PHASES = [
+const MENTAL_PHASES = [
     {
         id: 1,
         title: "FAZ 1: JAGUAR TEORİSİ",
@@ -1194,7 +1195,7 @@ const MENTAL_PHASES = window.MENTAL_PHASES = [
 ];
 
 // Add to DB namespace (exercises.js already declared DB)
-window.DB.MENTAL_PHASES = MENTAL_PHASES;
+DB.MENTAL_PHASES = MENTAL_PHASES;
 
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[DB] Mental phases loaded');
@@ -1208,8 +1209,8 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // anatomy.js - Anatomy Database
 // Extracted from original index.html
 
-// Use window.DB directly (exercises.js already declared it)
-window.DB.ANATOMY_DB = {
+// Use DB namespace directly (exercises.js already declared it)
+DB.ANATOMY_DB = {
     "chest": { name: "Pectoralis Major", function: "İtme kuvveti.", system: "Üst Gövde İtiş", action: "Push-up, Floor Press", recovery: "48-72 Saat" },
     "abs": { name: "Rectus Abdominis", function: "Core gücü, cinsel dayanıklılık.", system: "Merkezi Denge", action: "Plank, Leg Raise, Vacuum", recovery: "24-48 Saat" },
     "quads": { name: "Quadriceps", function: "Vücudu taşıma, piston gücü.", system: "Lokomotor", action: "Squat", recovery: "72 Saat" },
@@ -1235,7 +1236,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 1202-1316
 
 // Global scope assignment
-const Utils = window.Utils = {
+const Utils = {
     /**
      * Bugünün tarihini YYYY-MM-DD formatında döndürür.
      * Client Local Time kullanır (kullanıcının timezone'una göre).
@@ -1259,6 +1260,46 @@ const Utils = window.Utils = {
         const div = document.createElement('div');
         div.textContent = String(str);
         return div.innerHTML;
+    },
+
+    /**
+     * YouTube video ID format doğrulaması.
+     * @param {string} value - Kontrol edilecek video ID
+     * @returns {boolean} ID formatı geçerliyse true
+     */
+    isValidYouTubeId: (value) => (
+        typeof value === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(value)
+    ),
+
+    /**
+     * data-params attribute için güvenli JSON string üretir.
+     * @param {Array<any>} params - Action param listesi
+     * @returns {string}
+     */
+    encodeActionParams: (params = []) => {
+        try {
+            return Utils.escapeHtml(JSON.stringify(Array.isArray(params) ? params : []));
+        } catch {
+            return '[]';
+        }
+    },
+
+    /**
+     * Delegated action attribute string üretir.
+     * @param {string} action - Actions üzerindeki method adı
+     * @param {Array<any>} params - Method param listesi
+     * @param {Object} [opts]
+     * @param {('click'|'change'|'input')} [opts.event='click']
+     * @param {boolean} [opts.passElement=false] - true ise element ilk parametre olarak geçirilir
+     * @param {boolean} [opts.stopPropagation=false] - true ise event propagation durdurulur
+     * @returns {string}
+     */
+    actionAttrs: (action, params = [], opts = {}) => {
+        const eventType = opts.event || 'click';
+        const passElement = opts.passElement === true ? 'true' : 'false';
+        const stopPropagation = opts.stopPropagation === true ? 'true' : 'false';
+        const safeAction = typeof action === 'string' ? action : '';
+        return `data-action="${safeAction}" data-event="${eventType}" data-params='${Utils.encodeActionParams(params)}' data-pass-element="${passElement}" data-stop-propagation="${stopPropagation}"`;
     },
 
     /**
@@ -1320,13 +1361,13 @@ const Utils = window.Utils = {
         if (!data || typeof data !== 'object') {
             return { valid: false, data: null, skipped: [], error: 'Geçersiz veri formatı' };
         }
-        const validPrefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
+        const keyRules = Object.values(CONFIG.KEYS);
         const validData = {};
         const skipped = [];
         for (const key in data) {
             if (key === 'meta') {
                 validData[key] = data[key];
-            } else if (validPrefixes.some(p => key.startsWith(p))) {
+            } else if (keyRules.some(rule => rule.endsWith('_') ? key.startsWith(rule) : key === rule)) {
                 if (data[key] !== null && data[key] !== undefined) {
                     validData[key] = data[key];
                 }
@@ -1361,7 +1402,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 1340-1963
 
 // Global scope assignment
-const Store = window.Store = {
+const Store = {
     state: {
         weight: 45.0,
         fuelDate: null,
@@ -1390,12 +1431,12 @@ const Store = window.Store = {
      */
     async init() {
         const w = await Utils.storage.get(CONFIG.KEYS.WEIGHT);
-        if (w) this.state.weight = parseFloat(w);
-        this.state.fuelDate = await Utils.storage.get(CONFIG.KEYS.FUEL);
-        this.state.customFoods = await Utils.storage.get(CONFIG.KEYS.CUSTOM_FOODS) || [];
+        this.state.weight = this._toSafeNumber(w, this.state.weight, 20, 500);
+        this.state.fuelDate = this._sanitizeDateString(await Utils.storage.get(CONFIG.KEYS.FUEL)) || null;
+        this.state.customFoods = this._sanitizeCustomFoods(await Utils.storage.get(CONFIG.KEYS.CUSTOM_FOODS) || []);
 
         const today = Utils.dateStr();
-        const savedPlan = await Utils.storage.get(CONFIG.KEYS.DAILY_PLAN);
+        const savedPlan = this._sanitizeDailyPlanData(await Utils.storage.get(CONFIG.KEYS.DAILY_PLAN));
 
         if (savedPlan && savedPlan.date === today) {
             this.state.dailyPlan = savedPlan.plan;
@@ -1657,10 +1698,361 @@ const Store = window.Store = {
         return true;
     },
 
+    _toSafeNumber(value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return fallback;
+        return Math.min(max, Math.max(min, parsed));
+    },
+
+    _isIsoDateKey(value) {
+        return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+    },
+
+    _sanitizeDateString(value) {
+        if (typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        return this._isIsoDateKey(trimmed) ? trimmed : '';
+    },
+
+    _sanitizeTimestampString(value) {
+        if (typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        return /^[0-9]{4}-[0-9]{2}-[0-9]{2}(?:[T ][0-9:.+\-Z]+)?$/.test(trimmed)
+            ? trimmed.slice(0, 40)
+            : '';
+    },
+
+    _sanitizeWorkoutLog(logData) {
+        if (!Array.isArray(logData)) return [];
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        return logData
+            .filter(id => typeof id === 'string' && (allowedIds.size === 0 || allowedIds.has(id)))
+            .slice(0, 128);
+    },
+
+    _sanitizeWorkoutSetEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+        return {
+            weight: this._toSafeNumber(entry.weight, 0, 0, 1000),
+            reps: this._toSafeNumber(entry.reps, 0, 0, 1000),
+            duration: this._toSafeNumber(entry.duration, 0, 0, 86400),
+            timestamp: this._sanitizeTimestampString(entry.timestamp) || new Date().toISOString(),
+            completed: entry.completed === true
+        };
+    },
+
+    _sanitizeWorkoutDataLog(workoutData) {
+        if (!workoutData || typeof workoutData !== 'object') return {};
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        const out = {};
+
+        for (const [taskId, entries] of Object.entries(workoutData)) {
+            if (allowedIds.size > 0 && !allowedIds.has(taskId)) continue;
+            if (!Array.isArray(entries)) continue;
+
+            const safeEntries = entries
+                .map(entry => this._sanitizeWorkoutSetEntry(entry))
+                .filter(Boolean)
+                .slice(0, 64);
+
+            if (safeEntries.length > 0) {
+                out[taskId] = safeEntries;
+            }
+        }
+
+        return out;
+    },
+
+    _sanitizeWeightHistory(historyData) {
+        if (!historyData || typeof historyData !== 'object') return {};
+        const out = {};
+        for (const [date, value] of Object.entries(historyData)) {
+            if (!this._isIsoDateKey(date)) continue;
+            const safeWeight = this._toSafeNumber(value, NaN, 20, 500);
+            if (Number.isFinite(safeWeight)) out[date] = safeWeight;
+        }
+        return out;
+    },
+
+    _sanitizeStreakData(streakData) {
+        if (!streakData || typeof streakData !== 'object') {
+            return { count: 0, lastDate: null };
+        }
+        const count = Math.trunc(this._toSafeNumber(streakData.count, 0, 0, 10000));
+        const lastDate = this._sanitizeDateString(streakData.lastDate);
+        return { count, lastDate: lastDate || null };
+    },
+
+    _sanitizeDailyPlanMeal(meal) {
+        if (!meal || typeof meal !== 'object') return null;
+        const text = typeof meal.text === 'string' ? meal.text.slice(0, 140) : '';
+        const kcal = this._toSafeNumber(meal.kcal, 0, 0, 5000);
+        if (!text && kcal === 0) return null;
+        return { text, kcal };
+    },
+
+    _sanitizeDailyPlanData(planData) {
+        if (!planData || typeof planData !== 'object') {
+            return { date: Utils.dateStr(), plan: {} };
+        }
+
+        const planSource = (planData.plan && typeof planData.plan === 'object') ? planData.plan : planData;
+        const keys = ['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'];
+        const safePlan = {};
+
+        keys.forEach(key => {
+            const safeMeal = this._sanitizeDailyPlanMeal(planSource[key]);
+            if (safeMeal) safePlan[key] = safeMeal;
+        });
+
+        const safeDate = this._sanitizeDateString(planData.date) || Utils.dateStr();
+        return { date: safeDate, plan: safePlan };
+    },
+
+    _sanitizeCustomFoodOption(option) {
+        if (!option || typeof option !== 'object') return null;
+        const label = typeof option.label === 'string' ? option.label.slice(0, 80) : '';
+        const ratio = this._toSafeNumber(option.ratio, NaN, 0.01, 100);
+        if (!label || !Number.isFinite(ratio)) return null;
+        return { label, ratio };
+    },
+
+    _sanitizeCustomFood(food) {
+        if (!food || typeof food !== 'object') return null;
+
+        const type = food.type === 'portion' ? 'portion' : (food.type === 'piece' ? 'piece' : 'custom');
+        const safeVals = {
+            cal: this._toSafeNumber(food?.vals?.cal, 0, 0, 20000),
+            prot: this._toSafeNumber(food?.vals?.prot, 0, 0, 1000),
+            carb: this._toSafeNumber(food?.vals?.carb, 0, 0, 1000),
+            fat: this._toSafeNumber(food?.vals?.fat, 0, 0, 1000)
+        };
+
+        const safeFood = {
+            id: this._toSafeNumber(food.id, 0, 0, Number.MAX_SAFE_INTEGER),
+            cat: typeof food.cat === 'string' ? food.cat.slice(0, 24) : 'CUSTOM',
+            name: typeof food.name === 'string' ? food.name.slice(0, 120) : '',
+            type,
+            vals: safeVals
+        };
+
+        if (type === 'portion') {
+            safeFood.options = Array.isArray(food.options)
+                ? food.options.map(option => this._sanitizeCustomFoodOption(option)).filter(Boolean).slice(0, 8)
+                : [];
+            if (safeFood.options.length === 0) {
+                safeFood.options = [{ label: '1 Porsiyon', ratio: 1 }];
+            }
+        } else if (type === 'piece') {
+            safeFood.unitName = typeof food.unitName === 'string' ? food.unitName.slice(0, 24) : 'Adet';
+        } else {
+            safeFood.unit = typeof food.unit === 'string' ? food.unit.slice(0, 16) : 'custom';
+        }
+
+        return safeFood.name ? safeFood : null;
+    },
+
+    _sanitizeCustomFoods(customFoods) {
+        if (!Array.isArray(customFoods)) return [];
+        return customFoods
+            .map(food => this._sanitizeCustomFood(food))
+            .filter(Boolean)
+            .slice(-300);
+    },
+
+    _sanitizeExerciseHistoryEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        const safeWeight = this._toSafeNumber(entry.weight, NaN, 0, 1000);
+        const safeReps = this._toSafeNumber(entry.reps, NaN, 0, 1000);
+        const providedVolume = this._toSafeNumber(entry.volume, NaN, 0, 1000000);
+        const computedVolume = (Number.isFinite(safeWeight) && Number.isFinite(safeReps))
+            ? safeWeight * safeReps
+            : NaN;
+        const safeVolume = Number.isFinite(providedVolume) ? providedVolume : computedVolume;
+
+        const out = {};
+        if (Number.isFinite(safeWeight)) out.weight = safeWeight;
+        if (Number.isFinite(safeReps)) out.reps = safeReps;
+        if (Number.isFinite(safeVolume)) out.volume = safeVolume;
+
+        const safeDate = this._sanitizeDateString(entry.date);
+        if (safeDate) out.date = safeDate;
+
+        const safeTimestamp = this._sanitizeTimestampString(entry.timestamp);
+        if (safeTimestamp) out.timestamp = safeTimestamp;
+
+        return Object.keys(out).length > 0 ? out : null;
+    },
+
+    _sanitizeExerciseHistoryData(historyData) {
+        if (!historyData || typeof historyData !== 'object') return {};
+
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        const out = {};
+
+        for (const [exerciseId, entries] of Object.entries(historyData)) {
+            if (allowedIds.size > 0 && !allowedIds.has(exerciseId)) continue;
+            if (!Array.isArray(entries)) continue;
+
+            const safeEntries = entries
+                .map(entry => this._sanitizeExerciseHistoryEntry(entry))
+                .filter(Boolean)
+                .slice(-100);
+
+            if (safeEntries.length > 0) out[exerciseId] = safeEntries;
+        }
+
+        return out;
+    },
+
+    _sanitizeMentalProgressData(mentalData) {
+        if (!mentalData || typeof mentalData !== 'object') {
+            return { completedPhases: [], dailyPractice: {} };
+        }
+
+        const completedPhases = Array.isArray(mentalData.completedPhases)
+            ? Array.from(new Set(
+                mentalData.completedPhases
+                    .map(phase => this._toSafeNumber(phase, NaN, 1, 8))
+                    .filter(Number.isFinite)
+                    .map(phase => Math.trunc(phase))
+            ))
+            : [];
+
+        const dailyPractice = {};
+        if (mentalData.dailyPractice && typeof mentalData.dailyPractice === 'object') {
+            for (const [date, done] of Object.entries(mentalData.dailyPractice)) {
+                if (!this._isIsoDateKey(date)) continue;
+                dailyPractice[date] = done === true;
+            }
+        }
+
+        const out = { completedPhases, dailyPractice };
+        const lastPracticeDate = this._sanitizeDateString(mentalData.lastPracticeDate);
+        if (lastPracticeDate) out.lastPracticeDate = lastPracticeDate;
+        return out;
+    },
+
+    _sanitizeMealEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        return {
+            name: typeof entry.name === 'string' ? entry.name.slice(0, 120) : '',
+            amount: this._toSafeNumber(entry.amount, 0, 0, 10000),
+            unit: typeof entry.unit === 'string' ? entry.unit.slice(0, 32) : 'custom',
+            portionLabel: typeof entry.portionLabel === 'string' ? entry.portionLabel.slice(0, 80) : '',
+            cal: this._toSafeNumber(entry.cal, 0, 0, 20000),
+            prot: this._toSafeNumber(entry.prot, 0, 0, 1000),
+            carb: this._toSafeNumber(entry.carb, 0, 0, 1000),
+            fat: this._toSafeNumber(entry.fat, 0, 0, 1000)
+        };
+    },
+
+    _sanitizeMealLog(logData) {
+        if (!Array.isArray(logData)) return [];
+        return logData
+            .map(entry => this._sanitizeMealEntry(entry))
+            .filter(Boolean);
+    },
+
+    _sanitizeMeasureEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        const chest = this._toSafeNumber(entry.chest, NaN, 0, 300);
+        const arm = this._toSafeNumber(entry.arm, NaN, 0, 300);
+        const waist = this._toSafeNumber(entry.waist, NaN, 0, 300);
+        const leg = this._toSafeNumber(entry.leg, NaN, 0, 300);
+        const out = {};
+
+        if (Number.isFinite(chest)) out.chest = chest;
+        if (Number.isFinite(arm)) out.arm = arm;
+        if (Number.isFinite(waist)) out.waist = waist;
+        if (Number.isFinite(leg)) out.leg = leg;
+        const safeSavedAt = this._sanitizeDateString(entry.savedAt);
+        const safeDate = this._sanitizeDateString(entry.date);
+        if (safeSavedAt) out.savedAt = safeSavedAt;
+        if (safeDate) out.date = safeDate;
+
+        return out;
+    },
+
+    _sanitizeMeasureData(measureData) {
+        if (!measureData || typeof measureData !== 'object') {
+            return { current: {}, history: [] };
+        }
+
+        if (!measureData.current && !measureData.history) {
+            return {
+                current: this._sanitizeMeasureEntry(measureData) || {},
+                history: []
+            };
+        }
+
+        return {
+            current: this._sanitizeMeasureEntry(measureData.current) || {},
+            history: Array.isArray(measureData.history)
+                ? measureData.history
+                    .map(item => this._sanitizeMeasureEntry(item))
+                    .filter(item => item && Object.keys(item).length > 0)
+                    .slice(-30)
+                : []
+        };
+    },
+
+    _sanitizeImportedData(importData) {
+        const safeData = { meta: importData.meta };
+
+        for (const key in importData) {
+            if (key === 'meta') continue;
+
+            if (key.startsWith(CONFIG.KEYS.MEAL)) {
+                safeData[key] = this._sanitizeMealLog(importData[key]);
+            } else if (key === CONFIG.KEYS.MEASURE) {
+                safeData[key] = this._sanitizeMeasureData(importData[key]);
+            } else if (key === CONFIG.KEYS.WEIGHT) {
+                safeData[key] = this._toSafeNumber(importData[key], this.state.weight, 20, 500);
+            } else if (key === CONFIG.KEYS.WEIGHT_HISTORY) {
+                safeData[key] = this._sanitizeWeightHistory(importData[key]);
+            } else if (key === CONFIG.KEYS.CUSTOM_FOODS) {
+                safeData[key] = this._sanitizeCustomFoods(importData[key]);
+            } else if (key === CONFIG.KEYS.DAILY_PLAN) {
+                safeData[key] = this._sanitizeDailyPlanData(importData[key]);
+            } else if (key === CONFIG.KEYS.STREAK) {
+                safeData[key] = this._sanitizeStreakData(importData[key]);
+            } else if (key === CONFIG.KEYS.FUEL) {
+                safeData[key] = this._sanitizeDateString(importData[key]) || null;
+            } else if (key.startsWith(CONFIG.KEYS.WORKOUT)) {
+                safeData[key] = this._sanitizeWorkoutLog(importData[key]);
+            } else if (key.startsWith(CONFIG.KEYS.WORKOUT_DATA)) {
+                safeData[key] = this._sanitizeWorkoutDataLog(importData[key]);
+            } else if (key.startsWith(CONFIG.KEYS.SLEEP)) {
+                safeData[key] = this._toSafeNumber(importData[key], 0, 0, 24);
+            } else if (key.startsWith(CONFIG.KEYS.WATER)) {
+                safeData[key] = this._toSafeNumber(importData[key], 0, 0, 50);
+            } else if (key === CONFIG.KEYS.EXERCISE_HISTORY) {
+                safeData[key] = this._sanitizeExerciseHistoryData(importData[key]);
+            } else if (key === CONFIG.KEYS.MENTAL_PROGRESS) {
+                safeData[key] = this._sanitizeMentalProgressData(importData[key]);
+            } else if (key === CONFIG.KEYS.BACKUP) {
+                safeData[key] = this._sanitizeDateString(importData[key]) || Utils.dateStr();
+            } else {
+                safeData[key] = importData[key];
+            }
+        }
+
+        return safeData;
+    },
+
     async importData(jsonContent) {
         try {
-            const data = JSON.parse(jsonContent);
-            if (!data.meta) throw new Error("Geçersiz yedek dosyası");
+            const parsed = JSON.parse(jsonContent);
+            const validation = Utils.validateImportData(parsed);
+            if (!validation.valid) {
+                throw new Error(validation.error || "Geçersiz yedek dosyası");
+            }
+
+            const data = this._sanitizeImportedData(validation.data);
             const prefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
             const keysToRemove = [];
             for (let i = 0; i < localStorage.length; i++) {
@@ -1737,7 +2129,11 @@ const Store = window.Store = {
 
     async getExerciseHistory(exerciseId) {
         const history = await Utils.storage.get(CONFIG.KEYS.EXERCISE_HISTORY) || {};
-        return history[exerciseId] || [];
+        if (!Array.isArray(history[exerciseId])) return [];
+        return history[exerciseId]
+            .map(record => this._sanitizeExerciseHistoryEntry(record))
+            .filter(Boolean)
+            .slice(-100);
     },
 
     async getPersonalBest(exerciseId) {
@@ -1978,7 +2374,6 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 }
 
 
-
 // ============================================
 // ui.js
 // ============================================
@@ -1986,7 +2381,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 1985-2236
 
 // Global scope assignment
-const UI = window.UI = {
+const UI = {
     activeView: 'front',
 
     async init() {
@@ -2010,7 +2405,7 @@ const UI = window.UI = {
             tabs = tabs.filter(t => t.id !== 'mental');
         }
         document.getElementById('nav-tabs').innerHTML = tabs.map(t =>
-            `<button onclick="Actions.switchTab('${t.id}')" id="btn-${t.id}" class="tab-btn flex-none px-6 py-3 font-bold text-xs md:text-sm whitespace-nowrap text-gray-500 hover:text-white transition-colors border-b-2 border-transparent relative">
+            `<button ${Utils.actionAttrs('switchTab', [t.id])} id="btn-${t.id}" class="tab-btn flex-none px-6 py-3 font-bold text-xs md:text-sm whitespace-nowrap text-gray-500 hover:text-white transition-colors border-b-2 border-transparent relative">
                 <i class="fas ${t.i} mr-2"></i>${t.l}
                 <div id="badge-${t.id}" class="notification-badge hidden"></div>
             </button>`
@@ -2045,12 +2440,24 @@ const UI = window.UI = {
      */
     modal: {
         _escHandler: null,
-        open(t, c) {
+        _openInternal(t, c, allowHtml) {
             document.getElementById('modal-title').innerText = t;
-            document.getElementById('modal-body').innerHTML = c;
+            const body = document.getElementById('modal-body');
+            if (allowHtml) {
+                body.innerHTML = String(c ?? '');
+                UI.bindMediaFallbacks(body);
+            } else {
+                body.textContent = String(c ?? '');
+            }
             document.getElementById('universal-modal').classList.add('active');
             this._escHandler = (e) => { if (e.key === 'Escape') UI.modal.close(); };
             document.addEventListener('keydown', this._escHandler);
+        },
+        open(t, c = '') {
+            this._openInternal(t, c, false);
+        },
+        openHtml(t, c = '') {
+            this._openInternal(t, c, true);
         },
         close() {
             document.getElementById('universal-modal').classList.remove('active');
@@ -2066,7 +2473,11 @@ const UI = window.UI = {
      */
     alert: {
         show(msg) {
-            document.getElementById('alert-message').innerHTML = msg;
+            document.getElementById('alert-message').textContent = String(msg ?? '');
+            document.getElementById('alert-modal').classList.add('active');
+        },
+        showHtml(msg) {
+            document.getElementById('alert-message').innerHTML = String(msg ?? '');
             document.getElementById('alert-modal').classList.add('active');
         },
         close() {
@@ -2148,6 +2559,21 @@ const UI = window.UI = {
         this.renderPortionInputs();
     },
 
+    bindMediaFallbacks(root) {
+        if (!root) return;
+        const images = root.querySelectorAll('img[data-fallback-src]');
+        images.forEach(img => {
+            if (img.dataset.fallbackBound === 'true') return;
+            img.dataset.fallbackBound = 'true';
+            img.addEventListener('error', () => {
+                const fallbackSrc = img.dataset.fallbackSrc;
+                if (!fallbackSrc || img.dataset.fallbackApplied === 'true') return;
+                img.dataset.fallbackApplied = 'true';
+                img.src = fallbackSrc;
+            });
+        });
+    },
+
     /**
      * Epik tam ekran motivasyon overlay'i göster.
      * Sanitize modda overlay gösterilmez.
@@ -2155,13 +2581,19 @@ const UI = window.UI = {
     showEpicOverlay(emoji, text, sub, color = '#00ff41') {
         // Sanitize modda overlay gösterme
         if (typeof Stealth !== 'undefined' && Stealth.active) return;
+        const safeEmoji = Utils.escapeHtml(typeof emoji === 'string' ? emoji.slice(0, 12) : '');
+        const safeText = Utils.escapeHtml(typeof text === 'string' ? text.slice(0, 160) : '');
+        const safeSub = Utils.escapeHtml(typeof sub === 'string' ? sub.slice(0, 220) : '');
+        const safeColor = (typeof color === 'string' && /^#[0-9a-fA-F]{6}$/.test(color.trim()))
+            ? color.trim()
+            : '#00ff41';
         const overlay = document.createElement('div');
         overlay.id = 'epic-overlay-' + Date.now();
         overlay.innerHTML = `
             <div style="
                 position: fixed;
                 inset: 0;
-                background: radial-gradient(ellipse at center, ${color}15 0%, rgba(10,10,15,0.98) 70%);
+                background: radial-gradient(ellipse at center, ${safeColor}15 0%, rgba(10,10,15,0.98) 70%);
                 z-index: 9999;
                 display: flex;
                 flex-direction: column;
@@ -2172,19 +2604,19 @@ const UI = window.UI = {
                 <div style="
                     font-size: 120px;
                     animation: emojiPulse 0.5s ease-out;
-                    text-shadow: 0 0 60px ${color}80;
-                ">${emoji}</div>
+                    text-shadow: 0 0 60px ${safeColor}80;
+                ">${safeEmoji}</div>
                 <div style="
                     font-family: 'Orbitron', sans-serif;
                     font-size: clamp(28px, 8vw, 64px);
                     font-weight: 900;
-                    color: ${color};
+                    color: ${safeColor};
                     text-align: center;
                     margin-top: 20px;
-                    text-shadow: 0 0 30px ${color}80, 0 0 60px ${color}50;
+                    text-shadow: 0 0 30px ${safeColor}80, 0 0 60px ${safeColor}50;
                     animation: textSlideUp 0.4s ease-out 0.1s both;
                     letter-spacing: 4px;
-                ">${text}</div>
+                ">${safeText}</div>
                 <div style="
                     font-size: clamp(14px, 3vw, 20px);
                     color: #6b7280;
@@ -2192,7 +2624,7 @@ const UI = window.UI = {
                     text-align: center;
                     animation: textSlideUp 0.4s ease-out 0.2s both;
                     max-width: 80%;
-                ">${sub}</div>
+                ">${safeSub}</div>
                 <div style="
                     margin-top: 40px;
                     width: 200px;
@@ -2205,7 +2637,7 @@ const UI = window.UI = {
                     <div style="
                         width: 100%;
                         height: 100%;
-                        background: linear-gradient(90deg, ${color}, #00f3ff);
+                        background: linear-gradient(90deg, ${safeColor}, #00f3ff);
                         animation: progressFill 1.5s ease-out forwards;
                         transform-origin: left;
                     "></div>
@@ -2232,7 +2664,6 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 }
 
 
-
 // ============================================
 // components.js
 // ============================================
@@ -2240,7 +2671,13 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 672-872
 
 // Global scope assignment
-const Components = window.Components = {
+const safeNumberInputValue = (value, min = 0, max = 10000) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return '';
+    return String(Math.min(max, Math.max(min, parsed)));
+};
+
+const Components = {
     /**
      * Standard card wrapper with optional accent border
      * @param {string} label - Card header label (emoji + text)
@@ -2321,7 +2758,7 @@ const Components = window.Components = {
                 <div>
                     <div class="text-white font-bold text-sm">${Utils.escapeHtml(meal.name)}</div>
                     <div class="flex gap-2 text-[10px] text-gray-500 mt-0.5">
-                        ${meal.portionLabel ? `<span>${meal.portionLabel}</span>` : ''}
+                        ${meal.portionLabel ? `<span>${Utils.escapeHtml(meal.portionLabel)}</span>` : ''}
                     </div>
                 </div>
             </div>
@@ -2332,7 +2769,7 @@ const Components = window.Components = {
                     <span class="text-yellow-400"><b>${meal.fat || 0}</b>F</span>
                 </div>
                 <span class="text-neon-green font-bold text-sm">${meal.cal} kcal</span>
-                <button onclick="Actions.deleteMeal(${idx})" class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-2" title="Sil">
+                <button ${Utils.actionAttrs('deleteMeal', [idx])} class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-2" title="Sil">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -2391,12 +2828,13 @@ const Components = window.Components = {
     /**
      * Button component
      * @param {string} text - Button text
-     * @param {string} onclick - onclick handler
+     * @param {string} action - Action method name
+     * @param {Array<any>} params - Action params
      * @param {string} [type='primary'] - 'primary', 'secondary', 'danger', 'ghost'
      * @param {string} [icon=''] - FontAwesome icon class
      * @param {string} [extra=''] - Additional classes
      */
-    btn: (text, onclick, type = 'primary', icon = '', extra = '') => {
+    btn: (text, action, params = [], type = 'primary', icon = '', extra = '') => {
         const styles = {
             primary: 'bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black',
             secondary: 'bg-gray-800 hover:bg-gray-700 text-gray-300',
@@ -2405,20 +2843,20 @@ const Components = window.Components = {
             blue: 'bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black'
         };
         const iconHtml = icon ? `<i class="fas ${icon} mr-2"></i>` : '';
-        return `<button onclick="${onclick}" class="${styles[type] || styles.primary} px-4 py-2 rounded-lg font-bold text-sm transition-all ${extra}">${iconHtml}${text}</button>`;
+        return `<button ${Utils.actionAttrs(action, params)} class="${styles[type] || styles.primary} px-4 py-2 rounded-lg font-bold text-sm transition-all ${extra}">${iconHtml}${text}</button>`;
     },
 
     /**
      * Icon button (square)
      */
-    iconBtn: (icon, onclick, type = 'primary', size = 'w-12 h-12') => {
+    iconBtn: (icon, action, params = [], type = 'primary', size = 'w-12 h-12') => {
         const styles = {
             primary: 'bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black',
             secondary: 'bg-gray-800 hover:bg-gray-700 text-gray-400',
             success: 'bg-neon-green text-black',
             danger: 'bg-neon-red/20 hover:bg-neon-red text-neon-red hover:text-white'
         };
-        return `<button onclick="${onclick}" class="${styles[type] || styles.primary} ${size} rounded-xl flex items-center justify-center text-lg transition-all">
+        return `<button ${Utils.actionAttrs(action, params)} class="${styles[type] || styles.primary} ${size} rounded-xl flex items-center justify-center text-lg transition-all">
             <i class="fas ${icon}"></i>
         </button>`;
     },
@@ -2430,7 +2868,7 @@ const Components = window.Components = {
     weightedSetRow: (tid, idx, log, isSetDone, hint = '') => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
             <!-- Set Number Badge (Interactive Delete v8.3.0) -->
-            <button onclick="Actions.removeSet('${tid}', ${idx})" 
+            <button ${Utils.actionAttrs('removeSet', [tid, idx])}
                 class="group flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black hover:bg-red-900/80' : 'bg-gray-700 text-white hover:bg-red-900/80'} font-black text-lg md:text-xl flex items-center justify-center relative transition-all duration-200 hover:border-2 hover:border-red-500/50"
                 title="Set Sil">
                 <span class="group-hover:opacity-20 transition-opacity duration-200">${idx + 1}</span>
@@ -2440,20 +2878,22 @@ const Components = window.Components = {
             <!-- Inputs Row -->
             <div class="flex-1 flex items-center gap-2">
                 <div class="flex-1">
-                    <input type="number" placeholder="KG" value="${log.weight || ''}" id="w-${tid}-${idx}" 
+                    <input type="number" placeholder="KG" value="${safeNumberInputValue(log.weight, 0, 1000)}" id="w-${tid}-${idx}"
+                        ${Utils.actionAttrs('saveSet', [tid, idx, false], { event: 'change' })}
                         class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
-                        onchange="Actions.saveSet('${tid}', ${idx}, false)">
+                        >
                 </div>
                 <span class="text-gray-500 text-xl font-bold">×</span>
                 <div class="flex-1">
-                    <input type="number" placeholder="REP" value="${log.reps || ''}" id="r-${tid}-${idx}" 
+                    <input type="number" placeholder="REP" value="${safeNumberInputValue(log.reps, 0, 500)}" id="r-${tid}-${idx}"
+                        ${Utils.actionAttrs('saveSet', [tid, idx, false], { event: 'change' })}
                         class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all" 
-                        onchange="Actions.saveSet('${tid}', ${idx}, false)">
+                        >
                 </div>
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveSet('${tid}', ${idx}, true)" 
+            <button ${Utils.actionAttrs('saveSet', [tid, idx, true], { passElement: true })}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -2467,7 +2907,7 @@ const Components = window.Components = {
     timedSetRow: (tid, idx, log, isSetDone) => `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
             <!-- Set Number Badge (Interactive Delete v8.3.0) -->
-            <button onclick="Actions.removeSet('${tid}', ${idx})" 
+            <button ${Utils.actionAttrs('removeSet', [tid, idx])}
                 class="group flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black hover:bg-red-900/80' : 'bg-gray-700 text-white hover:bg-red-900/80'} font-black text-lg md:text-xl flex items-center justify-center relative transition-all duration-200 hover:border-2 hover:border-red-500/50"
                 title="Set Sil">
                 <span class="group-hover:opacity-20 transition-opacity duration-200">${idx + 1}</span>
@@ -2476,12 +2916,12 @@ const Components = window.Components = {
             
             <!-- Input -->
             <div class="flex-1">
-                <input type="number" placeholder="SANİYE" value="${log.duration || ''}" id="d-${tid}-${idx}" 
+                <input type="number" placeholder="SANİYE" value="${safeNumberInputValue(log.duration, 0, 7200)}" id="d-${tid}-${idx}" 
                     class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
             </div>
             
             <!-- Save Button -->
-            <button onclick="Actions.saveTimedSet('${tid}', ${idx})" 
+            <button ${Utils.actionAttrs('saveTimedSet', [tid, idx], { passElement: true })}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
                 <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
@@ -2492,7 +2932,7 @@ const Components = window.Components = {
      * Simple task toggle button
      */
     simpleTaskBtn: (tid, isDone) => `
-        <button onclick="Actions.toggleSimpleTask('${tid}')" 
+        <button ${Utils.actionAttrs('toggleSimpleTask', [tid])}
             class="w-full py-4 rounded-xl font-bold text-lg transition-all ${isDone ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green border-2 border-gray-600'}">
             <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
             ${isDone ? 'TAMAMLANDI ✓' : 'TAMAMLA'}
@@ -2518,7 +2958,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 3015-3036
 
 // Global scope assignment
-const VideoPlayer = window.VideoPlayer = {
+const VideoPlayer = {
     openVideo(videoId) {
         console.warn('VideoPlayer.openVideo deprecated. Use Actions.playVideoInline instead.');
     }
@@ -2535,7 +2975,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // stealth.js - Sanitize Mode for Privacy Protection
 // Hides sensitive content while keeping app fully functional
 
-const Stealth = window.Stealth = {
+const Stealth = {
     active: false,
 
     origTitle: null, // Will be set dynamically using CONFIG.VERSION
@@ -2661,12 +3101,25 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 2257-2993
 
 // Using window. for global scope access
-const Renderers = window.Renderers = {
+const toSafeNumber = (value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.min(max, Math.max(min, parsed));
+};
+
+const toSafeText = (value, maxLength = 160) => {
+    if (value === null || value === undefined) return '';
+    return Utils.escapeHtml(String(value).slice(0, maxLength));
+};
+
+const isIsoDateKey = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value);
+
+const Renderers = {
     async dashboard() {
         const today = Utils.dateStr();
 
         // 1. DATA GATHERING
-        const currentWeight = Store.state.weight;
+        const currentWeight = toSafeNumber(Store.state.weight, CONFIG.TARGETS.START, 20, 500);
         const startWeight = CONFIG.TARGETS.START;
         const goalWeight = CONFIG.TARGETS.GOAL;
         const weightProgress = Math.min(100, Math.max(0, ((currentWeight - startWeight) / (goalWeight - startWeight)) * 100));
@@ -2677,6 +3130,10 @@ const Renderers = window.Renderers = {
         const sleepHours = await Store.getSleep(today);
         const water = await Store.getWater(today);
         const fuelDone = Store.state.fuelDate === today;
+
+        const safeStreak = Math.trunc(toSafeNumber(streak, 0, 0, 10000));
+        const safeSleepHours = toSafeNumber(sleepHours, 0, 0, 24);
+        const safeWater = Math.round(toSafeNumber(water, 0, 0, 50));
 
         const dayIdx = new Date().getDay();
         const dailyPlan = WEEKLY_PLAN[dayIdx];
@@ -2690,7 +3147,7 @@ const Renderers = window.Renderers = {
 
         const isTrainingDone = totalTasks > 0 && completedTasks >= totalTasks;
         const isProteinDone = totalProtein >= targetProtein;
-        const isSleepDone = sleepHours >= 7;
+        const isSleepDone = safeSleepHours >= 7;
 
         const heatmapHTML = await this.getHeatmapHTML();
 
@@ -2716,7 +3173,7 @@ const Renderers = window.Renderers = {
                             </div>
                         </div>
 
-                        <button onclick="Actions.openWeightModal()" class="mt-6 z-10 text-[10px] border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-3 py-1 rounded transition-colors uppercase tracking-wider">
+                        <button ${Utils.actionAttrs('openWeightModal')} class="mt-6 z-10 text-[10px] border border-gray-700 hover:border-neon-green text-gray-400 hover:text-white px-3 py-1 rounded transition-colors uppercase tracking-wider">
                             [ UPDATE SENSOR ]
                         </button>
                     </div>
@@ -2726,7 +3183,7 @@ const Renderers = window.Renderers = {
                         <div>
                             <div class="${THEME.label}">UPTIME STREAK</div>
                             <div class="flex items-baseline gap-2 mb-4">
-                                <div class="text-5xl font-header font-black ${streak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${streak}</div>
+                                <div class="text-5xl font-header font-black ${safeStreak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${safeStreak}</div>
                                 <div class="text-xs text-text-muted uppercase tracking-wider">GÜN</div>
                             </div>
                         </div>
@@ -2765,10 +3222,10 @@ const Renderers = window.Renderers = {
                             </div>
 
                             <!-- Sleep -->
-                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'} cursor-pointer hover:bg-surface-hover transition-all" onclick="Actions.openSleepModal()">
+                            <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'} cursor-pointer hover:bg-surface-hover transition-all" ${Utils.actionAttrs('openSleepModal')}>
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="text-xs font-bold text-gray-300">UYKU</span>
-                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${sleepHours} Saat</span>
+                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${safeSleepHours} Saat</span>
                                 </div>
                                 <div class="text-[9px] text-gray-600">Kaydetmek icin tikla</div>
                             </div>
@@ -2786,16 +3243,16 @@ const Renderers = window.Renderers = {
                         </div>
                         <div class="flex items-end justify-between">
                             <div>
-                                <div class="text-4xl font-bold ${water >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">
-                                    ${water} <span class="text-lg text-gray-500">/ ${CONFIG.TARGETS.WATER}</span>
+                                <div class="text-4xl font-bold ${safeWater >= CONFIG.TARGETS.WATER ? 'text-neon-blue' : 'text-white'}">
+                                    ${safeWater} <span class="text-lg text-gray-500">/ ${CONFIG.TARGETS.WATER}</span>
                                 </div>
                                 <div class="w-32 bg-gray-800 h-1 mt-2 rounded-full overflow-hidden">
-                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (water / CONFIG.TARGETS.WATER) * 100)}%"></div>
+                                    <div class="h-full bg-neon-blue transition-all" style="width: ${Math.min(100, (safeWater / CONFIG.TARGETS.WATER) * 100)}%"></div>
                                 </div>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="Actions.addWater(-1)" class="w-10 h-10 rounded border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition flex items-center justify-center font-bold text-lg">-</button>
-                                <button onclick="Actions.addWater(1)" class="w-10 h-10 rounded bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black transition flex items-center justify-center font-bold text-lg">+</button>
+                                <button ${Utils.actionAttrs('addWater', [-1])} class="w-10 h-10 rounded border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white transition flex items-center justify-center font-bold text-lg">-</button>
+                                <button ${Utils.actionAttrs('addWater', [1])} class="w-10 h-10 rounded bg-neon-blue/20 hover:bg-neon-blue text-neon-blue hover:text-black transition flex items-center justify-center font-bold text-lg">+</button>
                             </div>
                         </div>
                     </div>
@@ -2823,7 +3280,7 @@ const Renderers = window.Renderers = {
                                 <div class="text-xl font-bold text-white">GAINER SHAKE</div>
                                 <div class="text-[10px] text-gray-500 mt-1">Süt + Yulaf + Fıstık + Muz</div>
                             </div>
-                            <button onclick="Actions.injectFuel()" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all tracking-wider ${fuelDone ? 'bg-neon-green text-black' : 'bg-neon-red text-white hover:bg-red-600'}">
+                            <button ${Utils.actionAttrs('injectFuel')} class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all tracking-wider ${fuelDone ? 'bg-neon-green text-black' : 'bg-neon-red text-white hover:bg-red-600'}">
                                 ${fuelDone ? 'INJECTED' : 'INJECT NOW'}
                             </button>
                         </div>
@@ -2832,7 +3289,7 @@ const Renderers = window.Renderers = {
 
                 <!-- BOTTOM: SYSTEM CHECK -->
                 <div class="grid grid-cols-1">
-                    <button onclick="Actions.completeDailyMission()" class="${THEME.card} group hover:border-neon-green/50 flex items-center justify-center p-4 cursor-pointer transition-all hover:bg-neon-green/5">
+                    <button ${Utils.actionAttrs('completeDailyMission')} class="${THEME.card} group hover:border-neon-green/50 flex items-center justify-center p-4 cursor-pointer transition-all hover:bg-neon-green/5">
                         <i class="fas fa-check-circle text-2xl text-gray-600 group-hover:text-neon-green transition-colors mr-4"></i>
                         <div class="text-center">
                             <div class="text-white font-bold text-sm tracking-widest">SYSTEM CHECK: COMPLETE DAY</div>
@@ -2891,7 +3348,7 @@ const Renderers = window.Renderers = {
                 <div><h2 class="text-3xl font-header font-bold text-white">${plan.name}</h2><div class="text-neon-green tracking-widest text-xs mt-1">${plan.title}</div></div>
                 <div class="text-xl font-mono text-white">0${day}</div>
             </div>
-            <button onclick="Actions.openWarmup()" class="${btnClass}"><i class="fas fa-fire animate-pulse"></i> SYSTEM BOOT (ISINMA)</button>
+            <button ${Utils.actionAttrs('openWarmup')} class="${btnClass}"><i class="fas fa-fire animate-pulse"></i> SYSTEM BOOT (ISINMA)</button>
             <div class="space-y-4">
                 ${plan.tasks.map(tid => {
             const ex = DB.EXERCISES[tid];
@@ -2917,7 +3374,7 @@ const Renderers = window.Renderers = {
                     setsHtml += Components.weightedSetRow(tid, i, log, isSetDone, intensityHints[i] || '');
                 }
                 // Add Set button for weighted exercises
-                addSetBtn = `<button onclick="Actions.addSet('${tid}')" 
+                addSetBtn = `<button ${Utils.actionAttrs('addSet', [tid])}
                     class="w-full mt-3 py-3 rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/30 text-gray-400 hover:border-neon-blue hover:text-neon-blue hover:bg-neon-blue/10 transition-all font-bold text-sm flex items-center justify-center gap-2">
                     <i class="fas fa-plus"></i> SET EKLE
                 </button>`;
@@ -2929,7 +3386,7 @@ const Renderers = window.Renderers = {
                     setsHtml += Components.timedSetRow(tid, i, log, isSetDone);
                 }
                 // Add Set button for timed exercises
-                addSetBtn = `<button onclick="Actions.addSet('${tid}')" 
+                addSetBtn = `<button ${Utils.actionAttrs('addSet', [tid])}
                     class="w-full mt-3 py-3 rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/30 text-gray-400 hover:border-neon-blue hover:text-neon-blue hover:bg-neon-blue/10 transition-all font-bold text-sm flex items-center justify-center gap-2">
                     <i class="fas fa-plus"></i> SET EKLE
                 </button>`;
@@ -2948,7 +3405,7 @@ const Renderers = window.Renderers = {
 
             return `
                         <div class="bg-gray-900 border-2 ${isDone ? 'border-neon-green shadow-[0_0_15px_rgba(0,255,65,0.15)]' : 'border-gray-700'} rounded-xl overflow-hidden transition-all">
-                            <div class="p-4 cursor-pointer hover:bg-gray-800/50 flex justify-between items-center" onclick="Actions.toggleExerciseBody('${tid}')">
+                            <div class="p-4 cursor-pointer hover:bg-gray-800/50 flex justify-between items-center" ${Utils.actionAttrs('toggleExerciseBody', [tid])}>
                                 <div class="flex items-center gap-3">
                                     <div class="w-3 h-3 rounded-full ${isDone ? 'bg-neon-green shadow-[0_0_8px_rgba(0,255,65,0.5)]' : 'bg-gray-600'} transition-all"></div>
                                     <div>
@@ -2967,7 +3424,7 @@ const Renderers = window.Renderers = {
                             <div id="body-${tid}" class="hidden bg-black/30 p-5 border-t border-gray-800">
                                 <div class="flex justify-between items-start mb-5">
                                     <div class="text-sm text-gray-300 p-4 bg-gray-800/70 rounded-xl border-l-4 border-neon-blue flex-1 mr-4 leading-relaxed">${ex.desc}</div>
-                                    <button onclick="event.stopPropagation(); Actions.showExercise('${tid}')" class="flex-shrink-0 w-12 h-12 rounded-xl bg-neon-blue/10 hover:bg-neon-blue/30 border-2 border-neon-blue/50 text-neon-blue flex items-center justify-center transition-all hover:scale-105" title="Detaylı Bilgi & PR">
+                                    <button ${Utils.actionAttrs('showExercise', [tid], { stopPropagation: true })} class="flex-shrink-0 w-12 h-12 rounded-xl bg-neon-blue/10 hover:bg-neon-blue/30 border-2 border-neon-blue/50 text-neon-blue flex items-center justify-center transition-all hover:scale-105" title="Detaylı Bilgi & PR">
                                         <i class="fas fa-info-circle text-lg"></i>
                                     </button>
                                 </div>
@@ -3024,7 +3481,7 @@ const Renderers = window.Renderers = {
             { icon: 'fa-bread-slice', name: 'Ekmek', id: 24 }
         ];
         const quickAddHtml = quickFoods.map(f => `
-            <button onclick="Actions.quickAddMeal(${f.id})" 
+            <button ${Utils.actionAttrs('quickAddMeal', [f.id])}
                 class="flex flex-col items-center gap-1 p-3 bg-gray-900 hover:bg-neon-green/20 rounded-lg transition-all group">
                 <i class="fas ${f.icon} text-lg text-gray-500 group-hover:text-neon-green"></i>
                 <span class="text-[10px] text-gray-500 group-hover:text-white">${f.name}</span>
@@ -3035,7 +3492,7 @@ const Renderers = window.Renderers = {
         const plan = Store.state.dailyPlan || {};
         let totalPlanCal = 0;
         ['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'].forEach(k => {
-            if (plan[k]) totalPlanCal += plan[k].kcal;
+            if (plan[k]) totalPlanCal += toSafeNumber(plan[k].kcal, 0, 0, 5000);
         });
 
         return `
@@ -3066,7 +3523,7 @@ const Renderers = window.Renderers = {
                         <div class="grid grid-cols-4 gap-2 mb-4">
                             ${quickAddHtml}
                         </div>
-                        <button onclick="Actions.openMealModal()" class="${THEME.btn} w-full">
+                        <button ${Utils.actionAttrs('openMealModal')} class="${THEME.btn} w-full">
                             <i class="fas fa-plus mr-2"></i>ÖĞÜN EKLE
                         </button>
                     </div>
@@ -3087,7 +3544,7 @@ const Renderers = window.Renderers = {
                 <div class="${THEME.card}">
                     <div class="flex justify-between mb-4 items-center">
                         <span class="text-[10px] text-gray-500 font-bold">📋 GÜNLÜK PLAN (${totalPlanCal} kcal)</span>
-                        <button onclick="Actions.rerollPlan()" class="text-xs text-neon-blue hover:text-white font-bold">
+                        <button ${Utils.actionAttrs('rerollPlan')} class="text-xs text-neon-blue hover:text-white font-bold">
                             <i class="fas fa-sync-alt mr-1"></i>YENİLE
                         </button>
                     </div>
@@ -3104,9 +3561,9 @@ const Renderers = window.Renderers = {
                                 </div>
                                 <div class="flex-1">
                                     <div class="text-[10px] text-gray-500">${times[k]} - ${labels[k]}</div>
-                                    <div class="text-sm text-white font-bold">${meal ? meal.text : '...'}</div>
+                                    <div class="text-sm text-white font-bold">${meal ? toSafeText(meal.text, 120) : '...'}</div>
                                 </div>
-                                ${meal ? `<span class="text-[10px] text-neon-green">${meal.kcal} kcal</span>` : ''}
+                                ${meal ? `<span class="text-[10px] text-neon-green">${toSafeNumber(meal.kcal, 0, 0, 5000)} kcal</span>` : ''}
                             </div>`;
         }).join('')}
                     </div>
@@ -3121,7 +3578,7 @@ const Renderers = window.Renderers = {
         const volStats = await Store.getVolumeStats();
         const stats = statsData.current || {};
         const measureHistory = statsData.history || [];
-        const dates = Object.keys(hist).sort().slice(-7);
+        const dates = Object.keys(hist).filter(date => isIsoDateKey(date)).sort().slice(-7);
         const volDates = Object.keys(volStats.daily).sort();
         const weeklySummary = await Store.getWeeklySummary();
         const sleepStats = await Store.getSleepStats();
@@ -3132,8 +3589,9 @@ const Renderers = window.Renderers = {
 
         if (dates.length > 0) {
             weightBars = dates.map(d => {
-                const h = ((hist[d] - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 70 + 15;
-                return `<div class="flex-1 flex flex-col items-center"><div class="text-[9px] text-neon-green font-bold mb-1">${hist[d]}</div><div class="w-full bg-gray-800 hover:bg-neon-green/50 rounded-t transition-all" style="height:${h}%"></div></div>`;
+                const safeWeight = toSafeNumber(hist[d], CONFIG.TARGETS.START, 20, 500);
+                const h = ((safeWeight - CONFIG.TARGETS.START) / (CONFIG.TARGETS.GOAL - CONFIG.TARGETS.START)) * 70 + 15;
+                return `<div class="flex-1 flex flex-col items-center"><div class="text-[9px] text-neon-green font-bold mb-1">${safeWeight}</div><div class="w-full bg-gray-800 hover:bg-neon-green/50 rounded-t transition-all" style="height:${h}%"></div></div>`;
             }).join('');
 
             dateLabels = dates.map((d, i) => {
@@ -3162,10 +3620,14 @@ const Renderers = window.Renderers = {
         }
 
         const labels = { chest: 'GÖĞÜS', arm: 'KOL', waist: 'BEL', leg: 'BACAK' };
+        const safeStatValue = (value) => {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? String(parsed) : '';
+        };
         const measurementInputs = ['chest', 'arm', 'waist', 'leg'].map(k => `
             <div class="bg-surface-raised p-3 rounded-lg">
                 <label class="text-[10px] text-gray-500 font-bold uppercase block mb-2">${labels[k]}</label>
-                <input type="number" id="stat-${k}" value="${stats[k] || ''}" placeholder="cm" class="${THEME.input} text-center text-lg font-bold">
+                <input type="number" id="stat-${k}" value="${safeStatValue(stats[k])}" placeholder="cm" class="${THEME.input} text-center text-lg font-bold">
             </div>
         `).join('');
 
@@ -3240,7 +3702,7 @@ const Renderers = window.Renderers = {
                 <div class="${THEME.card}">
                     <div class="flex justify-between mb-4 items-center">
                         <span class="text-[10px] text-gray-500 font-bold block">ÖLÇÜLER (CM)</span>
-                        <button onclick="Actions.saveStats()" class="bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black text-xs font-bold px-4 py-2 rounded-lg transition-all">
+                        <button ${Utils.actionAttrs('saveStats')} class="bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black text-xs font-bold px-4 py-2 rounded-lg transition-all">
                             <i class="fas fa-save mr-1"></i>KAYDET
                         </button>
                     </div>
@@ -3255,11 +3717,11 @@ const Renderers = window.Renderers = {
         const isSanitized = typeof Stealth !== 'undefined' && Stealth.active;
 
         // Pelvik üçgeni sanitize modda gizle
-        const pelvicPath = isSanitized ? '' : `<path d="M85,158 L115,158 L100,183 Z" fill="#ff003c" opacity="0.5" onclick="Actions.selectMuscle('pelvic')" class="cursor-pointer hover:opacity-100"></path>`;
+        const pelvicPath = isSanitized ? '' : `<path d="M85,158 L115,158 L100,183 Z" fill="#ff003c" opacity="0.5" ${Utils.actionAttrs('selectMuscle', ['pelvic'])} class="cursor-pointer hover:opacity-100"></path>`;
 
         const paths = {
-            front: `<path d="M60,50 Q100,70 140,50 L135,90 Q100,100 65,90 Z" class="muscle-path" onclick="Actions.selectMuscle('chest')"></path><rect x="80" y="95" width="40" height="55" rx="5" class="muscle-path" onclick="Actions.selectMuscle('abs')"></rect><path d="M65,160 L90,160 L85,240 L60,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><path d="M110,160 L135,160 L140,240 L115,240 Z" class="muscle-path" onclick="Actions.selectMuscle('quads')"></path><ellipse cx="45" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse><ellipse cx="155" cy="70" rx="10" ry="20" class="muscle-path" onclick="Actions.selectMuscle('biceps')"></ellipse>${pelvicPath}`,
-            back: `<path d="M70,40 L100,20 L130,40 L100,60 Z" class="muscle-path" onclick="Actions.selectMuscle('traps')"></path><path d="M60,60 L40,100 L100,125 L160,100 L140,60 L100,60 Z" class="muscle-path" onclick="Actions.selectMuscle('lats')"></path><rect x="85" y="128" width="30" height="22" class="muscle-path" onclick="Actions.selectMuscle('lowerback')"></rect><path d="M70,150 Q100,170 130,150 L130,190 Q100,210 70,190 Z" class="muscle-path" onclick="Actions.selectMuscle('glutes')"></path><rect x="75" y="200" width="20" height="60" class="muscle-path" onclick="Actions.selectMuscle('hamstrings')"></rect><rect x="105" y="200" width="20" height="60" class="muscle-path" onclick="Actions.selectMuscle('hamstrings')"></rect>`
+            front: `<path d="M60,50 Q100,70 140,50 L135,90 Q100,100 65,90 Z" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['chest'])}></path><rect x="80" y="95" width="40" height="55" rx="5" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['abs'])}></rect><path d="M65,160 L90,160 L85,240 L60,240 Z" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['quads'])}></path><path d="M110,160 L135,160 L140,240 L115,240 Z" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['quads'])}></path><ellipse cx="45" cy="70" rx="10" ry="20" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['biceps'])}></ellipse><ellipse cx="155" cy="70" rx="10" ry="20" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['biceps'])}></ellipse>${pelvicPath}`,
+            back: `<path d="M70,40 L100,20 L130,40 L100,60 Z" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['traps'])}></path><path d="M60,60 L40,100 L100,125 L160,100 L140,60 L100,60 Z" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['lats'])}></path><rect x="85" y="128" width="30" height="22" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['lowerback'])}></rect><path d="M70,150 Q100,170 130,150 L130,190 Q100,210 70,190 Z" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['glutes'])}></path><rect x="75" y="200" width="20" height="60" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['hamstrings'])}></rect><rect x="105" y="200" width="20" height="60" class="muscle-path" ${Utils.actionAttrs('selectMuscle', ['hamstrings'])}></rect>`
         };
 
         // Sanitize modda pelvik seçiliyse temizle
@@ -3284,7 +3746,7 @@ const Renderers = window.Renderers = {
             if (displaySystem.toLowerCase().includes('üreme')) displaySystem = 'Core Destek';
         }
 
-        return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button onclick="Actions.setAnatomyView('front')" class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ÖN</button><button onclick="Actions.setAnatomyView('back')" class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${displaySystem}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">GÖREV</div><div class="text-base text-gray-200">${displayFunction || 'Güç ve stabilizasyon.'}</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p></div>'}</div></div>`;
+        return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button ${Utils.actionAttrs('setAnatomyView', ['front'])} class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ÖN</button><button ${Utils.actionAttrs('setAnatomyView', ['back'])} class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${displaySystem}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">GÖREV</div><div class="text-base text-gray-200">${displayFunction || 'Güç ve stabilizasyon.'}</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p></div>'}</div></div>`;
     },
 
     async mental() {
@@ -3309,7 +3771,7 @@ const Renderers = window.Renderers = {
                 <div class="group relative bg-gradient-to-br ${isToday ? 'from-purple-900/40 to-gray-900' : 'from-gray-900 to-gray-800'} 
                     border-2 ${isToday ? 'border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.2)]' : isCompleted ? 'border-neon-green/50' : 'border-gray-700'}
                     rounded-2xl p-5 transition-all hover:border-neon-purple/80 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] cursor-pointer"
-                    onclick="Actions.showPhase(${p.id})">
+                    ${Utils.actionAttrs('showPhase', [p.id])}>
                     ${isToday ? '<div class="absolute -top-2 -right-2 bg-neon-purple text-black text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">BUGÜN</div>' : ''}
                     ${isCompleted ? '<div class="absolute top-3 right-3 text-neon-green text-lg">✓</div>' : ''}
                     <div class="flex items-start gap-4">
@@ -3369,7 +3831,7 @@ const Renderers = window.Renderers = {
                                 <div class="text-sm text-gray-400 mt-1">${todayPhase.desc}</div>
                             </div>
                         </div>
-                        <button onclick="Actions.showPhase(${todayPhase.id})" 
+                        <button ${Utils.actionAttrs('showPhase', [todayPhase.id])}
                             class="mt-4 px-4 py-2 bg-purple-600/20 border border-purple-500/50 rounded-lg text-purple-300 text-sm font-bold hover:bg-purple-600/40 transition">
                             <i class="fas fa-book-open mr-2"></i>Fazı İncele
                         </button>
@@ -3392,7 +3854,7 @@ const Renderers = window.Renderers = {
                         </div>
                     </div>
                     ${!isPracticeDone ? `
-                        <button onclick="Actions.completeDailyPractice()" 
+                        <button ${Utils.actionAttrs('completeDailyPractice')}
                             class="mt-4 w-full py-3 bg-neon-green/10 border-2 border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black transition-all">
                             <i class="fas fa-check mr-2"></i>Bunu Yaptım!
                         </button>
@@ -3419,7 +3881,6 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 }
 
 
-
 // ============================================
 // actions.js
 // ============================================
@@ -3427,20 +3888,32 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 // Extracted from original index.html lines 3038-3973
 
 // Using window. for global scope access
-const Actions = window.Actions = {
+const Actions = {
     // v7.1.0: Video modal
     playVideo(videoId) {
+        if (!Utils.isValidYouTubeId(videoId)) {
+            UI.showToast("Geçersiz video kimliği", "error");
+            return;
+        }
         const html = `<div class="aspect-video w-full"><iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-        UI.modal.open('Video Eğitimi', html);
+        UI.modal.openHtml('Video Eğitimi', html);
     },
 
     // v8.3.0: Fixed Error 153 by removing Data URI wrapper
     playVideoInline(el, videoId) {
+        const safeVideoId = Utils.isValidYouTubeId(videoId)
+            ? videoId
+            : null;
+        if (!safeVideoId) {
+            UI.showToast("Geçersiz video kimliği", "error");
+            return;
+        }
+
         // Direct injection to preserve Origin/Referer headers
         // This fixes "Video unavailable" (Error 153) caused by opaque origin in data: URIs
         el.innerHTML = `<iframe 
             class="w-full aspect-video" 
-            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+            src="https://www.youtube.com/embed/${safeVideoId}?autoplay=1&rel=0&modestbranding=1" 
             title="YouTube video player"
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -3456,6 +3929,34 @@ const Actions = window.Actions = {
         Store.state.activeTab = id;
         UI.updateTab(id);
         document.getElementById('view-container').innerHTML = await Renderers[id]();
+    },
+
+    closeModal() {
+        UI.modal.close();
+    },
+
+    closeAlert() {
+        UI.alert.close();
+    },
+
+    filterFoodList() {
+        UI.filterFoodList();
+    },
+
+    renderPortionInputs() {
+        UI.renderPortionInputs();
+    },
+
+    switchMealModalTab(tab) {
+        const showExisting = tab === 'exist';
+        const existTab = document.getElementById('tab-exist');
+        const newTab = document.getElementById('tab-new');
+        if (existTab) existTab.style.display = showExisting ? 'block' : 'none';
+        if (newTab) newTab.style.display = showExisting ? 'none' : 'block';
+    },
+
+    triggerImportFilePicker() {
+        document.getElementById('import-file')?.click();
     },
 
     async saveWeight(v) {
@@ -3656,23 +4157,23 @@ const Actions = window.Actions = {
 
     openMealModal() {
         const foods = Store.getAllFoods();
-        UI.modal.open("YAKIT EKLE", `
+        UI.modal.openHtml("YAKIT EKLE", `
             <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
-                <button onclick="document.getElementById('tab-exist').style.display='block';document.getElementById('tab-new').style.display='none'" class="text-xs text-neon-green font-bold hover:underline">LİSTEDEN SEÇ</button>
-                <button onclick="document.getElementById('tab-exist').style.display='none';document.getElementById('tab-new').style.display='block'" class="text-xs text-gray-500 font-bold hover:text-white hover:underline">YENİ TANIMLA</button>
+                <button ${Utils.actionAttrs('switchMealModalTab', ['exist'])} class="text-xs text-neon-green font-bold hover:underline">LİSTEDEN SEÇ</button>
+                <button ${Utils.actionAttrs('switchMealModalTab', ['new'])} class="text-xs text-gray-500 font-bold hover:text-white hover:underline">YENİ TANIMLA</button>
             </div>
             <div id="tab-exist">
                 <div class="space-y-4">
                     <div>
-                        <input type="text" id="food-search" placeholder="Besin Ara (örn: Döner, Pilav)" class="${THEME.input} mb-2 border-neon-blue/30 text-sm" onkeyup="UI.filterFoodList()">
-                        <select id="m-food" class="${THEME.input} custom-scrollbar" onchange="UI.renderPortionInputs()" size="5">
+                        <input type="text" id="food-search" placeholder="Besin Ara (örn: Döner, Pilav)" class="${THEME.input} mb-2 border-neon-blue/30 text-sm" ${Utils.actionAttrs('filterFoodList', [], { event: 'input' })}>
+                        <select id="m-food" class="${THEME.input} custom-scrollbar" ${Utils.actionAttrs('renderPortionInputs', [], { event: 'change' })} size="5">
                             ${foods.map((f, i) => `<option value="${i}">${Utils.escapeHtml(f.name)}</option>`).join('')}
                         </select>
                     </div>
                     <div id="portion-container">
                         <!-- Dynamic Inputs Here -->
                     </div>
-                    <button onclick="Actions.submitMeal()" class="${THEME.btn} w-full mt-2">EKLE</button>
+                    <button ${Utils.actionAttrs('submitMeal')} class="${THEME.btn} w-full mt-2">EKLE</button>
                 </div>
             </div>
             <div id="tab-new" style="display:none">
@@ -3691,7 +4192,7 @@ const Actions = window.Actions = {
                             <option value="ad">Adet/Porsiyon</option>
                         </select>
                     </div>
-                    <button onclick="Actions.createCustomFood()" class="${THEME.btn} w-full border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black">VERİTABANINA KAYDET</button>
+                    <button ${Utils.actionAttrs('createCustomFood')} class="${THEME.btn} w-full border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black">VERİTABANINA KAYDET</button>
                 </div>
             </div>
         `);
@@ -3790,24 +4291,39 @@ const Actions = window.Actions = {
         const ex = DB.EXERCISES[id];
         const history = await Store.getExerciseHistory(id);
         const pr = await Store.getPersonalBest(id);
+        const toSafeNumber = (value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+            const parsed = Number(value);
+            if (!Number.isFinite(parsed)) return fallback;
+            return Math.min(max, Math.max(min, parsed));
+        };
+        const safeDateLabel = (value) => {
+            if (typeof value !== 'string') return '';
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
+            return value.split('-')[2];
+        };
+        const safeVideoId = Utils.isValidYouTubeId(ex.videoId)
+            ? ex.videoId
+            : null;
 
         const targetMatch = ex.desc.match(/(\d+)\s*Set\s*x\s*(\d+)/i);
         const targetSets = targetMatch ? targetMatch[1] : '3-4';
         const targetReps = targetMatch ? targetMatch[2] : '12';
 
         const last5 = history.slice(-5);
-        const maxVol = Math.max(...last5.map(h => h.volume || 0), 1);
+        const maxVol = Math.max(...last5.map(h => toSafeNumber(h.volume, 0, 0, 1000000)), 1);
         const miniChart = last5.length > 0
             ? last5.map(h => {
-                const height = Math.max(8, ((h.volume || 0) / maxVol) * 60);
-                return `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full bg-neon-blue/60 rounded-t transition-all" style="height:${height}px"></div><div class="text-[8px] text-gray-600">${h.date ? h.date.split('-')[2] : ''}</div></div>`;
+                const safeVolume = toSafeNumber(h.volume, 0, 0, 1000000);
+                const height = Math.max(8, (safeVolume / maxVol) * 60);
+                const dayLabel = safeDateLabel(h.date);
+                return `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full bg-neon-blue/60 rounded-t transition-all" style="height:${height}px"></div><div class="text-[8px] text-gray-600">${dayLabel}</div></div>`;
             }).join('')
             : '<div class="text-gray-600 text-xs text-center w-full">Henüz veri yok</div>';
 
         const stepsHtml = ex.steps.map((s, i) => `
             <div class="flex items-start gap-3 p-2 bg-gray-800/50 rounded-lg">
                 <div class="w-6 h-6 rounded-full bg-neon-green/20 border border-neon-green/50 flex items-center justify-center text-neon-green font-bold text-xs flex-shrink-0">${i + 1}</div>
-                <span class="text-gray-200 text-sm">${s}</span>
+                <span class="text-gray-200 text-sm">${Utils.escapeHtml(s)}</span>
             </div>
         `).join('');
 
@@ -3819,7 +4335,7 @@ const Actions = window.Actions = {
                     </div>
                     <div class="flex-1">
                         <div class="flex flex-wrap gap-2">
-                            ${ex.tags.map(t => `<span class="text-[10px] px-2 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700">${t}</span>`).join('')}
+                            ${ex.tags.map(t => `<span class="text-[10px] px-2 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700">${Utils.escapeHtml(t)}</span>`).join('')}
                         </div>
                     </div>
                 </div>
@@ -3841,9 +4357,9 @@ const Actions = window.Actions = {
                             <i class="fas fa-trophy text-neon-yellow mr-1"></i>KİŞİSEL REKOR (PR)
                         </div>
                         ${pr
-                ? `<div class="text-2xl font-bold text-white">${pr.volume} <span class="text-sm text-gray-500">vol</span></div>
-                               <div class="text-xs text-gray-500 mt-1">${pr.weight}kg × ${pr.reps} tekrar</div>
-                               <div class="text-[10px] text-gray-600 mt-2">${pr.date || ''}</div>`
+                ? `<div class="text-2xl font-bold text-white">${toSafeNumber(pr.volume, 0, 0, 1000000)} <span class="text-sm text-gray-500">vol</span></div>
+                               <div class="text-xs text-gray-500 mt-1">${toSafeNumber(pr.weight, 0, 0, 1000)}kg × ${toSafeNumber(pr.reps, 0, 0, 1000)} tekrar</div>
+                               <div class="text-[10px] text-gray-600 mt-2">${Utils.escapeHtml(typeof pr.date === 'string' ? pr.date.slice(0, 20) : '')}</div>`
                 : `<div class="text-gray-600 text-sm">Henüz kayıt yok</div>
                                <div class="text-[10px] text-gray-700 mt-1">İlk setini tamamla!</div>`
             }
@@ -3857,15 +4373,15 @@ const Actions = window.Actions = {
                     </div>
                 </div>
                 
-                ${ex.videoId ? `
+                ${safeVideoId ? `
                 <div class="border border-gray-800 rounded-xl overflow-hidden hover:border-red-600/50 transition-all group cursor-pointer video-trigger"
-                    onclick="event.stopPropagation(); Actions.playVideoInline(this, '${ex.videoId}')">
+                    ${Utils.actionAttrs('playVideoInline', [safeVideoId], { passElement: true, stopPropagation: true })}>
                     <div class="relative">
                         <div class="aspect-video w-full bg-gray-900 relative overflow-hidden">
-                            <img src="https://img.youtube.com/vi/${ex.videoId}/maxresdefault.jpg" 
+                            <img src="https://img.youtube.com/vi/${safeVideoId}/maxresdefault.jpg" 
                                 alt="Video thumbnail"
                                 class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
-                                onerror="this.src='https://img.youtube.com/vi/${ex.videoId}/hqdefault.jpg'">
+                                data-fallback-src="https://img.youtube.com/vi/${safeVideoId}/hqdefault.jpg">
                             <div class="absolute inset-0 flex items-center justify-center">
                                 <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                     <i class="fas fa-play text-white text-2xl ml-1"></i>
@@ -3890,7 +4406,7 @@ const Actions = window.Actions = {
             </div>
         `;
 
-        UI.modal.open(ex.title, modalContent);
+        UI.modal.openHtml(ex.title, modalContent);
     },
 
     async showPhase(id) {
@@ -3962,7 +4478,7 @@ const Actions = window.Actions = {
                 
                 <div class="flex gap-3 pt-4 border-t border-gray-800">
                     ${!isCompleted ? `
-                        <button onclick="Actions.markPhaseComplete(${p.id})" 
+                        <button ${Utils.actionAttrs('markPhaseComplete', [p.id])}
                             class="flex-1 py-3 bg-neon-green/10 border-2 border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black transition-all">
                             <i class="fas fa-check-double mr-2"></i>Bu Fazı Anladım
                         </button>
@@ -3971,7 +4487,7 @@ const Actions = window.Actions = {
                             <i class="fas fa-trophy mr-2"></i>Faz Tamamlandı!
                         </div>
                     `}
-                    <button onclick="UI.modal.close()" 
+                    <button ${Utils.actionAttrs('closeModal')}
                         class="px-6 py-3 bg-gray-800 border border-gray-700 text-gray-400 font-bold rounded-xl hover:bg-gray-700 hover:text-white transition-all">
                         Kapat
                     </button>
@@ -3979,7 +4495,7 @@ const Actions = window.Actions = {
             </div>
         `;
 
-        UI.modal.open(p.title, modalContent);
+        UI.modal.openHtml(p.title, modalContent);
     },
 
     // Mental progress actions
@@ -4032,7 +4548,7 @@ const Actions = window.Actions = {
         }
 
         if (alertMsg !== "") {
-            UI.alert.show(alertMsg);
+            UI.alert.showHtml(alertMsg);
             const nutBtn = document.getElementById('badge-nutrition');
             if (nutBtn && meals.length === 0) nutBtn.classList.remove('hidden');
         }
@@ -4068,13 +4584,13 @@ const Actions = window.Actions = {
                     </ul>
                 </div>
                 <div class="text-center">
-                    <button onclick="Actions.startWorkout()" class="${THEME.btn} w-full bg-neon-green/20 border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-bold text-lg py-4 rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,255,65,0.3)]">
+                    <button ${Utils.actionAttrs('startWorkout')} class="${THEME.btn} w-full bg-neon-green/20 border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-black font-bold text-lg py-4 rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,255,65,0.3)]">
                         <i class="fas fa-rocket mr-2"></i>HAZIRIM, BAŞLAT!
                     </button>
                 </div>
             </div>
         `;
-        UI.modal.open("SYSTEM BOOT (ISINMA)", warmupRoutine);
+        UI.modal.openHtml("SYSTEM BOOT (ISINMA)", warmupRoutine);
     },
 
     startWorkout() {
@@ -4095,7 +4611,7 @@ const Actions = window.Actions = {
 
     // --- SETTINGS & DATA ---
     openSettings() {
-        UI.modal.open("VERİ YÖNETİMİ", `
+        UI.modal.openHtml("VERİ YÖNETİMİ", `
             <div class="space-y-6">
                 <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
                     <div class="flex items-center gap-3 mb-3">
@@ -4107,7 +4623,7 @@ const Actions = window.Actions = {
                             <p class="text-[10px] text-gray-500">Tüm verilerini cihazına indir (.json)</p>
                         </div>
                     </div>
-                    <button onclick="Actions.exportData()" class="${THEME.btn} w-full text-xs">YEDEĞİ İNDİR</button>
+                    <button ${Utils.actionAttrs('exportData')} class="${THEME.btn} w-full text-xs">YEDEĞİ İNDİR</button>
                 </div>
 
                 <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
@@ -4120,8 +4636,8 @@ const Actions = window.Actions = {
                             <p class="text-[10px] text-gray-500">Dikkat: Mevcut veriler silinir!</p>
                         </div>
                     </div>
-                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="Actions.startImport(this)">
-                    <button onclick="document.getElementById('import-file').click()" class="w-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 font-bold py-3 px-6 rounded-lg transition text-xs border border-dashed border-gray-600">DOSYA SEÇ VE YÜKLE</button>
+                    <input type="file" id="import-file" accept=".json" class="hidden" ${Utils.actionAttrs('startImport', [], { event: 'change', passElement: true })}>
+                    <button ${Utils.actionAttrs('triggerImportFilePicker')} class="w-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 font-bold py-3 px-6 rounded-lg transition text-xs border border-dashed border-gray-600">DOSYA SEÇ VE YÜKLE</button>
                 </div>
             </div>
         `);
@@ -4170,7 +4686,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveSet(taskId, setIdx, isDoneBtn) {
+    async saveSet(taskId, setIdx, isDoneBtn, sourceEl = null) {
         const wInput = document.getElementById(`w-${taskId}-${setIdx}`);
         const rInput = document.getElementById(`r-${taskId}-${setIdx}`);
         const weight = wInput ? wInput.value : 0;
@@ -4187,8 +4703,7 @@ const Actions = window.Actions = {
         const result = await Store.logSet(taskId, setIdx, weight, reps, isDoneBtn);
 
         if (isDoneBtn) {
-            const evt = window.event;
-            const btn = evt ? (evt.currentTarget || evt.target.closest('button')) : null;
+            const btn = sourceEl ? sourceEl.closest('button') : null;
             if (btn) {
                 btn.classList.remove('bg-gray-700', 'text-gray-400', 'hover:bg-gray-600');
                 btn.classList.add('bg-neon-green', 'text-black');
@@ -4212,7 +4727,7 @@ const Actions = window.Actions = {
         }
     },
 
-    async saveTimedSet(taskId, setIdx) {
+    async saveTimedSet(taskId, setIdx, sourceEl = null) {
         const dInput = document.getElementById(`d-${taskId}-${setIdx}`);
         const duration = dInput ? parseFloat(dInput.value) || 0 : 0;
 
@@ -4234,7 +4749,7 @@ const Actions = window.Actions = {
             dInput.classList.replace('border-gray-600', 'border-neon-green');
             dInput.classList.add('text-neon-green');
         }
-        const btn = event.currentTarget || event.target.closest('button');
+        const btn = sourceEl ? sourceEl.closest('button') : null;
         if (btn) {
             btn.classList.remove('bg-gray-700', 'text-gray-400');
             btn.classList.add('bg-neon-green', 'text-black');
@@ -4260,13 +4775,13 @@ const Actions = window.Actions = {
 
     openWeightModal() {
         const current = Store.state.weight;
-        UI.modal.open("SENSÖR KALİBRASYONU", `
+        UI.modal.openHtml("SENSÖR KALİBRASYONU", `
             <div class="space-y-4">
                 <div class="text-center">
                     <div class="text-[10px] text-gray-500 mb-2 tracking-widest">MEVCUT SİSTEM YÜKÜ</div>
                     <input type="number" id="modal-weight-input" value="${current}" step="0.1" class="${THEME.input} text-center text-4xl font-black text-white h-20 border-2 border-neon-blue focus:border-neon-green bg-black/50">
                 </div>
-                <button onclick="Actions.saveWeightFromModal()" class="${THEME.btn} w-full bg-neon-green text-black hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(0,255,65,0.3)]">
+                <button ${Utils.actionAttrs('saveWeightFromModal')} class="${THEME.btn} w-full bg-neon-green text-black hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(0,255,65,0.3)]">
                     <i class="fas fa-save mr-2"></i>VERİYİ İŞLE
                 </button>
             </div>
@@ -4281,7 +4796,7 @@ const Actions = window.Actions = {
     },
 
     completeDailyMission() {
-        UI.modal.open("SİSTEM KONTROLÜ", `
+        UI.modal.openHtml("SİSTEM KONTROLÜ", `
             <div class="text-center space-y-4">
                 <i class="fas fa-exclamation-triangle text-5xl text-neon-green animate-pulse"></i>
                 <div>
@@ -4289,8 +4804,8 @@ const Actions = window.Actions = {
                     <p class="text-gray-400 text-xs mt-2">Tüm günlük görevler (Antrenman, Beslenme vb.) 'TAMAMLANDI' olarak işaretlenecek.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-4">
-                    <button onclick="UI.modal.close()" class="py-3 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition text-xs font-bold">İPTAL</button>
-                    <button onclick="Actions.confirmDailyMission()" class="py-3 rounded-lg bg-neon-green text-black font-bold hover:bg-white transition text-xs shadow-[0_0_15px_rgba(0,255,65,0.3)]">ONAYLA</button>
+                    <button ${Utils.actionAttrs('closeModal')} class="py-3 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition text-xs font-bold">İPTAL</button>
+                    <button ${Utils.actionAttrs('confirmDailyMission')} class="py-3 rounded-lg bg-neon-green text-black font-bold hover:bg-white transition text-xs shadow-[0_0_15px_rgba(0,255,65,0.3)]">ONAYLA</button>
                 </div>
             </div>
         `);
@@ -4413,19 +4928,50 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     // v8.1.0: Stealth/Sanitize Mode
     if (typeof Stealth !== 'undefined') Stealth.init();
 
-    // --- v6.3.0: EVENT DELEGATION ---
-    document.getElementById('view-container').addEventListener('click', async (e) => {
+    // --- v8.3.1 Security Hardening: Centralized Event Delegation ---
+    const delegateAction = async (e) => {
         const actionEl = e.target.closest('[data-action]');
         if (!actionEl) return;
 
-        const action = actionEl.dataset.action;
-        const params = actionEl.dataset.params ? JSON.parse(actionEl.dataset.params) : [];
+        const expectedEvent = actionEl.dataset.event || 'click';
+        if (expectedEvent !== e.type) return;
 
-        if (Actions[action]) {
-            e.preventDefault();
-            await Actions[action](...params);
+        if (actionEl.dataset.stopPropagation === 'true') {
+            e.stopPropagation();
         }
-    });
+
+        let params = [];
+        if (actionEl.dataset.params) {
+            try {
+                params = JSON.parse(actionEl.dataset.params);
+            } catch {
+                params = [];
+            }
+        }
+
+        if (actionEl.dataset.passElement === 'true') {
+            params.unshift(actionEl);
+        }
+
+        const action = actionEl.dataset.action;
+        if (typeof Actions[action] !== 'function') return;
+
+        if (e.type === 'click') {
+            e.preventDefault();
+        }
+        await Actions[action](...params);
+    };
+
+    document.addEventListener('click', delegateAction);
+    document.addEventListener('change', delegateAction);
+    document.addEventListener('input', delegateAction);
+
+    const modal = document.getElementById('universal-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) UI.modal.close();
+        });
+    }
 
     // Auto Backup Reminder
     const backupStatus = await Store.checkBackupStatus();
@@ -4445,6 +4991,7 @@ if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
 
 
 
+        })();
     </script>
 </body>
 

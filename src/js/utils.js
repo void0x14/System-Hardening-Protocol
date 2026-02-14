@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 1202-1316
 
 // Global scope assignment
-const Utils = window.Utils = {
+const Utils = {
     /**
      * Bugünün tarihini YYYY-MM-DD formatında döndürür.
      * Client Local Time kullanır (kullanıcının timezone'una göre).
@@ -26,6 +26,46 @@ const Utils = window.Utils = {
         const div = document.createElement('div');
         div.textContent = String(str);
         return div.innerHTML;
+    },
+
+    /**
+     * YouTube video ID format doğrulaması.
+     * @param {string} value - Kontrol edilecek video ID
+     * @returns {boolean} ID formatı geçerliyse true
+     */
+    isValidYouTubeId: (value) => (
+        typeof value === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(value)
+    ),
+
+    /**
+     * data-params attribute için güvenli JSON string üretir.
+     * @param {Array<any>} params - Action param listesi
+     * @returns {string}
+     */
+    encodeActionParams: (params = []) => {
+        try {
+            return Utils.escapeHtml(JSON.stringify(Array.isArray(params) ? params : []));
+        } catch {
+            return '[]';
+        }
+    },
+
+    /**
+     * Delegated action attribute string üretir.
+     * @param {string} action - Actions üzerindeki method adı
+     * @param {Array<any>} params - Method param listesi
+     * @param {Object} [opts]
+     * @param {('click'|'change'|'input')} [opts.event='click']
+     * @param {boolean} [opts.passElement=false] - true ise element ilk parametre olarak geçirilir
+     * @param {boolean} [opts.stopPropagation=false] - true ise event propagation durdurulur
+     * @returns {string}
+     */
+    actionAttrs: (action, params = [], opts = {}) => {
+        const eventType = opts.event || 'click';
+        const passElement = opts.passElement === true ? 'true' : 'false';
+        const stopPropagation = opts.stopPropagation === true ? 'true' : 'false';
+        const safeAction = typeof action === 'string' ? action : '';
+        return `data-action="${safeAction}" data-event="${eventType}" data-params='${Utils.encodeActionParams(params)}' data-pass-element="${passElement}" data-stop-propagation="${stopPropagation}"`;
     },
 
     /**
@@ -87,13 +127,13 @@ const Utils = window.Utils = {
         if (!data || typeof data !== 'object') {
             return { valid: false, data: null, skipped: [], error: 'Geçersiz veri formatı' };
         }
-        const validPrefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
+        const keyRules = Object.values(CONFIG.KEYS);
         const validData = {};
         const skipped = [];
         for (const key in data) {
             if (key === 'meta') {
                 validData[key] = data[key];
-            } else if (validPrefixes.some(p => key.startsWith(p))) {
+            } else if (keyRules.some(rule => rule.endsWith('_') ? key.startsWith(rule) : key === rule)) {
                 if (data[key] !== null && data[key] !== undefined) {
                     validData[key] = data[key];
                 }

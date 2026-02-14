@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 1985-2236
 
 // Global scope assignment
-const UI = window.UI = {
+const UI = {
     activeView: 'front',
 
     async init() {
@@ -26,7 +26,7 @@ const UI = window.UI = {
             tabs = tabs.filter(t => t.id !== 'mental');
         }
         document.getElementById('nav-tabs').innerHTML = tabs.map(t =>
-            `<button onclick="Actions.switchTab('${t.id}')" id="btn-${t.id}" class="tab-btn flex-none px-6 py-3 font-bold text-xs md:text-sm whitespace-nowrap text-gray-500 hover:text-white transition-colors border-b-2 border-transparent relative">
+            `<button ${Utils.actionAttrs('switchTab', [t.id])} id="btn-${t.id}" class="tab-btn flex-none px-6 py-3 font-bold text-xs md:text-sm whitespace-nowrap text-gray-500 hover:text-white transition-colors border-b-2 border-transparent relative">
                 <i class="fas ${t.i} mr-2"></i>${t.l}
                 <div id="badge-${t.id}" class="notification-badge hidden"></div>
             </button>`
@@ -61,12 +61,24 @@ const UI = window.UI = {
      */
     modal: {
         _escHandler: null,
-        open(t, c) {
+        _openInternal(t, c, allowHtml) {
             document.getElementById('modal-title').innerText = t;
-            document.getElementById('modal-body').innerHTML = c;
+            const body = document.getElementById('modal-body');
+            if (allowHtml) {
+                body.innerHTML = String(c ?? '');
+                UI.bindMediaFallbacks(body);
+            } else {
+                body.textContent = String(c ?? '');
+            }
             document.getElementById('universal-modal').classList.add('active');
             this._escHandler = (e) => { if (e.key === 'Escape') UI.modal.close(); };
             document.addEventListener('keydown', this._escHandler);
+        },
+        open(t, c = '') {
+            this._openInternal(t, c, false);
+        },
+        openHtml(t, c = '') {
+            this._openInternal(t, c, true);
         },
         close() {
             document.getElementById('universal-modal').classList.remove('active');
@@ -82,7 +94,11 @@ const UI = window.UI = {
      */
     alert: {
         show(msg) {
-            document.getElementById('alert-message').innerHTML = msg;
+            document.getElementById('alert-message').textContent = String(msg ?? '');
+            document.getElementById('alert-modal').classList.add('active');
+        },
+        showHtml(msg) {
+            document.getElementById('alert-message').innerHTML = String(msg ?? '');
             document.getElementById('alert-modal').classList.add('active');
         },
         close() {
@@ -164,6 +180,21 @@ const UI = window.UI = {
         this.renderPortionInputs();
     },
 
+    bindMediaFallbacks(root) {
+        if (!root) return;
+        const images = root.querySelectorAll('img[data-fallback-src]');
+        images.forEach(img => {
+            if (img.dataset.fallbackBound === 'true') return;
+            img.dataset.fallbackBound = 'true';
+            img.addEventListener('error', () => {
+                const fallbackSrc = img.dataset.fallbackSrc;
+                if (!fallbackSrc || img.dataset.fallbackApplied === 'true') return;
+                img.dataset.fallbackApplied = 'true';
+                img.src = fallbackSrc;
+            });
+        });
+    },
+
     /**
      * Epik tam ekran motivasyon overlay'i göster.
      * Sanitize modda overlay gösterilmez.
@@ -171,13 +202,19 @@ const UI = window.UI = {
     showEpicOverlay(emoji, text, sub, color = '#00ff41') {
         // Sanitize modda overlay gösterme
         if (typeof Stealth !== 'undefined' && Stealth.active) return;
+        const safeEmoji = Utils.escapeHtml(typeof emoji === 'string' ? emoji.slice(0, 12) : '');
+        const safeText = Utils.escapeHtml(typeof text === 'string' ? text.slice(0, 160) : '');
+        const safeSub = Utils.escapeHtml(typeof sub === 'string' ? sub.slice(0, 220) : '');
+        const safeColor = (typeof color === 'string' && /^#[0-9a-fA-F]{6}$/.test(color.trim()))
+            ? color.trim()
+            : '#00ff41';
         const overlay = document.createElement('div');
         overlay.id = 'epic-overlay-' + Date.now();
         overlay.innerHTML = `
             <div style="
                 position: fixed;
                 inset: 0;
-                background: radial-gradient(ellipse at center, ${color}15 0%, rgba(10,10,15,0.98) 70%);
+                background: radial-gradient(ellipse at center, ${safeColor}15 0%, rgba(10,10,15,0.98) 70%);
                 z-index: 9999;
                 display: flex;
                 flex-direction: column;
@@ -188,19 +225,19 @@ const UI = window.UI = {
                 <div style="
                     font-size: 120px;
                     animation: emojiPulse 0.5s ease-out;
-                    text-shadow: 0 0 60px ${color}80;
-                ">${emoji}</div>
+                    text-shadow: 0 0 60px ${safeColor}80;
+                ">${safeEmoji}</div>
                 <div style="
                     font-family: 'Orbitron', sans-serif;
                     font-size: clamp(28px, 8vw, 64px);
                     font-weight: 900;
-                    color: ${color};
+                    color: ${safeColor};
                     text-align: center;
                     margin-top: 20px;
-                    text-shadow: 0 0 30px ${color}80, 0 0 60px ${color}50;
+                    text-shadow: 0 0 30px ${safeColor}80, 0 0 60px ${safeColor}50;
                     animation: textSlideUp 0.4s ease-out 0.1s both;
                     letter-spacing: 4px;
-                ">${text}</div>
+                ">${safeText}</div>
                 <div style="
                     font-size: clamp(14px, 3vw, 20px);
                     color: #6b7280;
@@ -208,7 +245,7 @@ const UI = window.UI = {
                     text-align: center;
                     animation: textSlideUp 0.4s ease-out 0.2s both;
                     max-width: 80%;
-                ">${sub}</div>
+                ">${safeSub}</div>
                 <div style="
                     margin-top: 40px;
                     width: 200px;
@@ -221,7 +258,7 @@ const UI = window.UI = {
                     <div style="
                         width: 100%;
                         height: 100%;
-                        background: linear-gradient(90deg, ${color}, #00f3ff);
+                        background: linear-gradient(90deg, ${safeColor}, #00f3ff);
                         animation: progressFill 1.5s ease-out forwards;
                         transform-origin: left;
                     "></div>
@@ -246,4 +283,3 @@ const UI = window.UI = {
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[UI] UI helpers loaded');
 }
-

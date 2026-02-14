@@ -81,7 +81,7 @@ const MEAL_PLAN_DB = {
 };
 
 // Add to DB namespace (exercises.js already declared DB)
-window.DB.MEAL_PLAN_DB = MEAL_PLAN_DB;
+DB.MEAL_PLAN_DB = MEAL_PLAN_DB;
 
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[DB] Meal plan database loaded');

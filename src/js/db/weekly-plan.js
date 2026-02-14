@@ -2,7 +2,7 @@
 // Extracted from original index.html
 
 // Global scope assignment
-const WEEKLY_PLAN = window.WEEKLY_PLAN = {
+const WEEKLY_PLAN = {
     1: { name: "PAZARTESİ", title: "FULL BODY START", tasks: ["squat", "pushup", "one_arm_row", "plank"] },
     2: { name: "SALI", title: "BESLENME & RECOVERY", tasks: ["eat_bulk", "stretch", "farmers_walk"] },
     3: { name: "ÇARŞAMBA", title: "CORE & KERNEL", tasks: ["lying_leg_raise", "mountain_climber", "stomach_vacuum", "kegel", "bottle_curl"] },

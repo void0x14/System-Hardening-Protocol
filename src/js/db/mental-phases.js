@@ -2,7 +2,7 @@
 // Extracted from original index.html
 
 // Global scope assignment
-const MENTAL_PHASES = window.MENTAL_PHASES = [
+const MENTAL_PHASES = [
     {
         id: 1,
         title: "FAZ 1: JAGUAR TEORİSİ",
@@ -78,7 +78,7 @@ const MENTAL_PHASES = window.MENTAL_PHASES = [
 ];
 
 // Add to DB namespace (exercises.js already declared DB)
-window.DB.MENTAL_PHASES = MENTAL_PHASES;
+DB.MENTAL_PHASES = MENTAL_PHASES;
 
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[DB] Mental phases loaded');

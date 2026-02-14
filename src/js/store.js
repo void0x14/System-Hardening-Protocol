@@ -2,7 +2,7 @@
 // Extracted from original index.html lines 1340-1963
 
 // Global scope assignment
-const Store = window.Store = {
+const Store = {
     state: {
         weight: 45.0,
         fuelDate: null,
@@ -31,12 +31,12 @@ const Store = window.Store = {
      */
     async init() {
         const w = await Utils.storage.get(CONFIG.KEYS.WEIGHT);
-        if (w) this.state.weight = parseFloat(w);
-        this.state.fuelDate = await Utils.storage.get(CONFIG.KEYS.FUEL);
-        this.state.customFoods = await Utils.storage.get(CONFIG.KEYS.CUSTOM_FOODS) || [];
+        this.state.weight = this._toSafeNumber(w, this.state.weight, 20, 500);
+        this.state.fuelDate = this._sanitizeDateString(await Utils.storage.get(CONFIG.KEYS.FUEL)) || null;
+        this.state.customFoods = this._sanitizeCustomFoods(await Utils.storage.get(CONFIG.KEYS.CUSTOM_FOODS) || []);
 
         const today = Utils.dateStr();
-        const savedPlan = await Utils.storage.get(CONFIG.KEYS.DAILY_PLAN);
+        const savedPlan = this._sanitizeDailyPlanData(await Utils.storage.get(CONFIG.KEYS.DAILY_PLAN));
 
         if (savedPlan && savedPlan.date === today) {
             this.state.dailyPlan = savedPlan.plan;
@@ -298,10 +298,361 @@ const Store = window.Store = {
         return true;
     },
 
+    _toSafeNumber(value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return fallback;
+        return Math.min(max, Math.max(min, parsed));
+    },
+
+    _isIsoDateKey(value) {
+        return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+    },
+
+    _sanitizeDateString(value) {
+        if (typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        return this._isIsoDateKey(trimmed) ? trimmed : '';
+    },
+
+    _sanitizeTimestampString(value) {
+        if (typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        return /^[0-9]{4}-[0-9]{2}-[0-9]{2}(?:[T ][0-9:.+\-Z]+)?$/.test(trimmed)
+            ? trimmed.slice(0, 40)
+            : '';
+    },
+
+    _sanitizeWorkoutLog(logData) {
+        if (!Array.isArray(logData)) return [];
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        return logData
+            .filter(id => typeof id === 'string' && (allowedIds.size === 0 || allowedIds.has(id)))
+            .slice(0, 128);
+    },
+
+    _sanitizeWorkoutSetEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+        return {
+            weight: this._toSafeNumber(entry.weight, 0, 0, 1000),
+            reps: this._toSafeNumber(entry.reps, 0, 0, 1000),
+            duration: this._toSafeNumber(entry.duration, 0, 0, 86400),
+            timestamp: this._sanitizeTimestampString(entry.timestamp) || new Date().toISOString(),
+            completed: entry.completed === true
+        };
+    },
+
+    _sanitizeWorkoutDataLog(workoutData) {
+        if (!workoutData || typeof workoutData !== 'object') return {};
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        const out = {};
+
+        for (const [taskId, entries] of Object.entries(workoutData)) {
+            if (allowedIds.size > 0 && !allowedIds.has(taskId)) continue;
+            if (!Array.isArray(entries)) continue;
+
+            const safeEntries = entries
+                .map(entry => this._sanitizeWorkoutSetEntry(entry))
+                .filter(Boolean)
+                .slice(0, 64);
+
+            if (safeEntries.length > 0) {
+                out[taskId] = safeEntries;
+            }
+        }
+
+        return out;
+    },
+
+    _sanitizeWeightHistory(historyData) {
+        if (!historyData || typeof historyData !== 'object') return {};
+        const out = {};
+        for (const [date, value] of Object.entries(historyData)) {
+            if (!this._isIsoDateKey(date)) continue;
+            const safeWeight = this._toSafeNumber(value, NaN, 20, 500);
+            if (Number.isFinite(safeWeight)) out[date] = safeWeight;
+        }
+        return out;
+    },
+
+    _sanitizeStreakData(streakData) {
+        if (!streakData || typeof streakData !== 'object') {
+            return { count: 0, lastDate: null };
+        }
+        const count = Math.trunc(this._toSafeNumber(streakData.count, 0, 0, 10000));
+        const lastDate = this._sanitizeDateString(streakData.lastDate);
+        return { count, lastDate: lastDate || null };
+    },
+
+    _sanitizeDailyPlanMeal(meal) {
+        if (!meal || typeof meal !== 'object') return null;
+        const text = typeof meal.text === 'string' ? meal.text.slice(0, 140) : '';
+        const kcal = this._toSafeNumber(meal.kcal, 0, 0, 5000);
+        if (!text && kcal === 0) return null;
+        return { text, kcal };
+    },
+
+    _sanitizeDailyPlanData(planData) {
+        if (!planData || typeof planData !== 'object') {
+            return { date: Utils.dateStr(), plan: {} };
+        }
+
+        const planSource = (planData.plan && typeof planData.plan === 'object') ? planData.plan : planData;
+        const keys = ['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'];
+        const safePlan = {};
+
+        keys.forEach(key => {
+            const safeMeal = this._sanitizeDailyPlanMeal(planSource[key]);
+            if (safeMeal) safePlan[key] = safeMeal;
+        });
+
+        const safeDate = this._sanitizeDateString(planData.date) || Utils.dateStr();
+        return { date: safeDate, plan: safePlan };
+    },
+
+    _sanitizeCustomFoodOption(option) {
+        if (!option || typeof option !== 'object') return null;
+        const label = typeof option.label === 'string' ? option.label.slice(0, 80) : '';
+        const ratio = this._toSafeNumber(option.ratio, NaN, 0.01, 100);
+        if (!label || !Number.isFinite(ratio)) return null;
+        return { label, ratio };
+    },
+
+    _sanitizeCustomFood(food) {
+        if (!food || typeof food !== 'object') return null;
+
+        const type = food.type === 'portion' ? 'portion' : (food.type === 'piece' ? 'piece' : 'custom');
+        const safeVals = {
+            cal: this._toSafeNumber(food?.vals?.cal, 0, 0, 20000),
+            prot: this._toSafeNumber(food?.vals?.prot, 0, 0, 1000),
+            carb: this._toSafeNumber(food?.vals?.carb, 0, 0, 1000),
+            fat: this._toSafeNumber(food?.vals?.fat, 0, 0, 1000)
+        };
+
+        const safeFood = {
+            id: this._toSafeNumber(food.id, 0, 0, Number.MAX_SAFE_INTEGER),
+            cat: typeof food.cat === 'string' ? food.cat.slice(0, 24) : 'CUSTOM',
+            name: typeof food.name === 'string' ? food.name.slice(0, 120) : '',
+            type,
+            vals: safeVals
+        };
+
+        if (type === 'portion') {
+            safeFood.options = Array.isArray(food.options)
+                ? food.options.map(option => this._sanitizeCustomFoodOption(option)).filter(Boolean).slice(0, 8)
+                : [];
+            if (safeFood.options.length === 0) {
+                safeFood.options = [{ label: '1 Porsiyon', ratio: 1 }];
+            }
+        } else if (type === 'piece') {
+            safeFood.unitName = typeof food.unitName === 'string' ? food.unitName.slice(0, 24) : 'Adet';
+        } else {
+            safeFood.unit = typeof food.unit === 'string' ? food.unit.slice(0, 16) : 'custom';
+        }
+
+        return safeFood.name ? safeFood : null;
+    },
+
+    _sanitizeCustomFoods(customFoods) {
+        if (!Array.isArray(customFoods)) return [];
+        return customFoods
+            .map(food => this._sanitizeCustomFood(food))
+            .filter(Boolean)
+            .slice(-300);
+    },
+
+    _sanitizeExerciseHistoryEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        const safeWeight = this._toSafeNumber(entry.weight, NaN, 0, 1000);
+        const safeReps = this._toSafeNumber(entry.reps, NaN, 0, 1000);
+        const providedVolume = this._toSafeNumber(entry.volume, NaN, 0, 1000000);
+        const computedVolume = (Number.isFinite(safeWeight) && Number.isFinite(safeReps))
+            ? safeWeight * safeReps
+            : NaN;
+        const safeVolume = Number.isFinite(providedVolume) ? providedVolume : computedVolume;
+
+        const out = {};
+        if (Number.isFinite(safeWeight)) out.weight = safeWeight;
+        if (Number.isFinite(safeReps)) out.reps = safeReps;
+        if (Number.isFinite(safeVolume)) out.volume = safeVolume;
+
+        const safeDate = this._sanitizeDateString(entry.date);
+        if (safeDate) out.date = safeDate;
+
+        const safeTimestamp = this._sanitizeTimestampString(entry.timestamp);
+        if (safeTimestamp) out.timestamp = safeTimestamp;
+
+        return Object.keys(out).length > 0 ? out : null;
+    },
+
+    _sanitizeExerciseHistoryData(historyData) {
+        if (!historyData || typeof historyData !== 'object') return {};
+
+        const allowedIds = new Set(Object.keys(DB.EXERCISES || {}));
+        const out = {};
+
+        for (const [exerciseId, entries] of Object.entries(historyData)) {
+            if (allowedIds.size > 0 && !allowedIds.has(exerciseId)) continue;
+            if (!Array.isArray(entries)) continue;
+
+            const safeEntries = entries
+                .map(entry => this._sanitizeExerciseHistoryEntry(entry))
+                .filter(Boolean)
+                .slice(-100);
+
+            if (safeEntries.length > 0) out[exerciseId] = safeEntries;
+        }
+
+        return out;
+    },
+
+    _sanitizeMentalProgressData(mentalData) {
+        if (!mentalData || typeof mentalData !== 'object') {
+            return { completedPhases: [], dailyPractice: {} };
+        }
+
+        const completedPhases = Array.isArray(mentalData.completedPhases)
+            ? Array.from(new Set(
+                mentalData.completedPhases
+                    .map(phase => this._toSafeNumber(phase, NaN, 1, 8))
+                    .filter(Number.isFinite)
+                    .map(phase => Math.trunc(phase))
+            ))
+            : [];
+
+        const dailyPractice = {};
+        if (mentalData.dailyPractice && typeof mentalData.dailyPractice === 'object') {
+            for (const [date, done] of Object.entries(mentalData.dailyPractice)) {
+                if (!this._isIsoDateKey(date)) continue;
+                dailyPractice[date] = done === true;
+            }
+        }
+
+        const out = { completedPhases, dailyPractice };
+        const lastPracticeDate = this._sanitizeDateString(mentalData.lastPracticeDate);
+        if (lastPracticeDate) out.lastPracticeDate = lastPracticeDate;
+        return out;
+    },
+
+    _sanitizeMealEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        return {
+            name: typeof entry.name === 'string' ? entry.name.slice(0, 120) : '',
+            amount: this._toSafeNumber(entry.amount, 0, 0, 10000),
+            unit: typeof entry.unit === 'string' ? entry.unit.slice(0, 32) : 'custom',
+            portionLabel: typeof entry.portionLabel === 'string' ? entry.portionLabel.slice(0, 80) : '',
+            cal: this._toSafeNumber(entry.cal, 0, 0, 20000),
+            prot: this._toSafeNumber(entry.prot, 0, 0, 1000),
+            carb: this._toSafeNumber(entry.carb, 0, 0, 1000),
+            fat: this._toSafeNumber(entry.fat, 0, 0, 1000)
+        };
+    },
+
+    _sanitizeMealLog(logData) {
+        if (!Array.isArray(logData)) return [];
+        return logData
+            .map(entry => this._sanitizeMealEntry(entry))
+            .filter(Boolean);
+    },
+
+    _sanitizeMeasureEntry(entry) {
+        if (!entry || typeof entry !== 'object') return null;
+
+        const chest = this._toSafeNumber(entry.chest, NaN, 0, 300);
+        const arm = this._toSafeNumber(entry.arm, NaN, 0, 300);
+        const waist = this._toSafeNumber(entry.waist, NaN, 0, 300);
+        const leg = this._toSafeNumber(entry.leg, NaN, 0, 300);
+        const out = {};
+
+        if (Number.isFinite(chest)) out.chest = chest;
+        if (Number.isFinite(arm)) out.arm = arm;
+        if (Number.isFinite(waist)) out.waist = waist;
+        if (Number.isFinite(leg)) out.leg = leg;
+        const safeSavedAt = this._sanitizeDateString(entry.savedAt);
+        const safeDate = this._sanitizeDateString(entry.date);
+        if (safeSavedAt) out.savedAt = safeSavedAt;
+        if (safeDate) out.date = safeDate;
+
+        return out;
+    },
+
+    _sanitizeMeasureData(measureData) {
+        if (!measureData || typeof measureData !== 'object') {
+            return { current: {}, history: [] };
+        }
+
+        if (!measureData.current && !measureData.history) {
+            return {
+                current: this._sanitizeMeasureEntry(measureData) || {},
+                history: []
+            };
+        }
+
+        return {
+            current: this._sanitizeMeasureEntry(measureData.current) || {},
+            history: Array.isArray(measureData.history)
+                ? measureData.history
+                    .map(item => this._sanitizeMeasureEntry(item))
+                    .filter(item => item && Object.keys(item).length > 0)
+                    .slice(-30)
+                : []
+        };
+    },
+
+    _sanitizeImportedData(importData) {
+        const safeData = { meta: importData.meta };
+
+        for (const key in importData) {
+            if (key === 'meta') continue;
+
+            if (key.startsWith(CONFIG.KEYS.MEAL)) {
+                safeData[key] = this._sanitizeMealLog(importData[key]);
+            } else if (key === CONFIG.KEYS.MEASURE) {
+                safeData[key] = this._sanitizeMeasureData(importData[key]);
+            } else if (key === CONFIG.KEYS.WEIGHT) {
+                safeData[key] = this._toSafeNumber(importData[key], this.state.weight, 20, 500);
+            } else if (key === CONFIG.KEYS.WEIGHT_HISTORY) {
+                safeData[key] = this._sanitizeWeightHistory(importData[key]);
+            } else if (key === CONFIG.KEYS.CUSTOM_FOODS) {
+                safeData[key] = this._sanitizeCustomFoods(importData[key]);
+            } else if (key === CONFIG.KEYS.DAILY_PLAN) {
+                safeData[key] = this._sanitizeDailyPlanData(importData[key]);
+            } else if (key === CONFIG.KEYS.STREAK) {
+                safeData[key] = this._sanitizeStreakData(importData[key]);
+            } else if (key === CONFIG.KEYS.FUEL) {
+                safeData[key] = this._sanitizeDateString(importData[key]) || null;
+            } else if (key.startsWith(CONFIG.KEYS.WORKOUT)) {
+                safeData[key] = this._sanitizeWorkoutLog(importData[key]);
+            } else if (key.startsWith(CONFIG.KEYS.WORKOUT_DATA)) {
+                safeData[key] = this._sanitizeWorkoutDataLog(importData[key]);
+            } else if (key.startsWith(CONFIG.KEYS.SLEEP)) {
+                safeData[key] = this._toSafeNumber(importData[key], 0, 0, 24);
+            } else if (key.startsWith(CONFIG.KEYS.WATER)) {
+                safeData[key] = this._toSafeNumber(importData[key], 0, 0, 50);
+            } else if (key === CONFIG.KEYS.EXERCISE_HISTORY) {
+                safeData[key] = this._sanitizeExerciseHistoryData(importData[key]);
+            } else if (key === CONFIG.KEYS.MENTAL_PROGRESS) {
+                safeData[key] = this._sanitizeMentalProgressData(importData[key]);
+            } else if (key === CONFIG.KEYS.BACKUP) {
+                safeData[key] = this._sanitizeDateString(importData[key]) || Utils.dateStr();
+            } else {
+                safeData[key] = importData[key];
+            }
+        }
+
+        return safeData;
+    },
+
     async importData(jsonContent) {
         try {
-            const data = JSON.parse(jsonContent);
-            if (!data.meta) throw new Error("Geçersiz yedek dosyası");
+            const parsed = JSON.parse(jsonContent);
+            const validation = Utils.validateImportData(parsed);
+            if (!validation.valid) {
+                throw new Error(validation.error || "Geçersiz yedek dosyası");
+            }
+
+            const data = this._sanitizeImportedData(validation.data);
             const prefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
             const keysToRemove = [];
             for (let i = 0; i < localStorage.length; i++) {
@@ -378,7 +729,11 @@ const Store = window.Store = {
 
     async getExerciseHistory(exerciseId) {
         const history = await Utils.storage.get(CONFIG.KEYS.EXERCISE_HISTORY) || {};
-        return history[exerciseId] || [];
+        if (!Array.isArray(history[exerciseId])) return [];
+        return history[exerciseId]
+            .map(record => this._sanitizeExerciseHistoryEntry(record))
+            .filter(Boolean)
+            .slice(-100);
     },
 
     async getPersonalBest(exerciseId) {
@@ -617,4 +972,3 @@ const Store = window.Store = {
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log('[Store] State management loaded');
 }
-
