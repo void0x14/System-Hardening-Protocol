@@ -1,30 +1,38 @@
 # İlerleme Durumu
 
-## Refactoring Projesi - Phase 0: Test Infrastructure ✅
+## Refactoring Projesi - Phase 1: Foundation ✅
 
 ### Tamamlanan Görevler (14 Şubat 2026)
+- ✅ `src/js/core/` dizini oluşturuldu
+- ✅ DI Container implement edildi (`src/js/core/Container.js`)
+  - Singleton ve transient lifecycle desteği
+  - Factory-based service registration
+  - Dependency injection through container
+  - Child container creation
+  - Service instantiation tracking
+- ✅ Event Bus implement edildi (`src/js/core/EventBus.js`)
+  - `on()`, `off()`, `emit()`, `once()` metodları
+  - Unsubscribe function return pattern
+  - Async emit desteği (`emitAsync`)
+  - Event history recording (debug için)
+  - Error handling in handlers
+- ✅ Core module index oluşturuldu (`src/js/core/index.js`)
+- ✅ Unit testler yazıldı:
+  - `tests/core/Container.test.js` - 25+ test case
+  - `tests/core/EventBus.test.js` - 30+ test case
+
+### Önceki Aşama: Phase 0 - Test Infrastructure ✅
 - ✅ Test dizin yapısı oluşturuldu (`tests/`, `tests/mocks/`)
 - ✅ Assertion library implement edildi (`tests/assert.js`)
-  - 18 assertion fonksiyonu: assertEqual, assertTrue, assertDeepEqual, assertThrows, vb.
-  - Async assertion desteği: assertResolves, assertRejects
 - ✅ Test runner implement edildi (`tests/runner.js`)
-  - describe/it pattern
-  - beforeEach/afterEach hooks
-  - itSkip/itOnly (xit/fit) desteği
 - ✅ Test reporter implement edildi (`tests/reporter.js`)
-  - Renkli console output
-  - ANSI color codes
-  - Özet raporu
 - ✅ Mock storage adapter implement edildi (`tests/mocks/storage.js`)
-  - localStorage API'sini taklit eden MockStorage sınıfı
-  - Event listener desteği
-  - JSON helper metodları
-  - createSystemHardeningStorage() factory fonksiyonu
 
-### Sonraki Adımlar (Phase 1: Foundation)
-- [ ] ES Module migration
-- [ ] Dependency Injection Container
-- [ ] Event Bus implementation
+### Sonraki Adımlar (Phase 2: Configuration Extraction)
+- [ ] `src/js/config/` dizini oluşturulması
+- [ ] Storage keys extraction (`keys.js`)
+- [ ] Validation limits extraction (`validation.js`)
+- [ ] Theme constants extraction (`theme.js`)
 
 ---
 
@@ -128,14 +136,13 @@
 - ❌ `toLocaleDateString('tr-TR')` timezone'a bağlı → streak kırılabilir
 - **Çözüm**: ISO 8601: `new Date().toISOString().split('T')[0]`
 
-### 10. No Tests → ✅ ÇÖZÜLDÜ (Phase 0)
+### 10. No Tests → ✅ ÇÖZÜLDÜ (Phase 0 + Phase 1)
 - ~~❌ 3900+ satır kod, 0 test~~
 - ~~❌ Refactor risk yüksek~~
 - ✅ Custom test framework implement edildi (Zero Dependencies)
 - ✅ Mock storage adapter hazır
-- **Sonraki**: Critical fonksiyonlar için unit testler yazılacak
-
-> **NOT**: Phase 0 tamamlandı. Phase 1 (Foundation) başlatılacak.
+- ✅ DI Container ve EventBus için unit testler yazıldı
+- **Sonraki**: Critical fonksiyonlar için daha fazla unit test
 
 ## Future Enhancement Ideas (Brutal Suggestions)
 
@@ -295,6 +302,11 @@ Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (
 **Output**: Maintainable codebase, same single-file deployment
 
 ## Recent Updates
+- **[2026-02-14]**: Phase 1 - Foundation completed.
+  - DI Container (`src/js/core/Container.js`) - Singleton/transient lifecycle
+  - Event Bus (`src/js/core/EventBus.js`) - Pub/sub pattern
+  - Core module index (`src/js/core/index.js`)
+  - Unit tests for Container and EventBus
 - **[2026-02-14]**: Phase 0 - Test Infrastructure completed.
   - Custom test framework (Zero Dependencies)
   - tests/assert.js - 18 assertion fonksiyonu
@@ -326,3 +338,4 @@ Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (
 ## Video Eklenen Egzersizler
 squat, goblet_squat, pushup, one_arm_row, plank, 
 farmers_walk, hammer_curl, mountain_climber, lying_leg_raise, superman
+
