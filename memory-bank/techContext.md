@@ -19,7 +19,7 @@
 - **Çıktı**: `dist/index.html` (~208 KB)
 - **Bağımlılık**: Sadece Node.js runtime (harici npm paketi yok)
 
-## Test Altyapısı (Phase 0 - Yeni)
+## Test Altyapısı (Phase 0)
 
 ### Test Framework
 - **Yaklaşım**: Custom-built test framework (Zero Dependencies)
@@ -67,9 +67,78 @@ node tests/runner.js
 pnpm test
 ```
 
+## Core Modül Yapısı (Phase 1)
+
+### Dizin Yapısı
+```
+src/js/core/
+├── index.js       # Module exports (Container, EventBus)
+├── Container.js   # DI Container
+└── EventBus.js    # Event Bus (Pub/Sub)
+```
+
+### DI Container (Container.js)
+- **Lifecycle**: Singleton (default), Transient
+- **API**: `register(name, factory, lifecycle)`, `get(name)`, `has(name)`, `remove(name)`
+- **Features**: Child container creation, instantiation tracking
+- **Pattern**: Factory-based dependency injection
+
+### Event Bus (EventBus.js)
+- **API**: `on(event, handler)`, `off(event, handler)`, `emit(event, data)`, `once(event, handler)`
+- **Features**: Unsubscribe function return, async emit (`emitAsync`), event history
+- **Pattern**: Observer/Pub-Sub
+
+## Config Modül Yapısı (Phase 2)
+
+### Dizin Yapısı
+```
+src/js/config/
+├── index.js       # ConfigService + exports
+├── keys.js        # Storage key constants
+├── targets.js     # Nutrition/fitness targets
+├── validation.js  # Input validation limits
+└── theme.js       # UI theme constants
+```
+
+### ConfigService (index.js)
+- **Pattern**: Singleton via exported `config` instance
+- **API**: `getKey()`, `getTarget()`, `getLimit()`, `getThemeClasses()`
+- **Features**: Unified configuration access, helper methods
+
+### Storage Keys (keys.js)
+- **15 localStorage key constants**
+- **Helper functions**: `isDatePrefixedKey()`, `createDatedKey()`, `getAllKeys()`
+- **Key types**: Single value keys, Date-prefixed keys (append YYYY-MM-DD)
+
+### Validation Limits (validation.js)
+- **Weight limits**: 20-500 kg
+- **Calorie limits**: 0-20000 kcal
+- **Macro limits**: 0-1000g
+- **Sleep limits**: 0-24 hours
+- **Water limits**: 0-50 glasses
+- **Exercise limits**: weight, reps, duration, volume
+- **Storage limits**: history entries, custom foods, etc.
+- **Helper functions**: `clampToRange()`, `isValidIsoDate()`, `isValidTimestamp()`
+
+### Targets (targets.js)
+- **Weight targets**: START: 45kg, GOAL: 60kg
+- **Calorie targets**: 3000 kcal daily
+- **Macro targets**: 225g protein, 375g carbs, 67g fat
+- **Milestones**: 4 weight milestones (48kg, 50kg, 55kg, 60kg)
+- **Helper functions**: `getNextMilestone()`, `getCompletedMilestones()`, `getProgressPercentage()`
+
+### Theme (theme.js)
+- **CSS class compositions**: card, button, input, label
+- **Color palette**: Neon green (#00ff41) on dark theme
+- **Animation durations**: FAST (150ms), NORMAL (300ms), SLOW (500ms), EPIC (1000ms)
+- **Z-index layers**: BASE (0) to TOAST (500)
+- **Breakpoints**: SM (640px) to XXL (1536px)
+- **Helper functions**: `getClasses()`, `getButtonVariant()`
+
 ## Modül Yapısı (Dependency Order)
 ```
-Layer 1: config.js, db/ (exercises, foods, weekly-plan, mental-phases, anatomy)
+Layer 0: core/ (Container, EventBus)
+Layer 1: config/ (keys, validation, targets, theme), db/ (exercises, foods, weekly-plan, mental-phases, anatomy)
 Layer 2: utils.js
 Layer 3: store.js
 Layer 4: ui.js, components.js, video-player.js, stealth.js
@@ -85,7 +154,7 @@ Layer 7: app.js
 
 ## Veri Depolama
 - **localStorage**: Tüm veriler tarayıcıda
-- **Anahtar Yapısı**:
+- **Anahtar Yapısı** (config/keys.js'den):
   - `monk_weight` - Mevcut kilo
   - `monk_workout_log_YYYY-MM-DD` - Günlük tamamlanan görevler
   - `monk_workout_data_YYYY-MM-DD` - Set/tekrar detayları
@@ -101,4 +170,4 @@ Layer 7: app.js
 - Tek dosya olmalı (bağımsız çalışma)
 - İnternet kesilse de çalışmalı (localStorage)
 - Build adımı: `pnpm run build`
-- ~~Test framework yok (manuel test)~~ → **Custom test framework aktif (Phase 0)**
+- Test framework: Custom-built (Zero Dependencies)

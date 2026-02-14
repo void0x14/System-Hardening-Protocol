@@ -1,25 +1,41 @@
 # İlerleme Durumu
 
-## Refactoring Projesi - Phase 1: Foundation ✅
+## Refactoring Projesi - Phase 2: Configuration Extraction ✅
 
 ### Tamamlanan Görevler (14 Şubat 2026)
-- ✅ `src/js/core/` dizini oluşturuldu
+- ✅ `src/js/config/` dizini oluşturuldu
+- ✅ Storage keys extraction (`keys.js`)
+  - 15 localStorage key constants
+  - Helper functions: isDatePrefixedKey, createDatedKey, getAllKeys
+- ✅ Validation limits extraction (`validation.js`)
+  - Weight, calorie, macro limits
+  - Sleep, water, exercise limits
+  - Body measurement, streak, mental phase limits
+  - Storage limits (history entries, custom foods, etc.)
+  - Helper functions: clampToRange, isValidIsoDate, isValidTimestamp
+- ✅ Targets extraction (`targets.js`)
+  - Weight targets (START: 45kg, GOAL: 60kg)
+  - Calorie targets (3000 kcal daily)
+  - Macro targets (225g protein, 375g carbs, 67g fat)
+  - Water/Sleep targets
+  - Milestone definitions
+  - Helper functions: getNextMilestone, getCompletedMilestones, getProgressPercentage
+- ✅ Theme constants extraction (`theme.js`)
+  - Card, button, input, label CSS classes
+  - Color palette (neon green on dark theme)
+  - Animation durations, z-index layers
+  - Responsive breakpoints, spacing scale
+  - Helper functions: getClasses, getButtonVariant
+- ✅ ConfigService implementation (`index.js`)
+  - Unified configuration access
+  - Singleton pattern via `config` instance
+  - Re-exports all sub-modules
+
+### Önceki Aşama: Phase 1 - Foundation ✅
 - ✅ DI Container implement edildi (`src/js/core/Container.js`)
-  - Singleton ve transient lifecycle desteği
-  - Factory-based service registration
-  - Dependency injection through container
-  - Child container creation
-  - Service instantiation tracking
 - ✅ Event Bus implement edildi (`src/js/core/EventBus.js`)
-  - `on()`, `off()`, `emit()`, `once()` metodları
-  - Unsubscribe function return pattern
-  - Async emit desteği (`emitAsync`)
-  - Event history recording (debug için)
-  - Error handling in handlers
 - ✅ Core module index oluşturuldu (`src/js/core/index.js`)
-- ✅ Unit testler yazıldı:
-  - `tests/core/Container.test.js` - 25+ test case
-  - `tests/core/EventBus.test.js` - 30+ test case
+- ✅ Unit testler yazıldı (Container.test.js, EventBus.test.js)
 
 ### Önceki Aşama: Phase 0 - Test Infrastructure ✅
 - ✅ Test dizin yapısı oluşturuldu (`tests/`, `tests/mocks/`)
@@ -28,15 +44,15 @@
 - ✅ Test reporter implement edildi (`tests/reporter.js`)
 - ✅ Mock storage adapter implement edildi (`tests/mocks/storage.js`)
 
-### Sonraki Adımlar (Phase 2: Configuration Extraction)
-- [ ] `src/js/config/` dizini oluşturulması
-- [ ] Storage keys extraction (`keys.js`)
-- [ ] Validation limits extraction (`validation.js`)
-- [ ] Theme constants extraction (`theme.js`)
+### Sonraki Adımlar (Phase 3: Store Module Extraction)
+- [ ] `src/js/store/` dizini oluşturulması
+- [ ] State management extraction
+- [ ] Data operations extraction
+- [ ] Validation integration with config module
 
 ---
 
-## Çalışan Özellikler - v8.1.1
+## Çalışan Özellikler - v8.3.1
 - ✅ Dashboard (streak, kilo, su, uyku takibi)
 - ✅ Antrenman sekmesi (premium set input, PR takibi)
 - ✅ Premium egzersiz bilgi modalı
@@ -119,9 +135,9 @@
 - ⚠️ Negatif kilo kaydedilebilir
 - **Çözüm**: Store katmanında validation: `if (isNaN(w) || w <= 0 || w > 300) throw new Error("Invalid weight")`
 
-### 6. Magic Numbers
-- ⚠️ `if (todaySleep < 6)`, `for (let w = 0; w < 4; w++)` → hardcoded
-- **Çözüm**: `CONFIG.THRESHOLDS = { SLEEP_LOW: 6, WEEKLY_SUMMARY_WEEKS: 4 }`
+### 6. Magic Numbers → ✅ ÇÖZÜLDÜ (Phase 2)
+- ~~⚠️ `if (todaySleep < 6)`, `for (let w = 0; w < 4; w++)` → hardcoded~~
+- ✅ **Çözüm**: Tüm magic numbers `src/js/config/validation.js` ve `src/js/config/targets.js` dosyalarına taşındı
 
 ### 7. Backup Export DOM Hack
 - ⚠️ `document.body.appendChild(a); a.click(); document.body.removeChild(a)`
@@ -302,6 +318,13 @@ Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (
 **Output**: Maintainable codebase, same single-file deployment
 
 ## Recent Updates
+- **[2026-02-14]**: Phase 2 - Configuration Extraction completed.
+  - Created `src/js/config/` directory with 5 modules
+  - keys.js: 15 localStorage key constants
+  - validation.js: All magic numbers extracted
+  - targets.js: Nutrition/fitness targets
+  - theme.js: UI theme constants
+  - index.js: ConfigService with unified access
 - **[2026-02-14]**: Phase 1 - Foundation completed.
   - DI Container (`src/js/core/Container.js`) - Singleton/transient lifecycle
   - Event Bus (`src/js/core/EventBus.js`) - Pub/sub pattern
@@ -338,4 +361,3 @@ Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (
 ## Video Eklenen Egzersizler
 squat, goblet_squat, pushup, one_arm_row, plank, 
 farmers_walk, hammer_curl, mountain_climber, lying_leg_raise, superman
-
