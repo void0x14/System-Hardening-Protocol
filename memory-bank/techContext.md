@@ -19,6 +19,54 @@
 - **Çıktı**: `dist/index.html` (~208 KB)
 - **Bağımlılık**: Sadece Node.js runtime (harici npm paketi yok)
 
+## Test Altyapısı (Phase 0 - Yeni)
+
+### Test Framework
+- **Yaklaşım**: Custom-built test framework (Zero Dependencies)
+- **Test Runner**: `tests/runner.js` - describe/it pattern
+- **Assertion Library**: `tests/assert.js` - 18 assertion fonksiyonu
+- **Reporter**: `tests/reporter.js` - Console output formatting
+
+### Test Dizin Yapısı
+```
+tests/
+├── runner.js      # Custom test runner (describe/it pattern)
+├── assert.js      # Assertion library (assertEqual, assertTrue, etc.)
+├── reporter.js    # Test reporter (console output)
+└── mocks/
+    └── storage.js # Mock localStorage adapter
+```
+
+### Assertion Fonksiyonları
+- `assertEqual(actual, expected)` - Strict equality (===)
+- `assertTrue(value)` - Truthy kontrolü
+- `assertFalse(value)` - Falsy kontrolü
+- `assertDeepEqual(actual, expected)` - JSON comparison
+- `assertThrows(fn)` - Fonksiyon hata fırlatmalı
+- `assertThrowsType(fn, ErrorType)` - Belirli hata tipi
+- `assertNull(value)` / `assertNotNull(value)`
+- `assertUndefined(value)` / `assertDefined(value)`
+- `assertInstanceOf(value, ClassType)`
+- `assertContains(str, substring)` - String contains
+- `assertLength(arr, length)` - Array length
+- `assertNaN(value)` / `assertNotNaN(value)`
+- `assertApproxEqual(actual, expected, tolerance)` - Yaklaşık eşitlik
+- `assertResolves(asyncFn)` / `assertRejects(asyncFn)` - Async assertions
+
+### Mock Storage
+- `MockStorage` sınıfı localStorage API'sini taklit eder
+- `createSystemHardeningStorage()` - Örnek veri ile mock storage
+- Event listener desteği (storage events)
+- JSON helper metodları (`getJSON`, `setJSON`)
+- Snapshot/restore özelliği
+
+### Test Komutu
+```bash
+node tests/runner.js
+# veya
+pnpm test
+```
+
 ## Modül Yapısı (Dependency Order)
 ```
 Layer 1: config.js, db/ (exercises, foods, weekly-plan, mental-phases, anatomy)
@@ -53,4 +101,4 @@ Layer 7: app.js
 - Tek dosya olmalı (bağımsız çalışma)
 - İnternet kesilse de çalışmalı (localStorage)
 - Build adımı: `pnpm run build`
-- Test framework yok (manuel test)
+- ~~Test framework yok (manuel test)~~ → **Custom test framework aktif (Phase 0)**

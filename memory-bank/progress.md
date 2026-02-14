@@ -1,5 +1,33 @@
 # İlerleme Durumu
 
+## Refactoring Projesi - Phase 0: Test Infrastructure ✅
+
+### Tamamlanan Görevler (14 Şubat 2026)
+- ✅ Test dizin yapısı oluşturuldu (`tests/`, `tests/mocks/`)
+- ✅ Assertion library implement edildi (`tests/assert.js`)
+  - 18 assertion fonksiyonu: assertEqual, assertTrue, assertDeepEqual, assertThrows, vb.
+  - Async assertion desteği: assertResolves, assertRejects
+- ✅ Test runner implement edildi (`tests/runner.js`)
+  - describe/it pattern
+  - beforeEach/afterEach hooks
+  - itSkip/itOnly (xit/fit) desteği
+- ✅ Test reporter implement edildi (`tests/reporter.js`)
+  - Renkli console output
+  - ANSI color codes
+  - Özet raporu
+- ✅ Mock storage adapter implement edildi (`tests/mocks/storage.js`)
+  - localStorage API'sini taklit eden MockStorage sınıfı
+  - Event listener desteği
+  - JSON helper metodları
+  - createSystemHardeningStorage() factory fonksiyonu
+
+### Sonraki Adımlar (Phase 1: Foundation)
+- [ ] ES Module migration
+- [ ] Dependency Injection Container
+- [ ] Event Bus implementation
+
+---
+
 ## Çalışan Özellikler - v8.1.1
 - ✅ Dashboard (streak, kilo, su, uyku takibi)
 - ✅ Antrenman sekmesi (premium set input, PR takibi)
@@ -100,12 +128,14 @@
 - ❌ `toLocaleDateString('tr-TR')` timezone'a bağlı → streak kırılabilir
 - **Çözüm**: ISO 8601: `new Date().toISOString().split('T')[0]`
 
-### 10. No Tests
-- ❌ 3900+ satır kod, 0 test
-- ❌ Refactor risk yüksek
-- **Çözüm**: Critical fonksiyonlar için unit test (min. `Utils.dateStr`, `Store.saveWeight`)
+### 10. No Tests → ✅ ÇÖZÜLDÜ (Phase 0)
+- ~~❌ 3900+ satır kod, 0 test~~
+- ~~❌ Refactor risk yüksek~~
+- ✅ Custom test framework implement edildi (Zero Dependencies)
+- ✅ Mock storage adapter hazır
+- **Sonraki**: Critical fonksiyonlar için unit testler yazılacak
 
-> **NOT**: Yukarıdaki 10 madde **SADECE DOKÜMANTE EDİLDİ**, uygulanmadı. Her biri ayrı refactoring task gerektirir.
+> **NOT**: Phase 0 tamamlandı. Phase 1 (Foundation) başlatılacak.
 
 ## Future Enhancement Ideas (Brutal Suggestions)
 
@@ -265,6 +295,12 @@ Detaylı strateji notu: `modularization_strategy.md` harici notlarda tutuluyor (
 **Output**: Maintainable codebase, same single-file deployment
 
 ## Recent Updates
+- **[2026-02-14]**: Phase 0 - Test Infrastructure completed.
+  - Custom test framework (Zero Dependencies)
+  - tests/assert.js - 18 assertion fonksiyonu
+  - tests/runner.js - describe/it pattern
+  - tests/reporter.js - console output formatting
+  - tests/mocks/storage.js - MockStorage adapter
 - **[2026-02-10]**: Full Project Orchestration & pnpm Migration.
   - Created `package.json` with pnpm as package manager.
   - `pnpm run build` artık aktif - 15 JS modülü, 208.38 KB bundle.
