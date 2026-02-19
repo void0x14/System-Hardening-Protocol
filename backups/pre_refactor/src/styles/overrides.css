@@ -1,0 +1,64 @@
+/* overrides.css - Robot Mode, Dark Overlays, Override Styles */
+/* Extracted from original index.html lines 119-174 */
+
+/* ============================================
+   ROBOT MODE (Override Mode)
+   ============================================ */
+body.override-mode {
+    filter: grayscale(80%) contrast(1.1);
+}
+
+body.override-mode * {
+    animation-play-state: paused !important;
+    transition: none !important;
+}
+
+body.override-mode .tab-btn:not(.active-override-tab) {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+body.override-mode .override-hide {
+    display: none !important;
+}
+
+body.override-mode .override-highlight {
+    border-color: #ff003c !important;
+    box-shadow: 0 0 10px rgba(255, 0, 60, 0.5) !important;
+}
+
+/* ============================================
+   OVERRIDE PANEL
+   ============================================ */
+#override-panel {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 0, 0, 0.95);
+    border: 2px solid #ff003c;
+    padding: 1rem 2rem;
+    z-index: 100;
+    text-align: center;
+    border-radius: 8px;
+}
+
+body.override-mode #override-panel {
+    display: block;
+}
+
+#override-timer {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff003c;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+#override-mission {
+    color: #fff;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}

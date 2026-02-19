@@ -1,0 +1,350 @@
+/* components.css - Card, Button, Checkbox, Modal, Toast Styles */
+/* Extracted from original index.html */
+
+/* ============================================
+   CUSTOM CHECKBOX
+   ============================================ */
+.custom-checkbox {
+    appearance: none;
+    width: 1.2em;
+    height: 1.2em;
+    border: 2px solid #444;
+    background: #111;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-checkbox::before {
+    content: "";
+    width: 0.6em;
+    height: 0.6em;
+    transform: scale(0);
+    background: #00ff41;
+    transition: 0.2s transform ease-in-out;
+}
+
+.custom-checkbox:checked {
+    border-color: #00ff41;
+}
+
+.custom-checkbox:checked::before {
+    transform: scale(1);
+}
+
+.custom-checkbox:hover {
+    border-color: #00ff41;
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS
+   ============================================ */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 1rem;
+    border-left: 4px solid;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ============================================
+   MODAL STYLING
+   ============================================ */
+.modal {
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ============================================
+   MUSCLE/ANATOMY PATHS
+   ============================================ */
+.muscle-path {
+    fill: #1a1a1a;
+    stroke: #333;
+    stroke-width: 1;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.muscle-path:hover {
+    fill: #00ff41;
+    stroke: #fff;
+}
+
+.muscle-path.active {
+    fill: #00f3ff;
+    stroke: #fff;
+    filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.5));
+}
+
+.anatomy-grid {
+    background-image: linear-gradient(rgba(0, 255, 65, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* ============================================
+   ALERT OVERLAY
+   ============================================ */
+.alert-overlay {
+    background: rgba(255, 0, 60, 0.1);
+    border: 1px solid #ff003c;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 10px;
+    height: 10px;
+    background-color: #ff003c;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #ff003c;
+}
+
+/* ============================================
+   RADIO BUTTON STYLING (Portions)
+   ============================================ */
+.portion-radio:checked+div {
+    background-color: rgba(0, 255, 65, 0.1);
+    border-color: #00ff41;
+    color: #fff;
+}
+
+.portion-radio:checked+div .radio-dot {
+    background-color: #00ff41;
+    box-shadow: 0 0 8px #00ff41;
+}
+
+/* ============================================
+   CARD HOVER EFFECTS
+   ============================================ */
+.card-hover-lift {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card-hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 255, 65, 0.1);
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+.progress-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+/* ============================================
+   TAB NAVIGATION
+   ============================================ */
+.tab-btn {
+    position: relative;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #00ff41;
+    transition: width 0.25s ease, left 0.25s ease;
+}
+
+.tab-btn:hover::after,
+.tab-btn.active-tab::after {
+    width: 100%;
+    left: 0;
+}
+
+.tab-btn:hover i,
+.tab-btn.active-tab i {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+/* ============================================
+   BUTTON INTERACTIONS
+   ============================================ */
+button,
+.btn-press {
+    transition: transform 0.1s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+button:active,
+.btn-press:active {
+    transform: scale(0.97);
+}
+
+/* ============================================
+   INPUT FOCUS GLOW
+   ============================================ */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #00ff41 !important;
+    box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.15), 0 0 12px rgba(0, 255, 65, 0.1);
+}
+
+/* ============================================
+   EXERCISE CARD
+   ============================================ */
+.exercise-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.exercise-card:hover {
+    background: rgba(0, 255, 65, 0.03);
+    border-color: rgba(0, 255, 65, 0.3) !important;
+    transform: translateX(4px);
+}
+
+.exercise-card:hover i {
+    color: #00ff41;
+}
+
+/* ============================================
+   MEAL ITEM
+   ============================================ */
+.meal-item {
+    transition: all 0.2s ease;
+}
+
+.meal-item:hover {
+    background: rgba(0, 255, 65, 0.05);
+    transform: translateX(3px);
+}
+
+/* ============================================
+   DETAILS/SUMMARY
+   ============================================ */
+details {
+    transition: all 0.25s ease;
+}
+
+details summary {
+    cursor: pointer;
+}
+
+/* ============================================
+   VIEW CONTAINER
+   ============================================ */
+#view-container {
+    transition: opacity 0.15s ease;
+}
+
+/* ============================================
+   MOBILE TOUCH FEEDBACK
+   ============================================ */
+@media (hover: none) {
+    .card-hover-lift:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+
+    .exercise-card:active {
+        background: rgba(0, 255, 65, 0.08);
+        transform: scale(0.99);
+    }
+
+    .meal-item:active {
+        background: rgba(0, 255, 65, 0.08);
+    }
+
+    button:active {
+        transform: scale(0.95);
+    }
+
+    .tab-btn:active {
+        background: rgba(0, 255, 65, 0.1);
+    }
+}
+/* ============================================
+   SNIPER DASHBOARD ELEMENTS
+   ============================================ */
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background-color: #1a1a22;
+    transition: all 0.2s ease;
+}
+
+.heatmap-cell.active-1 { background-color: rgba(0, 255, 65, 0.3); }
+.heatmap-cell.active-2 { background-color: rgba(0, 255, 65, 0.6); }
+.heatmap-cell.active-3 { background-color: rgba(0, 255, 65, 0.9); box-shadow: 0 0 5px rgba(0, 255, 65, 0.5); }
+
+.circular-chart {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 250px;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #1a1a22;
+    stroke-width: 2.5;
+}
+
+.circle {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease-out;
+}
+
+.sniper-panel {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.sniper-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.sniper-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 2px; height: 100%;
+    background-color: currentColor;
+    opacity: 0.5;
+}
+
+.sniper-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    letter-spacing: 0.05em;
+}
+
+/* Patch for Heatmap Visibility */
+.heatmap-cell {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}

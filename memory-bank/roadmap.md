@@ -253,3 +253,20 @@ Proje v8.0.0 haliyle **fonksiyonel ve modüler** ama hala **çok ham**. Her sekm
 
 **Last Updated**: 10 Şubat 2026  
 **Current Version**: v8.3.1 (Documentation + pnpm Migration)
+
+---
+
+## 🌑 VOID PROTOCOL: Phase 9 (v9.0+)
+**Status**: 🌑 IN DARKNESS  
+**Goal**: Zero-Dependency Otonom Yapı + Ultimate Performance Tracking
+
+### 1. 🧬 MİMARİ DEĞİŞİM (Void Architecture)
+- [ ] **Zero-Dependency Transitions**: Tailwind CDN ve FontAwesome kaldırılması.
+- [ ] **Void Template Isolation**: Mantığın "Void-skeleton" olarak paketlenmesi.
+- [ ] **Transgressive Icons**: Mizahı yüksek, but-and-phallic-shaped "Void" kalkanları.
+- [ ] **State-Driven i18n**: Harici paket olmadan dile uyarlı UI.
+
+### 2. ⚡ PERFORMANS & ÖZEL MODÜLLER
+- [ ] **Private Performance Chamber**: Fiziksel dayanıklılık ve libido/seks performans takibi.
+- [ ] **Habbo-Style Logic Rooms**: İzole modüller olarak çalışan oda mantığı.
+- [ ] **Shocked Tux UI Implementation**: "Yok Artık!" dedirtecek görsel efektler ve tepkisellik.

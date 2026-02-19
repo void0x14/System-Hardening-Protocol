@@ -1,17 +1,20 @@
 <p align="center">
-  <img src="docs/screenshots/dashboard_full_hd.png" alt="System Hardening Protocol Dashboard" width="800">
+  <img src="docs/assets/void_tux_mascot.png" alt="Void Dual Tux Mascot" width="600">
 </p>
 
-<h1 align="center">🛡️ System Hardening Protocol</h1>
+<h1 align="center">🌑 SYSTEM HARDENING PROTOCOL</h1>
 
 <p align="center">
-  <strong>Military-grade personal tracking system for human performance optimization.</strong>
+  <strong>"Discipline equals Freedom."</strong><br>
+  Military-grade personal tracking system for human performance optimization.<br>
+  Zero-dependency. Zero-leaks. Zero-weakness.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-8.3.1-00ff88?style=for-the-badge&labelColor=0a0a0a" alt="Version">
+  <img src="https://img.shields.io/badge/version-9.0.0-00ff88?style=for-the-badge&labelColor=0a0a0a" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=0a0a0a" alt="License">
   <img src="https://img.shields.io/badge/zero-dependencies-ff4444?style=for-the-badge&labelColor=0a0a0a" alt="Zero Dependencies">
+  <img src="https://img.shields.io/badge/VOID-ARCHITECTURE-000000?style=for-the-badge&labelColor=00ff88" alt="Void Architecture">
   <img src="https://img.shields.io/badge/offline-first-00ccff?style=for-the-badge&labelColor=0a0a0a" alt="Offline First">
   <img src="https://img.shields.io/badge/single-file-ffaa00?style=for-the-badge&labelColor=0a0a0a" alt="Single File">
 </p>

@@ -1,0 +1,110 @@
+/* base.css - Reset, Variables, Body Styles */
+/* Extracted from original index.html lines 60-88, 288-302 */
+
+/* ============================================
+   CSS VARIABLES (Neon Theme)
+   ============================================ */
+:root {
+    /* Neon Colors */
+    --neon-green: #00ff41;
+    --neon-red: #ff003c;
+    --neon-blue: #00f3ff;
+    --neon-yellow: #facc15;
+    --neon-purple: #a855f7;
+
+    /* Surfaces */
+    --surface-gunmetal: #0a0a0f;
+    --surface-card: #111116;
+    --surface-raised: #1a1a22;
+    --surface-hover: #222230;
+
+    /* Text */
+    --text-white: #e5e7eb;
+    --text-muted: #6b7280;
+}
+
+/* ============================================
+   BODY & SCROLLBAR
+   ============================================ */
+body {
+    background-color: #0a0a0f;
+    color: #e5e7eb;
+    overflow-x: hidden;
+    font-size: 15px;
+}
+
+/* Typography Enhancement */
+body {
+    font-family: 'Inter', 'JetBrains Mono', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.font-mono,
+code,
+pre,
+input[type="number"] {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    letter-spacing: -0.02em;
+}
+
+/* Smooth Global Transitions */
+*,
+*::before,
+*::after {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #00ff41;
+}
+
+/* Custom Scrollbar for containers */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #00ff41;
+}
+
+.custom-scrollbar {
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   CYBER BORDER EFFECT
+   ============================================ */
+.cyber-border:hover {
+    border-color: #00ff41;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+}
