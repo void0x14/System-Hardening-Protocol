@@ -1,8 +1,12 @@
 // build.js - System Hardening Protocol Build Script
 // Combines modular JS files and injects into template.html
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 console.log('🔨 Building System Hardening Protocol v8.3.1...\n');
 
