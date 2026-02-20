@@ -1,3 +1,5 @@
+import { Store } from '../store.js';
+
 /**
  * MemoryStorageAdapter - In-memory implementation of StorageAdapter
  * 
@@ -8,7 +10,7 @@
  * @since Phase 3
  */
 
-import { StorageAdapter } from './StorageAdapter.js';
+import { StorageAdapter } from '../StorageAdapter.js';
 
 /**
  * In-memory storage adapter for testing and temporary data

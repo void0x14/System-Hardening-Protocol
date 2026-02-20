@@ -1,6 +1,8 @@
 // index.js - State Management Module Exports
 // Zero-dependency state management inspired by Redux
 
+import { Store } from '../store.js';
+
 /**
  * State Management Module
  * 
@@ -12,7 +14,7 @@
  * 
  * @example
  * // Basic usage
- * import { StateManager, initialState, rootReducer } from './state/index.js';
+ * import { StateManager, initialState, rootReducer } from '../state/index.js';
  * 
  * const store = new StateManager(initialState, rootReducer);
  * 
@@ -29,7 +31,7 @@
  */
 
 // Core exports
-export { StateManager } from './StateManager.js';
+export { StateManager } from '../StateManager.js';
 
 // State exports
 export { 
@@ -39,7 +41,7 @@ export {
     mergeState,
     stateTypes,
     checkType
-} from './initialState.js';
+} from '../initialState.js';
 
 // Reducer exports
 export { 
@@ -54,7 +56,7 @@ export {
     ActionTypes,
     actions,
     createReducer
-} from './reducers.js';
+} from '../reducers.js';
 
 // Middleware exports
 export { 
@@ -69,7 +71,7 @@ export {
     timingMiddleware,
     batchMiddleware,
     composeMiddleware
-} from './middleware.js';
+} from '../middleware.js';
 
 /**
  * Create a fully configured store with common middleware
@@ -83,7 +85,7 @@ export {
  * @returns {StateManager} Configured store instance
  * 
  * @example
- * import { createStore, LocalStorageAdapter } from './index.js';
+ * import { createStore, LocalStorageAdapter } from '../index.js';
  * 
  * const storage = new LocalStorageAdapter({ prefix: 'app_' });
  * const store = createStore({
@@ -132,7 +134,7 @@ export function createStore(options = {}) {
  * @returns {Object} Bound action creators
  * 
  * @example
- * import { bindActionCreators, actions } from './state/index.js';
+ * import { bindActionCreators, actions } from '../state/index.js';
  * 
  * const boundActions = bindActionCreators(store, actions);
  * boundActions.setWeight(75.5); // Automatically dispatches

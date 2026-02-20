@@ -2,7 +2,12 @@
 // Extracted from original index.html lines 1202-1316
 
 // Global scope assignment
-const Utils = {
+import { Actions } from './actions.js';
+import { UI } from './ui.js';
+import { CONFIG } from './config/index.js';
+import { DB } from './config/db.js';
+
+export const Utils = {
     /**
      * Bugünün tarihini YYYY-MM-DD formatında döndürür.
      * Client Local Time kullanır (kullanıcının timezone'una göre).

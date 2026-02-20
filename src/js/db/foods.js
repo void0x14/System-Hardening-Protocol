@@ -1,6 +1,9 @@
 // foods.js - Meal Plan Database
 // Extracted from original index.html
 
+import { CONFIG } from '../config/index.js';
+import { DB } from '../config/db.js';
+
 const MEAL_PLAN_DB = {
     breakfast: [
         { text: "3 Yumurta (Tavada/Omlet) + 3 Dilim Kaşar + Ekmek", kcal: 550 },

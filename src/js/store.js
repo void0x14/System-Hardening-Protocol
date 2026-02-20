@@ -2,7 +2,12 @@
 // Extracted from original index.html lines 1340-1963
 
 // Global scope assignment
-const Store = {
+import { UI } from './ui.js';
+import { Utils } from './utils.js';
+import { CONFIG } from './config/index.js';
+import { DB } from './config/db.js';
+
+export const Store = {
     state: {
         weight: 45.0,
         fuelDate: null,

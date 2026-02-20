@@ -2,6 +2,9 @@
 // Extracted from original index.html
 
 // Use DB namespace directly (exercises.js already declared it)
+import { CONFIG } from '../config/index.js';
+import { DB } from '../config/db.js';
+
 DB.ANATOMY_DB = {
     "chest": { name: "Pectoralis Major", function: "İtme kuvveti.", system: "Üst Gövde İtiş", action: "Push-up, Floor Press", recovery: "48-72 Saat" },
     "abs": { name: "Rectus Abdominis", function: "Core gücü, cinsel dayanıklılık.", system: "Merkezi Denge", action: "Plank, Leg Raise, Vacuum", recovery: "24-48 Saat" },

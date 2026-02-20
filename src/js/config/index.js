@@ -1,21 +1,24 @@
 // index.js - ConfigService and Module Exports
 // Phase 2: Configuration Extraction - Unified Config Access
 
+import { UI } from '../ui.js';
+import { THEME } from '../config/theme.js';
+
 /**
  * ConfigService - Unified configuration access for System Hardening app.
  * Provides centralized access to all configuration modules.
  * 
  * @module config
  * @example
- * import { config } from './config/index.js';
+ * import { config } from '../config/index.js';
  * const weightKey = config.getKey('WEIGHT');
  * const calorieTarget = config.getTarget('CALORIES');
  */
 
-import { KEYS, isDatePrefixedKey, createDatedKey, getAllKeys } from './keys.js';
-import { TARGETS, getNextMilestone, getCompletedMilestones, getProgressPercentage, getRemainingToGoal } from './targets.js';
-import { VALIDATION_LIMITS, clampToRange, isValidIsoDate, isValidTimestamp } from './validation.js';
-import { THEME, getClasses, getButtonVariant, COLORS, ANIMATION_DURATIONS, Z_INDEX, BREAKPOINTS, SPACING, BORDER_RADIUS } from './theme.js';
+import { KEYS, isDatePrefixedKey, createDatedKey, getAllKeys } from '../keys.js';
+import { TARGETS, getNextMilestone, getCompletedMilestones, getProgressPercentage, getRemainingToGoal } from '../targets.js';
+import { VALIDATION_LIMITS, clampToRange, isValidIsoDate, isValidTimestamp } from '../validation.js';
+import { THEME, getClasses, getButtonVariant, COLORS, ANIMATION_DURATIONS, Z_INDEX, BREAKPOINTS, SPACING, BORDER_RADIUS } from '../theme.js';
 
 /**
  * Application version string.
@@ -271,16 +274,16 @@ export class ConfigService {
  * 
  * @constant {ConfigService}
  * @example
- * import { config } from './config/index.js';
+ * import { config } from '../config/index.js';
  * console.log(config.getVersion()); // '8.3.1'
  */
 export const config = new ConfigService();
 
 // Re-export all modules for direct access
-export { KEYS, isDatePrefixedKey, createDatedKey, getAllKeys } from './keys.js';
-export { TARGETS, getNextMilestone, getCompletedMilestones, getProgressPercentage, getRemainingToGoal } from './targets.js';
-export { VALIDATION_LIMITS, clampToRange, isValidIsoDate, isValidTimestamp } from './validation.js';
-export { THEME, getClasses, getButtonVariant, COLORS, ANIMATION_DURATIONS, Z_INDEX, BREAKPOINTS, SPACING, BORDER_RADIUS } from './theme.js';
+export { KEYS, isDatePrefixedKey, createDatedKey, getAllKeys } from '../keys.js';
+export { TARGETS, getNextMilestone, getCompletedMilestones, getProgressPercentage, getRemainingToGoal } from '../targets.js';
+export { VALIDATION_LIMITS, clampToRange, isValidIsoDate, isValidTimestamp } from '../validation.js';
+export { THEME, getClasses, getButtonVariant, COLORS, ANIMATION_DURATIONS, Z_INDEX, BREAKPOINTS, SPACING, BORDER_RADIUS } from '../theme.js';
 
 // Default export is the config singleton
 export default config;

@@ -2,6 +2,9 @@
 // Extracted from original index.html lines 631-664
 
 // Global scope assignments
+import { CONFIG } from './config/index.js';
+import { THEME } from './config/theme.js';
+
 const CONFIG = {
     VERSION: '8.3.1',
     DEBUG_MODE: false, // Set to true for development debug logs

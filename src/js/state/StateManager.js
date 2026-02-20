@@ -1,6 +1,8 @@
 // StateManager.js - Zero-dependency State Management
 // Inspired by Redux but simplified for this project's needs
 
+import { Store } from '../store.js';
+
 /**
  * @typedef {Object} Action
  * @property {string} type - Action type identifier

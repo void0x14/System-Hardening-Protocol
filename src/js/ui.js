@@ -2,7 +2,15 @@
 // Extracted from original index.html lines 1985-2236
 
 // Global scope assignment
-const UI = {
+import { Store } from './store.js';
+import { Actions } from './actions.js';
+import { Stealth } from './stealth.js';
+import { Utils } from './utils.js';
+import { CONFIG } from './config/index.js';
+import { THEME } from './config/theme.js';
+import { i18n } from './services/i18nService.js';
+
+export const UI = {
     activeView: 'front',
 
     async init() {
@@ -14,12 +22,12 @@ const UI = {
 
     renderTabs() {
         let tabs = [
-            { id: 'dashboard', l: 'DASHBOARD', i: 'fa-chart-line' },
-            { id: 'training', l: 'ANTRENMAN', i: 'fa-dumbbell' },
-            { id: 'nutrition', l: 'BESLENME', i: 'fa-utensils' },
-            { id: 'progress', l: 'GELİŞİM', i: 'fa-chart-bar' },
-            { id: 'anatomy', l: 'ANATOMİ LAB', i: 'fa-dna' },
-            { id: 'mental', l: 'ZİHİNSEL', i: 'fa-brain' }
+            { id: 'dashboard', l: i18n.t('ui.tabs.dashboard'), i: 'fa-chart-line' },
+            { id: 'training', l: i18n.t('ui.tabs.training'), i: 'fa-dumbbell' },
+            { id: 'nutrition', l: i18n.t('ui.tabs.nutrition'), i: 'fa-utensils' },
+            { id: 'progress', l: i18n.t('ui.tabs.progress'), i: 'fa-chart-bar' },
+            { id: 'anatomy', l: i18n.t('ui.tabs.anatomy'), i: 'fa-dna' },
+            { id: 'mental', l: i18n.t('ui.tabs.mental'), i: 'fa-brain' }
         ];
         // Sanitize modda Mental tab'ı gizle
         if (typeof Stealth !== 'undefined' && Stealth.active) {

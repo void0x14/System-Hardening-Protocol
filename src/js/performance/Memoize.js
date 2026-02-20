@@ -1,3 +1,5 @@
+import { Store } from '../store.js';
+
 /**
  * Memoize - Zero-dependency function memoization utilities
  * 
@@ -10,7 +12,7 @@
  * - Support for async functions
  * 
  * @example
- * import { memoize, memoizeWith, memoizeAsync } from './Memoize.js';
+ * import { memoize, memoizeWith, memoizeAsync } from '../Memoize.js';
  * 
  * // Simple memoization
  * const expensiveCalc = memoize((n) => {

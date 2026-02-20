@@ -1,3 +1,5 @@
+import { Store } from '../store.js';
+
 /**
  * Dependency Injection Container
  * Zero-dependency implementation for managing service lifecycles

@@ -16,17 +16,17 @@
  *     memoize, 
  *     VirtualList, 
  *     LazyLoader 
- * } from './performance/index.js';
+ * } from '../performance/index.js';
  * 
  * // Or import specific modules
- * import { CacheService } from './performance/CacheService.js';
- * import { memoize, memoizeAsync } from './performance/Memoize.js';
- * import { VirtualList } from './performance/VirtualList.js';
- * import { LazyLoader, LazyImage } from './performance/LazyLoader.js';
+ * import { CacheService } from '../performance/CacheService.js';
+ * import { memoize, memoizeAsync } from '../performance/Memoize.js';
+ * import { VirtualList } from '../performance/VirtualList.js';
+ * import { LazyLoader, LazyImage } from '../performance/LazyLoader.js';
  */
 
 // CacheService - In-memory caching with TTL
-export { CacheService } from './CacheService.js';
+export { CacheService } from '../CacheService.js';
 
 // Memoize - Function memoization utilities
 export {
@@ -37,10 +37,10 @@ export {
     memoizeWeak,
     memoizeThrottled,
     clearMemoizedCache
-} from './Memoize.js';
+} from '../Memoize.js';
 
 // VirtualList - Virtual scrolling for large lists
-export { VirtualList } from './VirtualList.js';
+export { VirtualList } from '../VirtualList.js';
 
 // LazyLoader - Lazy loading for components and images
 export {
@@ -49,7 +49,7 @@ export {
     LazyComponent,
     createLazyLoader,
     lazyLoadImages
-} from './LazyLoader.js';
+} from '../LazyLoader.js';
 
 /**
  * Create a performance utilities container

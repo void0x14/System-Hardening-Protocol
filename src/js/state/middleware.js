@@ -1,6 +1,8 @@
 // middleware.js - State Middleware Functions
 // Provides logging, persistence, and other cross-cutting concerns
 
+import { Store } from '../store.js';
+
 /**
  * @typedef {Function} Middleware
  * @param {StateManager} store - Store instance

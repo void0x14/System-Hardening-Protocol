@@ -1,7 +1,12 @@
 // stealth.js - Sanitize Mode for Privacy Protection
 // Hides sensitive content while keeping app fully functional
 
-const Stealth = {
+import { Store } from './store.js';
+import { Actions } from './actions.js';
+import { UI } from './ui.js';
+import { CONFIG } from './config/index.js';
+
+export const Stealth = {
     active: false,
 
     origTitle: null, // Will be set dynamically using CONFIG.VERSION

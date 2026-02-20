@@ -2,7 +2,14 @@
 // Extracted from original index.html lines 3038-3973
 
 // Using window. for global scope access
-const Actions = {
+import { Store } from './store.js';
+import { UI } from './ui.js';
+import { Utils } from './utils.js';
+import { CONFIG } from './config/index.js';
+import { THEME } from './config/theme.js';
+import { DB } from './config/db.js';
+
+export const Actions = {
     // v7.1.0: Video modal
     playVideo(videoId) {
         if (!Utils.isValidYouTubeId(videoId)) {

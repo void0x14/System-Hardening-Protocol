@@ -1,6 +1,8 @@
 // initialState.js - Default State Values
 // Extracted from store.js for centralized state management
 
+import { UI } from '../ui.js';
+
 /**
  * Initial state for the application
  * This represents the default state when the app starts fresh

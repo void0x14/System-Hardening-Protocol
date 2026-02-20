@@ -1,6 +1,9 @@
 // exercises.js - Exercise Database
 // Extracted from original index.html
 
+import { CONFIG } from '../config/index.js';
+import { DB } from '../config/db.js';
+
 const DB = {};
 
 DB.EXERCISES = {

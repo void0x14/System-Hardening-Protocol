@@ -14,11 +14,11 @@
  */
 
 // Export all services
-export { ValidationService } from './ValidationService.js';
-export { BackupService } from './BackupService.js';
-export { StatisticsService } from './StatisticsService.js';
-export { ExerciseHistoryService } from './ExerciseHistoryService.js';
-export { StreakService } from './StreakService.js';
+export { ValidationService } from '../ValidationService.js';
+export { BackupService } from '../BackupService.js';
+export { StatisticsService } from '../StatisticsService.js';
+export { ExerciseHistoryService } from '../ExerciseHistoryService.js';
+export { StreakService } from '../StreakService.js';
 
 // Default export with all services
 export default {
@@ -34,7 +34,7 @@ export default {
  * Creates configured service instances with shared dependencies
  * 
  * @example
- * import { createServices } from './services/index.js';
+ * import { createServices } from '../services/index.js';
  * 
  * const services = createServices({
  *     storage: localStorageAdapter,

@@ -2,6 +2,9 @@
 // Extracted from original index.html
 
 // Global scope assignment
+import { CONFIG } from '../config/index.js';
+import { DB } from '../config/db.js';
+
 const WEEKLY_PLAN = {
     1: { name: "PAZARTESİ", title: "FULL BODY START", tasks: ["squat", "pushup", "one_arm_row", "plank"] },
     2: { name: "SALI", title: "BESLENME & RECOVERY", tasks: ["eat_bulk", "stretch", "farmers_walk"] },

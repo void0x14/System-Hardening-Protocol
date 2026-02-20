@@ -10,7 +10,7 @@
  * 
  * @example
  * // Import specific adapters
- * import { LocalStorageAdapter, MemoryStorageAdapter } from './infrastructure/index.js';
+ * import { LocalStorageAdapter, MemoryStorageAdapter } from '../infrastructure/index.js';
  * 
  * // Use localStorage for persistence
  * const storage = new LocalStorageAdapter({ prefix: 'monk_' });
@@ -21,9 +21,9 @@
  */
 
 // Storage Adapters
-export { StorageAdapter } from './StorageAdapter.js';
-export { LocalStorageAdapter } from './LocalStorageAdapter.js';
-export { MemoryStorageAdapter } from './MemoryStorageAdapter.js';
+export { StorageAdapter } from '../StorageAdapter.js';
+export { LocalStorageAdapter } from '../LocalStorageAdapter.js';
+export { MemoryStorageAdapter } from '../MemoryStorageAdapter.js';
 
 // Default export for convenience
 export default {

@@ -2,12 +2,16 @@
 // Re-exports all view components for easy importing
 
 // View components
-export { DashboardView } from './DashboardView.js';
-export { TrainingView } from './TrainingView.js';
-export { NutritionView } from './NutritionView.js';
-export { ProgressView } from './ProgressView.js';
-export { AnatomyView } from './AnatomyView.js';
-export { MentalView } from './MentalView.js';
+import { Store } from '../store.js';
+import { UI } from '../ui.js';
+import { Stealth } from '../stealth.js';
+
+export { DashboardView } from '../DashboardView.js';
+export { TrainingView } from '../TrainingView.js';
+export { NutritionView } from '../NutritionView.js';
+export { ProgressView } from '../ProgressView.js';
+export { AnatomyView } from '../AnatomyView.js';
+export { MentalView } from '../MentalView.js';
 
 /**
  * Create Views Factory Object

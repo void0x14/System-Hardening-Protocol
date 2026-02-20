@@ -2,6 +2,11 @@
 // Extracted from original index.html lines 672-872
 
 // Global scope assignment
+import { UI } from './ui.js';
+import { Utils } from './utils.js';
+import { CONFIG } from './config/index.js';
+import { THEME } from './config/theme.js';
+
 const safeNumberInputValue = (value, min = 0, max = 10000) => {
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) return '';

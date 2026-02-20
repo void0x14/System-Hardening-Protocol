@@ -2,6 +2,9 @@
 // Extracted from original index.html
 
 // Global scope assignment
+import { CONFIG } from '../config/index.js';
+import { DB } from '../config/db.js';
+
 const MENTAL_PHASES = [
     {
         id: 1,

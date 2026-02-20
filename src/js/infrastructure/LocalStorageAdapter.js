@@ -8,7 +8,7 @@
  * @since Phase 3
  */
 
-import { StorageAdapter } from './StorageAdapter.js';
+import { StorageAdapter } from '../StorageAdapter.js';
 
 /**
  * LocalStorage adapter for browser persistence

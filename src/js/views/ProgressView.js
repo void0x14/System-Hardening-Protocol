@@ -1,6 +1,9 @@
 // views/ProgressView.js - Progress Tab View Component
 // Extracted from renderers/dashboard.js
 
+import { Store } from '../store.js';
+import { Stealth } from '../stealth.js';
+
 /**
  * Progress View Class
  * Renders the progress tab with weight history, volume stats, and measurements

@@ -10,7 +10,7 @@
  * 
  * @example
  * // Import specific repositories
- * import { WeightRepository, WorkoutRepository, MealRepository } from './repositories/index.js';
+ * import { WeightRepository, WorkoutRepository, MealRepository } from '../repositories/index.js';
  * 
  * // Create instances with storage adapter
  * const weightRepo = new WeightRepository(storage);
@@ -24,12 +24,12 @@
  */
 
 // Base Repository
-export { BaseRepository } from './BaseRepository.js';
+export { BaseRepository } from '../BaseRepository.js';
 
 // Entity Repositories
-export { WeightRepository } from './WeightRepository.js';
-export { WorkoutRepository } from './WorkoutRepository.js';
-export { MealRepository } from './MealRepository.js';
+export { WeightRepository } from '../WeightRepository.js';
+export { WorkoutRepository } from '../WorkoutRepository.js';
+export { MealRepository } from '../MealRepository.js';
 
 // Default export for convenience
 export default {

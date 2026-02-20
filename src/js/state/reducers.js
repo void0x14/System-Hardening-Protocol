@@ -1,7 +1,10 @@
 // reducers.js - State Transformation Functions
 // Handles all state changes through action dispatch
 
-import { initialState } from './initialState.js';
+import { initialState } from '../initialState.js';
+
+import { Actions } from '../actions.js';
+import { UI } from '../ui.js';
 
 /**
  * Action type constants

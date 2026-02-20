@@ -1,6 +1,8 @@
 // views/MentalView.js - Mental Health Tab View Component
 // Extracted from renderers/dashboard.js
 
+import { Store } from '../store.js';
+
 /**
  * Mental View Class
  * Renders the mental health tab with phases and daily practices

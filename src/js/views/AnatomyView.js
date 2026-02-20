@@ -1,6 +1,10 @@
 // views/AnatomyView.js - Anatomy Lab View Component
 // Extracted from renderers/dashboard.js
 
+import { Store } from '../store.js';
+import { UI } from '../ui.js';
+import { Stealth } from '../stealth.js';
+
 /**
  * Anatomy View Class
  * Renders the anatomy lab with interactive muscle diagrams

@@ -2,20 +2,23 @@
 // Re-exports all UI components for easy importing
 
 // Card components
-export { Card, StatCard, StatMini } from './Card.js';
+import { UI } from '../ui.js';
+import { THEME } from '../config/theme.js';
+
+export { Card, StatCard, StatMini } from '../Card.js';
 
 // Progress components
-export { ProgressBar, ProgressRow, CircularProgress } from './ProgressBar.js';
+export { ProgressBar, ProgressRow, CircularProgress } from '../ProgressBar.js';
 
 // Nutrition components
-export { MacroRing, MacroRings } from './MacroRing.js';
-export { MealCard, MealCardCompact, EmptyMealList } from './MealCard.js';
+export { MacroRing, MacroRings } from '../MacroRing.js';
+export { MealCard, MealCardCompact, EmptyMealList } from '../MealCard.js';
 
 // Modal components
-export { Modal, AlertModal, modal, alertModal, createModalHTML } from './Modal.js';
+export { Modal, AlertModal, modal, alertModal, createModalHTML } from '../Modal.js';
 
 // Toast components
-export { Toast, toast, showToast, createToastContainerHTML } from './Toast.js';
+export { Toast, toast, showToast, createToastContainerHTML } from '../Toast.js';
 
 // Exercise set components
 export { 
@@ -24,7 +27,7 @@ export {
     SimpleTaskBtn, 
     AddSetButton,
     safeNumberInputValue 
-} from './SetRow.js';
+} from '../SetRow.js';
 
 /**
  * Create Components Factory Object

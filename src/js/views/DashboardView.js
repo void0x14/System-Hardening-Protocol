@@ -1,5 +1,8 @@
+import { i18n } from '../services/i18nService.js';
 // views/DashboardView.js - Main Dashboard View Component
 // Extracted from renderers/dashboard.js
+
+import { Store } from '../store.js';
 
 /**
  * Dashboard View Class
@@ -166,7 +169,7 @@ export class DashboardView {
                     <!-- 1. SYSTEM INTEGRITY (Circular Progress) -->
                     <div class="${cardClass} relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
                         <div class="absolute inset-0 bg-gradient-to-b from-neon-green/5 to-transparent"></div>
-                        <div class="${labelClass} z-10 w-full text-center">SYSTEM INTEGRITY</div>
+                        <div class="${labelClass} z-10 w-full text-center">${i18n.t("dashboard.system_integrity")}</div>
 
                         <div class="relative z-10">
                             <svg viewBox="0 0 36 36" class="circular-chart w-48 h-48">
@@ -175,7 +178,7 @@ export class DashboardView {
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center">
                                 <div class="text-4xl font-black text-white font-mono tracking-tighter">${currentWeight}<span class="text-lg text-gray-500">kg</span></div>
-                                <div class="text-[10px] text-neon-blue mt-1 font-mono">GOAL: ${goalWeight}</div>
+                                <div class="text-[10px] text-neon-blue mt-1 font-mono">${i18n.t("dashboard.goal")} ${goalWeight}</div>
                             </div>
                         </div>
 
@@ -187,17 +190,17 @@ export class DashboardView {
                     <!-- 2. UPTIME HISTORY (Streak + Heatmap) -->
                     <div class="${cardClass} flex flex-col justify-between min-h-[200px]">
                         <div>
-                            <div class="${labelClass}">UPTIME STREAK</div>
+                            <div class="${labelClass}">${i18n.t("dashboard.uptime_streak")}</div>
                             <div class="flex items-baseline gap-2 mb-4">
                                 <div class="text-5xl font-header font-black ${safeStreak > 0 ? 'text-neon-green' : 'text-gray-500'} leading-none">${safeStreak}</div>
-                                <div class="text-xs text-text-muted uppercase tracking-wider">GÜN</div>
+                                <div class="text-xs text-text-muted uppercase tracking-wider">${i18n.t("dashboard.days")}</div>
                             </div>
                         </div>
 
                         <div class="space-y-2">
                             <div class="flex justify-between items-end">
-                                <div class="text-[9px] text-gray-500 font-bold">SON 28 GÜN</div>
-                                <div class="text-[9px] text-neon-green font-bold">CONSISTENCY</div>
+                                <div class="text-[9px] text-gray-500 font-bold">${i18n.t("dashboard.last_28_days")}</div>
+                                <div class="text-[9px] text-neon-green font-bold">${i18n.t("dashboard.consistency")}</div>
                             </div>
                             <div class="heatmap-grid bg-black/20 p-2 rounded border border-gray-800">
                                 ${heatmapHTML}
@@ -207,22 +210,22 @@ export class DashboardView {
 
                     <!-- 3. DAILY PROTOCOL STATUS -->
                     <div class="${cardClass}">
-                        <div class="${labelClass}">DAILY PROTOCOL</div>
+                        <div class="${labelClass}">${i18n.t("dashboard.daily_protocol")}</div>
                         <div class="space-y-4 mt-2">
                             <!-- Training -->
                             <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isTrainingDone ? 'border-neon-green' : 'border-neon-red'}">
                                 <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs font-bold text-gray-300">ANTRENMAN</span>
+                                    <span class="text-xs font-bold text-gray-300">${i18n.t("dashboard.training")}</span>
                                     ${isTrainingDone ? '<i class="fas fa-check text-neon-green"></i>' : '<i class="fas fa-times text-neon-red"></i>'}
                                 </div>
-                                <div class="text-[10px] text-gray-500 font-mono">${completedTasks}/${totalTasks} Görev</div>
+                                <div class="text-[10px] text-gray-500 font-mono">${completedTasks}/${totalTasks} ${i18n.t("dashboard.tasks")}</div>
                             </div>
 
                             <!-- Nutrition -->
                             <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isProteinDone ? 'border-neon-green' : 'border-accent-orange'}">
                                 <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs font-bold text-gray-300">PROTEİN</span>
-                                    ${isProteinDone ? '<i class="fas fa-check text-neon-green"></i>' : '<span class="text-accent-orange text-[10px] font-bold">EKSİK</span>'}
+                                    <span class="text-xs font-bold text-gray-300">${i18n.t("dashboard.protein")}</span>
+                                    ${isProteinDone ? '<i class="fas fa-check text-neon-green"></i>' : '<span class="text-accent-orange text-[10px] font-bold">${i18n.t("dashboard.missing")}</span>'}
                                 </div>
                                 <div class="text-[10px] text-gray-500 font-mono">${Math.round(totalProtein)} / ${targetProtein}g</div>
                             </div>
@@ -230,10 +233,10 @@ export class DashboardView {
                             <!-- Sleep -->
                             <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isSleepDone ? 'border-neon-green' : 'border-gray-600'} cursor-pointer hover:bg-surface-hover transition-all" ${actionAttrs('openSleepModal')}>
                                 <div class="flex justify-between items-center mb-1">
-                                    <span class="text-xs font-bold text-gray-300">UYKU</span>
-                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${safeSleepHours} Saat</span>
+                                    <span class="text-xs font-bold text-gray-300">${i18n.t("dashboard.sleep")}</span>
+                                    <span class="text-[10px] font-mono ${isSleepDone ? 'text-neon-green' : 'text-gray-500'}">${safeSleepHours} ${i18n.t("dashboard.hours")}</span>
                                 </div>
-                                <div class="text-[9px] text-gray-600">Kaydetmek icin tikla</div>
+                                <div class="text-[9px] text-gray-600">${i18n.t("dashboard.click_to_save")}</div>
                             </div>
                         </div>
                     </div>
@@ -244,7 +247,7 @@ export class DashboardView {
                     <!-- HYDRATION MONITOR -->
                     <div class="${cardClass}">
                         <div class="flex justify-between items-start mb-4">
-                            <div class="${labelClass}">HYDRATION LEVEL</div>
+                            <div class="${labelClass}">${i18n.t("dashboard.hydration_level")}</div>
                             <i class="fas fa-tint text-neon-blue"></i>
                         </div>
                         <div class="flex items-end justify-between">
@@ -273,7 +276,7 @@ export class DashboardView {
                         <!-- Calorie Tracker -->
                         <div class="mb-4">
                             <div class="flex justify-between items-end mb-1">
-                                <span class="text-xs text-gray-400 font-bold">ENERGY LEVEL</span>
+                                <span class="text-xs text-gray-400 font-bold">${i18n.t("dashboard.energy_level")}</span>
                                 <span class="text-white font-bold text-sm font-mono">${totalCal} / ${targetCal} kcal</span>
                             </div>
                             <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
@@ -283,11 +286,11 @@ export class DashboardView {
 
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="text-xl font-bold text-white">GAINER SHAKE</div>
-                                <div class="text-[10px] text-gray-500 mt-1">Süt + Yulaf + Fıstık + Muz</div>
+                                <div class="text-xl font-bold text-white">${i18n.t("dashboard.gainer_shake")}</div>
+                                <div class="text-[10px] text-gray-500 mt-1">${i18n.t("dashboard.gainer_ingredients")}</div>
                             </div>
                             <button ${actionAttrs('injectFuel')} class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all tracking-wider ${fuelDone ? 'bg-neon-green text-black' : 'bg-neon-red text-white hover:bg-red-600'}">
-                                ${fuelDone ? 'INJECTED' : 'INJECT NOW'}
+                                ${fuelDone ? i18n.t('dashboard.injected') : i18n.t('dashboard.inject_now')}
                             </button>
                         </div>
                     </div>
@@ -298,8 +301,8 @@ export class DashboardView {
                     <button ${actionAttrs('completeDailyMission')} class="${cardClass} group hover:border-neon-green/50 flex items-center justify-center p-4 cursor-pointer transition-all hover:bg-neon-green/5">
                         <i class="fas fa-check-circle text-2xl text-gray-600 group-hover:text-neon-green transition-colors mr-4"></i>
                         <div class="text-center">
-                            <div class="text-white font-bold text-sm tracking-widest">SYSTEM CHECK: COMPLETE DAY</div>
-                            <div class="text-[10px] text-gray-500 font-mono">ALL TASKS DONE</div>
+                            <div class="text-white font-bold text-sm tracking-widest">${i18n.t("dashboard.system_check")}</div>
+                            <div class="text-[10px] text-gray-500 font-mono">${i18n.t("dashboard.all_tasks_done")}</div>
                         </div>
                     </button>
                 </div>

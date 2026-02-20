@@ -1,6 +1,8 @@
 // theme.js - UI Theme Constants
 // Extracted from config.js for Phase 2: Configuration Extraction
 
+import { UI } from '../ui.js';
+
 /**
  * UI theme and styling constants for System Hardening app.
  * Tailwind CSS class compositions for consistent styling.

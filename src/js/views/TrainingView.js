@@ -3,6 +3,9 @@
 
 import { WeightedSetRow, TimedSetRow, SimpleTaskBtn, AddSetButton } from '../components/SetRow.js';
 
+import { Store } from '../store.js';
+import { Stealth } from '../stealth.js';
+
 /**
  * Training View Class
  * Renders the training/workout tab with exercise list and set tracking

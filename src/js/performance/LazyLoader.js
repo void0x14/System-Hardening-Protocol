@@ -10,7 +10,7 @@
  * - Preloading for anticipated content
  * 
  * @example
- * import { LazyLoader, LazyImage, LazyComponent } from './LazyLoader.js';
+ * import { LazyLoader, LazyImage, LazyComponent } from '../LazyLoader.js';
  * 
  * // Basic lazy loading
  * const loader = new LazyLoader({

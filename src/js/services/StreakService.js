@@ -2,7 +2,7 @@
 // Phase 5: Service Layer - Extracted from store.js
 
 import { config } from '../config/index.js';
-import { ValidationService } from './ValidationService.js';
+import { ValidationService } from '../ValidationService.js';
 
 /**
  * StreakService

@@ -1,3 +1,5 @@
+import { Store } from '../store.js';
+
 /**
  * Core Module - DI Container and Event Bus
  * 
@@ -6,7 +8,7 @@
  * Provides dependency injection and event-driven communication patterns.
  * 
  * @example
- * import { Container, EventBus } from './core/index.js';
+ * import { Container, EventBus } from '../core/index.js';
  * 
  * // Create container and event bus
  * const container = new Container();
@@ -20,5 +22,5 @@
  * eventBus.on('store:change', (state) => console.log(state));
  */
 
-export { Container } from './Container.js';
-export { EventBus } from './EventBus.js';
+export { Container } from '../Container.js';
+export { EventBus } from '../EventBus.js';

@@ -1,6 +1,8 @@
 // components/Card.js - Card Container Component
 // Extracted from components.js for reusability
 
+import { THEME } from '../config/theme.js';
+
 /**
  * Card Component Factory
  * Standard card wrapper with optional accent border

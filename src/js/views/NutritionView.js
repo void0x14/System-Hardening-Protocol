@@ -4,6 +4,8 @@
 import { MacroRing } from '../components/MacroRing.js';
 import { MealCard, EmptyMealList } from '../components/MealCard.js';
 
+import { Store } from '../store.js';
+
 /**
  * Nutrition View Class
  * Renders the nutrition tab with macro tracking and meal management
