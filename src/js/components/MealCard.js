@@ -1,6 +1,8 @@
 // components/MealCard.js - Meal Card Component
 // Extracted from components.js for reusability
 
+import { i18n } from '../services/i18nService.js';
+
 /**
  * Meal Card Component Factory
  * Enhanced meal card with macro breakdown
@@ -24,14 +26,14 @@
 export function MealCard(meal, idx, utils = {}) {
     const escapeHtml = utils.escapeHtml || defaultEscapeHtml;
     const actionAttrs = utils.actionAttrs || defaultActionAttrs;
-    
+
     const safeName = escapeHtml(meal.name || 'Unknown Meal');
     const safePortionLabel = meal.portionLabel ? escapeHtml(meal.portionLabel) : '';
     const safeCal = Number(meal.cal) || 0;
     const safeProt = Number(meal.prot) || 0;
     const safeCarb = Number(meal.carb) || 0;
     const safeFat = Number(meal.fat) || 0;
-    
+
     return `
         <div class="meal-item flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-gray-900/80 p-3 rounded-lg mb-2 border border-gray-800 group hover:border-gray-700 transition-all">
             <div class="flex items-center gap-3">
@@ -52,7 +54,7 @@ export function MealCard(meal, idx, utils = {}) {
                     <span class="text-yellow-400"><b>${safeFat}</b>F</span>
                 </div>
                 <span class="text-neon-green font-bold text-sm">${safeCal} kcal</span>
-                <button ${actionAttrs('deleteMeal', [idx])} class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-2" title="Sil">
+                <button ${actionAttrs('deleteMeal', [idx])} class="text-red-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-2" title="${i18n.t('ui.nutrition.delete')}">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -72,10 +74,10 @@ export function MealCard(meal, idx, utils = {}) {
 export function MealCardCompact(meal, idx, utils = {}) {
     const escapeHtml = utils.escapeHtml || defaultEscapeHtml;
     const actionAttrs = utils.actionAttrs || defaultActionAttrs;
-    
+
     const safeName = escapeHtml(meal.name || 'Unknown Meal');
     const safeCal = Number(meal.cal) || 0;
-    
+
     return `
         <div class="flex justify-between items-center p-2 bg-gray-900/50 rounded group hover:bg-gray-800/50 transition">
             <div class="flex items-center gap-2">
@@ -100,8 +102,8 @@ export function EmptyMealList() {
     return `
         <div class="text-center text-gray-600 py-8 border-2 border-dashed border-gray-800 rounded-xl">
             <i class="fas fa-utensils text-3xl mb-3 text-gray-700"></i>
-            <div class="font-bold">HENÜZ YAKIT GİRİLMEDİ</div>
-            <span class="text-[10px] text-neon-red">SİSTEM ZAYIFLIYOR!</span>
+            <div class="font-bold">${i18n.t('ui.nutrition.empty_fuel')}</div>
+            <span class="text-[10px] text-neon-red">${i18n.t('ui.nutrition.system_weak')}</span>
         </div>
     `;
 }

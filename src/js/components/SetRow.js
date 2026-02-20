@@ -1,6 +1,8 @@
 // components/SetRow.js - Exercise Set Row Components
 // Extracted from components.js for reusability
 
+import { i18n } from '../services/i18nService.js';
+
 /**
  * Safe number input value formatter
  * @param {*} value - Value to format
@@ -33,13 +35,13 @@ export function safeNumberInputValue(value, min = 0, max = 10000) {
 export function WeightedSetRow(tid, idx, log = {}, isSetDone, hint = '', utils = {}) {
     const actionAttrs = utils.actionAttrs || defaultActionAttrs;
     const logData = log || {};
-    
+
     return `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
             <!-- Set Number Badge (Interactive Delete v8.3.0) -->
             <button ${actionAttrs('removeSet', [tid, idx])}
                 class="group flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black hover:bg-red-900/80' : 'bg-gray-700 text-white hover:bg-red-900/80'} font-black text-lg md:text-xl flex items-center justify-center relative transition-all duration-200 hover:border-2 hover:border-red-500/50"
-                title="Set Sil">
+                title="${i18n.t('training.delete_set')}">
                 <span class="group-hover:opacity-20 transition-opacity duration-200">${idx + 1}</span>
                 <i class="fas fa-times absolute inset-0 flex items-center justify-center text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
             </button>
@@ -65,7 +67,7 @@ export function WeightedSetRow(tid, idx, log = {}, isSetDone, hint = '', utils =
             <button ${actionAttrs('saveSet', [tid, idx, true], { passElement: true })}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-save'}"></i>
-                <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
+                <span class="hidden sm:inline">${isSetDone ? i18n.t('training.ok') : i18n.t('training.save')}</span>
             </button>
         </div>
     `;
@@ -88,20 +90,20 @@ export function WeightedSetRow(tid, idx, log = {}, isSetDone, hint = '', utils =
 export function TimedSetRow(tid, idx, log = {}, isSetDone, utils = {}) {
     const actionAttrs = utils.actionAttrs || defaultActionAttrs;
     const logData = log || {};
-    
+
     return `
         <div class="set-row ${isSetDone ? 'set-complete-animation' : ''} flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl ${isSetDone ? 'bg-gradient-to-r from-neon-green/20 to-neon-green/5 border-2 border-neon-green' : 'bg-gray-800/70 border-2 border-gray-700 hover:border-gray-600'} transition-all duration-300">
             <!-- Set Number Badge (Interactive Delete v8.3.0) -->
             <button ${actionAttrs('removeSet', [tid, idx])}
                 class="group flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-lg ${isSetDone ? 'bg-neon-green text-black hover:bg-red-900/80' : 'bg-gray-700 text-white hover:bg-red-900/80'} font-black text-lg md:text-xl flex items-center justify-center relative transition-all duration-200 hover:border-2 hover:border-red-500/50"
-                title="Set Sil">
+                title="${i18n.t('training.delete_set')}">
                 <span class="group-hover:opacity-20 transition-opacity duration-200">${idx + 1}</span>
                 <i class="fas fa-times absolute inset-0 flex items-center justify-center text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></i>
             </button>
             
             <!-- Input -->
             <div class="flex-1">
-                <input type="number" placeholder="SANİYE" value="${safeNumberInputValue(logData.duration, 0, 7200)}" id="d-${tid}-${idx}" 
+                <input type="number" placeholder="${i18n.t('training.seconds')}" value="${safeNumberInputValue(logData.duration, 0, 7200)}" id="d-${tid}-${idx}" 
                     class="w-full bg-gray-900 text-white rounded-lg p-2 md:p-3 text-center text-lg md:text-xl font-bold border-2 ${isSetDone ? 'border-neon-green text-neon-green' : 'border-gray-600 focus:border-neon-blue'} outline-none transition-all">
             </div>
             
@@ -109,7 +111,7 @@ export function TimedSetRow(tid, idx, log = {}, isSetDone, utils = {}) {
             <button ${actionAttrs('saveTimedSet', [tid, idx], { passElement: true })}
                 class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm md:text-base ${isSetDone ? 'bg-neon-green text-black' : 'bg-gray-700 text-white hover:bg-neon-green hover:text-black'} transition-all">
                 <i class="fas ${isSetDone ? 'fa-check' : 'fa-stopwatch'}"></i>
-                <span class="hidden sm:inline">${isSetDone ? 'TAMAM' : 'KAYDET'}</span>
+                <span class="hidden sm:inline">${isSetDone ? i18n.t('training.ok') : i18n.t('training.save')}</span>
             </button>
         </div>
     `;
@@ -127,12 +129,12 @@ export function TimedSetRow(tid, idx, log = {}, isSetDone, utils = {}) {
  */
 export function SimpleTaskBtn(tid, isDone, utils = {}) {
     const actionAttrs = utils.actionAttrs || defaultActionAttrs;
-    
+
     return `
         <button ${actionAttrs('toggleSimpleTask', [tid])}
             class="w-full py-4 rounded-xl font-bold text-lg transition-all ${isDone ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(0,255,65,0.3)]' : 'bg-gray-700 text-gray-400 hover:bg-neon-green/20 hover:text-neon-green border-2 border-gray-600'}">
             <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
-            ${isDone ? 'TAMAMLANDI ✓' : 'TAMAMLA'}
+            ${isDone ? i18n.t('training.completed_check') : i18n.t('training.complete')}
         </button>
     `;
 }
@@ -148,11 +150,11 @@ export function SimpleTaskBtn(tid, isDone, utils = {}) {
  */
 export function AddSetButton(tid, utils = {}) {
     const actionAttrs = utils.actionAttrs || defaultActionAttrs;
-    
+
     return `
         <button ${actionAttrs('addSet', [tid])}
             class="w-full mt-3 py-3 rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/30 text-gray-400 hover:border-neon-blue hover:text-neon-blue hover:bg-neon-blue/10 transition-all font-bold text-sm flex items-center justify-center gap-2">
-            <i class="fas fa-plus"></i> SET EKLE
+            <i class="fas fa-plus"></i> ${i18n.t('training.add_set')}
         </button>
     `;
 }

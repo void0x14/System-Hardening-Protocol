@@ -486,3 +486,10 @@ const safeMeal = validation.sanitizeMealEntry(mealData);
 
 ---
 
+## [2026-02-20] Session Handoff: UI Internationalization Update
+**Context Size Reached. Handoff to Next Session.**
+- **Completed Migrations**: `MealCard.js` (ui.nutrition), `SetRow.js` (training), and `AnatomyView.js` (db.renderers.anatomy keys).
+- **Current Status**: Investigating `ProgressView.js`. Translations lay inside `tr.js` under `db.renderers.progress` instead of `ui.*`. Proper helper node scripts have been written (`find_keys.js`) to parse ES modules without ES Module loader conflicts.
+- **Next Steps**: Continue editing `ProgressView.js` to replace hardcoded strings with exact `i18n.t(...)` paths mapped to `db.renderers.progress`. Ensure missing strings (e.g. `Kilo Δ`, `GÜNLÜK SU`) are declared simultaneously in `en.js` and `tr.js`. Then scan remaining views (`TrainingView.js`, `LogMealView.js`, `SettingsView.js`) using `grep_search` and python scripts.
+- **Rules Reminder**: Do NOT use Bash specific EOF blocks as User runs Fish shell. Do NOT manipulate MD files via Terminal commands, use `multi_replace_file_content` or `mcp_filesystem_edit_file`.
+- **Required MCP Servers**: `sequential-thinking`, `code-index`, `filesystem`, `memory`.

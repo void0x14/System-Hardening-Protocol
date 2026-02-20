@@ -22,6 +22,11 @@ export const en = {
         info: "INFO",
         close: "Close"
     },
+    system: {
+        backup: {
+            invalid_file: "Invalid backup file"
+        }
+    },
     alert: {
         title: "SYSTEM ALERT",
         acknowledge: "ACKNOWLEDGED COMMANDER"
@@ -67,9 +72,24 @@ export const en = {
         timed_set: "Timed Set",
         finish_workout: "Complete Workout",
         save: "SAVE",
-        done: "Done"
+        done: "Done",
+        ok: "OK",
+        delete_set: "Delete Set",
+        seconds: "SECONDS",
+        completed_check: "COMPLETED ✓",
+        complete: "COMPLETE",
+        add_set: "ADD SET"
     },
     nutrition: {
+        macros: {
+            calories: "CALORIES",
+            protein: "PROTEIN",
+            carbs: "CARBS",
+            fat: "FAT"
+        },
+        empty_fuel: "NO FUEL ENTERED YET",
+        system_weak: "SYSTEM WEAKENING!",
+        delete: "Delete",
         daily_protein: "Daily Protein:",
         daily_cal: "Daily Calories:",
         breakfast: "BREAKFAST",
@@ -89,6 +109,12 @@ export const en = {
         warning: "Insufficient sleep. Please prioritize resting."
     },
     db: {
+        milestones: {
+            start: "Starting +3kg",
+            half_hundred: "Half Hundred",
+            half_way: "Half Way",
+            target: "TARGET"
+        },
         weekly_plan: {
             "1": { name: "MONDAY", title: "FULL BODY START" },
             "2": { name: "TUESDAY", title: "NUTRITION & RECOVERY" },
@@ -372,7 +398,7 @@ export const en = {
             },
             neck_curl: {
                 title: "Lying Neck Curls (Network Hardening)",
-                desc: "<strong>SYSTEM GOAL:</strong> Kalın boyun inşası - \",
+                desc: "<strong>SYSTEM GOAL:</strong> Kalın boyun inşası - ",
                 tags: {
                     _0: "Boyun",
                     _1: "Stabilizasyon",
@@ -398,7 +424,7 @@ export const en = {
             },
             tibialis_raise: {
                 title: "Tibialis Raises (System Stability Patch)",
-                desc: "<strong>SYSTEM GOAL:</strong> \",
+                desc: "<strong>SYSTEM GOAL:</strong> ",
                 tags: {
                     _0: "Kaval Kemiği",
                     _1: "Denge",
@@ -984,6 +1010,107 @@ export const en = {
                 },
             },
         },
+
+        renderers: {
+            training: {
+                warmup: "SYSTEM BOOT (WARMUP)",
+                add_set: "ADD SET",
+                sets: "Sets",
+                duration: "Duration",
+                activity: "Activity",
+                task: "Task",
+                done: "DONE",
+                details: "Detailed Info & PR"
+            },
+            nutrition: {
+                no_fuel: "NO FUEL ADDED YET",
+                system_weakening: "SYSTEM WEAKENING!",
+                critical: "CRITICAL: {count}% missing",
+                missing: "{count} kcal needed",
+                goal_done: "GOAL REACHED",
+                egg: "Egg",
+                chicken: "Chicken",
+                rice: "Rice",
+                bread: "Bread",
+                quick_add: "QUICK ADD",
+                add_meal: "ADD MEAL",
+                todays_fuel: "TODAY'S FUELS",
+                daily_plan: "DAILY PLAN",
+                refresh: "REFRESH",
+                daily_macros: "DAILY MACROS",
+                cal: "CALORIES",
+                protein: "PROTEIN",
+                carb: "CARBS",
+                fat: "FAT",
+                breakfast: "Breakfast",
+                snack: "Snack",
+                lunch: "Lunch",
+                preworkout: "Pre Workout",
+                dinner: "Dinner",
+                night: "Night"
+            },
+            progress: {
+                no_data: "No data",
+                no_training_data: "No training data yet",
+                chest: "CHEST",
+                arm: "ARM",
+                waist: "WAIST",
+                leg: "LEG",
+                current: "CURRENT",
+                today: "TODAY",
+                weekly: "WEEKLY",
+                monthly: "MONTHLY",
+                total_sets: "TOTAL SETS",
+                goal: "GOAL",
+                weekly_sleep: "WEEKLY SLEEP",
+                monthly_sleep: "MONTHLY SLEEP",
+                weekly_water: "WEEKLY WATER",
+                monthly_water: "MONTHLY WATER",
+                hours_day: "hrs/day",
+                glasses: "glasses",
+                training_volume: "TRAINING VOLUME",
+                last_7_days: "Last 7 Days",
+                total_ton: "Total: {val} tons",
+                weekly_summary: "WEEKLY SUMMARY (Last 4 Weeks)",
+                week: "Week",
+                avg_cal: "Avg. Calories",
+                training: "Training",
+                weight_delta: "Weight Δ",
+                this_week: "This Week",
+                last_week: "Last Week",
+                weeks_ago: "Weeks Ago",
+                days: "days",
+                weight_history: "WEIGHT HISTORY (Last 7 Days)",
+                measurements: "MEASUREMENTS (CM)",
+                save: "SAVE",
+                months: "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+                ton: "ton"
+            },
+            anatomy: {
+                front: "FRONT",
+                back: "BACK",
+                default_func: "Power and stabilization.",
+                task: "TASK",
+                waiting_selection: "Awaiting Muscle Selection...",
+                core_support: "Core Support"
+            },
+            mental: {
+                today: "TODAY",
+                title: "MENTAL WARFARE",
+                subtitle: "Mental Hardening Protocol v8.0.0",
+                phase: "Phase",
+                phase_num: "PHASE {p}",
+                examine_phase: "Examine Phase",
+                phase_of_day: "PHASE OF THE DAY",
+                daily_practice: "DAILY PRACTICE",
+                completed: "COMPLETED",
+                did_this: "I Did This!",
+                detail: "DETAIL",
+                strategy: "Strategy",
+                practice: "Practice"
+            }
+        },
+
         anatomy: {
             chest: { name: "Pectoralis Major", function: "Pushing force.", system: "Upper Body Push", action: "Push-up, Floor Press", recovery: "48-72 Hours" },
             abs: { name: "Rectus Abdominis", function: "Core strength, sexual stamina.", system: "Central Balance", action: "Plank, Leg Raise, Vacuum", recovery: "24-48 Hours" },

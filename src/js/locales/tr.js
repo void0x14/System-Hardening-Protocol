@@ -22,6 +22,11 @@ export const tr = {
         info: "BİLGİ",
         close: "Kapat"
     },
+    system: {
+        backup: {
+            invalid_file: "Geçersiz yedek dosyası"
+        }
+    },
     alert: {
         title: "SİSTEM UYARISI",
         acknowledge: "ANLAŞILDI KOMUTANIM"
@@ -67,9 +72,24 @@ export const tr = {
         timed_set: "Süreli Set",
         finish_workout: "Antrenmanı Bitir",
         save: "KAYDET",
-        done: "Bitti"
+        done: "Bitti",
+        ok: "TAMAM",
+        delete_set: "Set Sil",
+        seconds: "SANİYE",
+        completed_check: "TAMAMLANDI ✓",
+        complete: "TAMAMLA",
+        add_set: "SET EKLE"
     },
     nutrition: {
+        macros: {
+            calories: "KALORİ",
+            protein: "PROTEİN",
+            carbs: "KARB",
+            fat: "YAĞ"
+        },
+        empty_fuel: "HENÜZ YAKIT GİRİLMEDİ",
+        system_weak: "SİSTEM ZAYIFLIYOR!",
+        delete: "Sil",
         daily_protein: "Günlük Protein:",
         daily_cal: "Günlük Kalori:",
         breakfast: "KAHVALTI",
@@ -89,6 +109,12 @@ export const tr = {
         warning: "Yetersiz uyku. Lütfen dinlenmeye özen göster."
     },
     db: {
+        milestones: {
+            start: "Başlangıç +3kg",
+            half_hundred: "Yarım Yüzlük",
+            half_way: "Yarı Yol",
+            target: "HEDEF"
+        },
         weekly_plan: {
             "1": { name: "PAZARTESİ", title: "FULL BODY START" },
             "2": { name: "SALI", title: "BESLENME & RECOVERY" },
@@ -372,7 +398,7 @@ export const tr = {
             },
             neck_curl: {
                 title: "Lying Neck Curls (Network Hardening)",
-                desc: "<strong>SYSTEM GOAL:</strong> Kalın boyun inşası - \",
+                desc: "<strong>SYSTEM GOAL:</strong> Kalın boyun inşası - ",
                 tags: {
                     _0: "Boyun",
                     _1: "Stabilizasyon",
@@ -398,7 +424,7 @@ export const tr = {
             },
             tibialis_raise: {
                 title: "Tibialis Raises (System Stability Patch)",
-                desc: "<strong>SYSTEM GOAL:</strong> \",
+                desc: "<strong>SYSTEM GOAL:</strong> ",
                 tags: {
                     _0: "Kaval Kemiği",
                     _1: "Denge",
@@ -984,6 +1010,107 @@ export const tr = {
                 },
             },
         },
+
+        renderers: {
+            training: {
+                warmup: "SYSTEM BOOT (ISINMA)",
+                add_set: "SET EKLE",
+                sets: "Set",
+                duration: "Süre",
+                activity: "Aktivite",
+                task: "Görev",
+                done: "TAMAM",
+                details: "Detaylı Bilgi & PR"
+            },
+            nutrition: {
+                no_fuel: "HENÜZ YAKIT GİRİLMEDİ",
+                system_weakening: "SİSTEM ZAYIFLIYOR!",
+                critical: "KRİTİK: {count}% eksik",
+                missing: "{count} kcal daha lazım",
+                goal_done: "HEDEF TAMAMLANDI",
+                egg: "Yumurta",
+                chicken: "Tavuk",
+                rice: "Pilav",
+                bread: "Ekmek",
+                quick_add: "HIZLI EKLE",
+                add_meal: "ÖĞÜN EKLE",
+                todays_fuel: "BUGÜNKÜ YAKITLAR",
+                daily_plan: "GÜNLÜK PLAN",
+                refresh: "YENİLE",
+                daily_macros: "GÜNLÜK MAKS TAKIP",
+                cal: "KALORİ",
+                protein: "PROTEİN",
+                carb: "KARB",
+                fat: "YAĞ",
+                breakfast: "Kahvaltı",
+                snack: "Ara Öğün",
+                lunch: "Öğle",
+                preworkout: "Antrenman Öncesi",
+                dinner: "Akşam",
+                night: "Gece"
+            },
+            progress: {
+                no_data: "Veri yok",
+                no_training_data: "Henüz antrenman verisi yok",
+                chest: "GÖĞÜS",
+                arm: "KOL",
+                waist: "BEL",
+                leg: "BACAK",
+                current: "MEVCUT",
+                today: "BUGÜN",
+                weekly: "HAFTALIK",
+                monthly: "AYLIK",
+                total_sets: "TOPLAM SET",
+                goal: "HEDEF",
+                weekly_sleep: "HAFTALIK UYKU",
+                monthly_sleep: "AYLIK UYKU",
+                weekly_water: "HAFTALIK SU",
+                monthly_water: "AYLIK SU",
+                hours_day: "saat/gün",
+                glasses: "bardak",
+                training_volume: "ANTRENMAN HACMİ",
+                last_7_days: "Son 7 Gün",
+                total_ton: "Toplam: {val} ton",
+                weekly_summary: "HAFTALIK ÖZET (Son 4 Hafta)",
+                week: "Hafta",
+                avg_cal: "Ort. Kalori",
+                training: "Antrenman",
+                weight_delta: "Kilo Δ",
+                this_week: "Bu Hafta",
+                last_week: "Geçen Hafta",
+                weeks_ago: "Hafta Önce",
+                days: "gün",
+                weight_history: "AĞIRLIK GEÇMİŞİ (Son 7 Gün)",
+                measurements: "ÖLÇÜLER (CM)",
+                save: "KAYDET",
+                months: "Oca,Şub,Mar,Nis,May,Haz,Tem,Ağu,Eyl,Eki,Kas,Ara",
+                ton: "ton"
+            },
+            anatomy: {
+                front: "ÖN",
+                back: "ARKA",
+                default_func: "Güç ve stabilizasyon.",
+                task: "GÖREV",
+                waiting_selection: "Kas Seçimi Bekleniyor...",
+                core_support: "Core Destek"
+            },
+            mental: {
+                today: "BUGÜN",
+                title: "ZİHİNSEL SAVAŞ",
+                subtitle: "Mental Hardening Protokolü v8.0.0",
+                phase: "Faz",
+                phase_num: "FAZ {p}",
+                examine_phase: "Fazı İncele",
+                phase_of_day: "GÜNÜN FAZI",
+                daily_practice: "GÜNLÜK PRATİK",
+                completed: "TAMAMLANDI",
+                did_this: "Bunu Yaptım!",
+                detail: "DETAY",
+                strategy: "Strateji",
+                practice: "Pratik"
+            }
+        },
+
         anatomy: {
             chest: { name: "Pectoralis Major", function: "İtme kuvveti.", system: "Üst Gövde İtiş", action: "Push-up, Floor Press", recovery: "48-72 Saat" },
             abs: { name: "Rectus Abdominis", function: "Core gücü, cinsel dayanıklılık.", system: "Merkezi Denge", action: "Plank, Leg Raise, Vacuum", recovery: "24-48 Saat" },

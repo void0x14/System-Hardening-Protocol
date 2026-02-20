@@ -4,6 +4,7 @@
 import { Store } from '../store.js';
 import { UI } from '../ui.js';
 import { Stealth } from '../stealth.js';
+import { i18n } from '../services/i18nService.js';
 
 /**
  * Anatomy View Class
@@ -40,7 +41,7 @@ export class AnatomyView {
 
         // Get selected muscle info
         let selectedMuscle = this.store.state.selectedMuscle;
-        
+
         // Sanitize modda pelvik seçiliyse temizle
         if (isSanitized && selectedMuscle === 'pelvic') {
             selectedMuscle = null;
@@ -52,14 +53,14 @@ export class AnatomyView {
         // Process display text for sanitize mode
         let displayFunction = sel ? sel.function : '';
         let displaySystem = sel ? sel.system : '';
-        
+
         if (isSanitized && sel) {
             const sensitiveWords = ['cinsel', 'Cinsel', 'boşalma', 'Boşalma', 'üreme', 'Üreme', 'piston'];
             sensitiveWords.forEach(word => {
                 displayFunction = displayFunction.replace(new RegExp(word + '[^,\\.]*[,\\.]?\\s*', 'gi'), '');
             });
             displayFunction = displayFunction.replace(/,\s*$/, '.').replace(/\s+/g, ' ').trim();
-            if (displaySystem.toLowerCase().includes('üreme')) displaySystem = 'Core Destek';
+            if (displaySystem.toLowerCase().includes('üreme')) displaySystem = i18n.t('db.renderers.anatomy.core_support');
         }
 
         return this._template({
@@ -93,11 +94,11 @@ export class AnatomyView {
                     <div class="absolute top-4 left-4 flex gap-2">
                         <button ${actionAttrs('setAnatomyView', ['front'])} 
                             class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">
-                            ÖN
+                            ${i18n.t('db.renderers.anatomy.front')}
                         </button>
                         <button ${actionAttrs('setAnatomyView', ['back'])} 
                             class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">
-                            ARKA
+                            ${i18n.t('db.renderers.anatomy.back')}
                         </button>
                     </div>
                     
@@ -165,8 +166,8 @@ export class AnatomyView {
                 
                 <div class="grid gap-4">
                     <div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green">
-                        <div class="${labelClass} mb-2">GÖREV</div>
-                        <div class="text-base text-gray-200">${displayFunction || 'Güç ve stabilizasyon.'}</div>
+                        <div class="${labelClass} mb-2">${i18n.t('db.renderers.anatomy.task')}</div>
+                        <div class="text-base text-gray-200">${displayFunction || i18n.t('db.renderers.anatomy.default_func')}</div>
                     </div>
                     
                     <div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange">
@@ -196,7 +197,7 @@ export class AnatomyView {
         return `
             <div class="h-full flex flex-col items-center justify-center text-gray-600">
                 <i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i>
-                <p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p>
+                <p class="text-sm uppercase tracking-widest">${i18n.t('db.renderers.anatomy.waiting_selection')}</p>
             </div>
         `;
     }
