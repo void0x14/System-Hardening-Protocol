@@ -4,6 +4,7 @@
 // Global scope assignment
 import { CONFIG } from '../config/index.js';
 import { DB } from '../config/db.js';
+import { i18n } from '../services/i18nService.js';
 
 const WEEKLY_PLAN = {
     1: { name: "PAZARTESİ", title: "FULL BODY START", tasks: ["squat", "pushup", "one_arm_row", "plank"] },
