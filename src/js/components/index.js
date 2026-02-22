@@ -4,30 +4,32 @@
 // Card components
 import { UI } from '../ui.js';
 import { THEME } from '../config/theme.js';
+// BUG-006 FIX: Use static import instead of require()
+import { MacroRing as MacroRingComponent } from './MacroRing.js';
 
-export { Card, StatCard, StatMini } from '../Card.js';
+export { Card, StatCard, StatMini } from './Card.js';
 
 // Progress components
-export { ProgressBar, ProgressRow, CircularProgress } from '../ProgressBar.js';
+export { ProgressBar, ProgressRow, CircularProgress } from './ProgressBar.js';
 
 // Nutrition components
-export { MacroRing, MacroRings } from '../MacroRing.js';
-export { MealCard, MealCardCompact, EmptyMealList } from '../MealCard.js';
+export { MacroRing, MacroRings } from './MacroRing.js';
+export { MealCard, MealCardCompact, EmptyMealList } from './MealCard.js';
 
 // Modal components
-export { Modal, AlertModal, modal, alertModal, createModalHTML } from '../Modal.js';
+export { Modal, AlertModal, modal, alertModal, createModalHTML } from './Modal.js';
 
 // Toast components
-export { Toast, toast, showToast, createToastContainerHTML } from '../Toast.js';
+export { Toast, toast, showToast, createToastContainerHTML } from './Toast.js';
 
 // Exercise set components
-export { 
-    WeightedSetRow, 
-    TimedSetRow, 
-    SimpleTaskBtn, 
+export {
+    WeightedSetRow,
+    TimedSetRow,
+    SimpleTaskBtn,
     AddSetButton,
-    safeNumberInputValue 
-} from '../SetRow.js';
+    safeNumberInputValue
+} from './SetRow.js';
 
 /**
  * Create Components Factory Object
@@ -40,7 +42,7 @@ export {
  */
 export function createComponents(utils = {}) {
     const { escapeHtml, actionAttrs } = utils;
-    
+
     return {
         card: (label, content, accent = '', extra = '') => {
             const cardClass = typeof THEME !== 'undefined' ? THEME.card : 'bg-gray-900 border border-gray-800 rounded-xl p-4';
@@ -52,7 +54,7 @@ export function createComponents(utils = {}) {
                 </div>
             `;
         },
-        
+
         progressBar: (percent, color = 'neon-green', height = 'h-2') => {
             const safePercent = Math.min(100, Math.max(0, percent));
             return `
@@ -61,36 +63,36 @@ export function createComponents(utils = {}) {
                 </div>
             `;
         },
-        
+
         macroRing: (label, current, target, unit, color, size = '80') => {
-            const { MacroRing } = require('./MacroRing.js');
-            return MacroRing(label, current, target, unit, color, size);
+            // BUG-006 FIX: Use imported component instead of require()
+            return MacroRingComponent(label, current, target, unit, color, size);
         },
-        
+
         mealCard: (meal, idx) => {
             return MealCard(meal, idx, { escapeHtml, actionAttrs });
         },
-        
+
         weightedSetRow: (tid, idx, log, isSetDone, hint = '') => {
             return WeightedSetRow(tid, idx, log, isSetDone, hint, { actionAttrs });
         },
-        
+
         timedSetRow: (tid, idx, log, isSetDone) => {
             return TimedSetRow(tid, idx, log, isSetDone, { actionAttrs });
         },
-        
+
         simpleTaskBtn: (tid, isDone) => {
             return SimpleTaskBtn(tid, isDone, { actionAttrs });
         },
-        
+
         statCard: (label, value, unit = '', color = 'white', accent = '') => {
             return StatCard(label, value, unit, color, accent);
         },
-        
+
         statMini: (label, value, unit = '', labelColor = 'gray-500', valueColor = 'white') => {
             return StatMini(label, value, unit, labelColor, valueColor);
         },
-        
+
         badge: (text, type = 'default') => {
             const styles = {
                 success: 'text-neon-green bg-neon-green/10 border-neon-green/30',
@@ -101,7 +103,7 @@ export function createComponents(utils = {}) {
             };
             return `<span class="text-[10px] font-bold px-2 py-1 rounded border ${styles[type] || styles.default}">${text}</span>`;
         },
-        
+
         btn: (text, action, params = [], type = 'primary', icon = '', extra = '') => {
             const styles = {
                 primary: 'bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black',
@@ -113,7 +115,7 @@ export function createComponents(utils = {}) {
             const iconHtml = icon ? `<i class="fas ${icon} mr-2"></i>` : '';
             return `<button ${actionAttrs(action, params)} class="${styles[type] || styles.primary} px-4 py-2 rounded-lg font-bold text-sm transition-all ${extra}">${iconHtml}${text}</button>`;
         },
-        
+
         iconBtn: (icon, action, params = [], type = 'primary', size = 'w-12 h-12') => {
             const styles = {
                 primary: 'bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black',
@@ -125,11 +127,11 @@ export function createComponents(utils = {}) {
                 <i class="fas ${icon}"></i>
             </button>`;
         },
-        
+
         statusDot: (active) => {
             return `<div class="w-3 h-3 rounded-full ${active ? 'bg-neon-green shadow-[0_0_8px_rgba(0,255,65,0.5)]' : 'bg-gray-600'} transition-all"></div>`;
         },
-        
+
         progressRow: (label, value, percent, color = 'neon-green') => {
             return `
                 <div>

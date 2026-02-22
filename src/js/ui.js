@@ -147,18 +147,18 @@ export const UI = {
                                 <div class="w-4 h-4 rounded-full border border-gray-500 radio-dot flex items-center justify-center"></div>
                                 <span class="text-sm font-bold">${Utils.escapeHtml(opt.label)}</span>
                             </div>
-                            <span class="text-xs text-gray-500 font-mono">~${Math.round(selectedFood.vals.cal * opt.ratio)} kcal</span>
+                            <span class="text-xs text-gray-500 font-mono">~${Math.round(selectedFood.vals.cal * opt.ratio)} ${i18n.t('ui.nutrition.kcal')}</span>
                         </div>
                     </label>
                 `;
             });
             html += `</div>`;
-            container.innerHTML = `<label class="text-[10px] text-gray-500 font-bold block mb-2 tracking-widest">PORSİYON SEÇİMİ</label>${html}`;
+            container.innerHTML = `<label class="text-[10px] text-gray-500 font-bold block mb-2 tracking-widest">${i18n.t('ui.nutrition.portion_select')}</label>${html}`;
         } else {
             const unitName = selectedFood.unitName || 'Adet';
             container.innerHTML = `
-                <label class="text-[10px] text-gray-500 font-bold block mb-1">MİKTAR (${Utils.escapeHtml(unitName)})</label>
-                <input type="number" id="m-amount" class="${THEME.input}" value="1" placeholder="Kaç ${Utils.escapeHtml(unitName)}?">
+                <label class="text-[10px] text-gray-500 font-bold block mb-1">${i18n.t('ui.nutrition.amount_label', { unitName: Utils.escapeHtml(unitName) })}</label>
+                <input type="number" id="m-amount" class="${THEME.input}" value="1" placeholder="${i18n.t('ui.nutrition.how_many', { unitName: Utils.escapeHtml(unitName) })}">
             `;
         }
     },

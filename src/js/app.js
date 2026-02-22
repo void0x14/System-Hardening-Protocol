@@ -2,6 +2,8 @@
 // Native ESM Migration with Top-Level Await
 
 import { CONFIG } from './config/index.js';
+import { initAllDB } from './config/db.js';
+import { initMilestones } from './config/targets.js';
 import { Store } from './store.js';
 import { UI } from './ui.js';
 import { Stealth } from './stealth.js';
@@ -11,6 +13,15 @@ import { i18n } from './services/i18nService.js';
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log("SYSTEM BOOT...");
 }
+
+// 1. Init i18n first so translations are ready
+await i18n.init();
+
+// 2. Populate DB data with translated strings (must be AFTER i18n.init)
+initAllDB();
+initMilestones();
+
+// 3. Init store and UI
 await Store.init();
 await UI.init();
 
@@ -66,7 +77,9 @@ if (modal) {
 const backupStatus = await Store.checkBackupStatus();
 if (backupStatus !== 'OK') {
     setTimeout(() => {
-        const msg = backupStatus === 'NEVER' ? i18n.t("sleep.warning") /* fallback info msg */ : "⚠️ Yedekleme zamanı geldi! (>7 Gün)";
+        const msg = backupStatus === 'NEVER'
+            ? i18n.t('ui.toast.backup_never')
+            : i18n.t('ui.toast.backup_overdue');
         const type = backupStatus === 'NEVER' ? "warning" : "error";
         UI.showToast(msg, type);
     }, 3000);
@@ -75,3 +88,4 @@ if (backupStatus !== 'OK') {
 if (typeof CONFIG !== 'undefined' && CONFIG.DEBUG_MODE) {
     console.log(`[App] v${CONFIG.VERSION} initialized via Native ESM`);
 }
+

@@ -13,7 +13,7 @@ const safeNumberInputValue = (value, min = 0, max = 10000) => {
     return String(Math.min(max, Math.max(min, parsed)));
 };
 
-const Components = {
+export const Components = {
     /**
      * Standard card wrapper with optional accent border
      * @param {string} label - Card header label (emoji + text)

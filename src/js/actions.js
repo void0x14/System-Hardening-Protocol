@@ -4,16 +4,18 @@
 // Using window. for global scope access
 import { Store } from './store.js';
 import { UI } from './ui.js';
+import { i18n } from './services/i18nService.js';
 import { Utils } from './utils.js';
 import { CONFIG } from './config/index.js';
 import { THEME } from './config/theme.js';
 import { DB } from './config/db.js';
+import { Renderers } from './renderers/dashboard.js';
 
 export const Actions = {
     // v7.1.0: Video modal
     playVideo(videoId) {
         if (!Utils.isValidYouTubeId(videoId)) {
-            UI.showToast("Geçersiz video kimliği", "error");
+            UI.showToast(i18n.t('ui.toast.invalid_video_id'), "error");
             return;
         }
         const html = `<div class="aspect-video w-full"><iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
@@ -26,7 +28,7 @@ export const Actions = {
             ? videoId
             : null;
         if (!safeVideoId) {
-            UI.showToast("Geçersiz video kimliği", "error");
+            UI.showToast(i18n.t('ui.toast.invalid_video_id'), "error");
             return;
         }
 
@@ -83,11 +85,11 @@ export const Actions = {
     async saveWeight(v) {
         const num = parseFloat(v);
         if (isNaN(num) || num <= 0 || num > 300) {
-            UI.showToast("Geçersiz kilo!", "error");
+            UI.showToast(i18n.t('ui.toast.invalid_weight'), 'error');
             return;
         }
         if (await Store.saveWeight(num)) {
-            UI.showToast("Kilo güncellendi.");
+            UI.showToast(i18n.t('ui.toast.weight_updated'));
             this.switchTab('dashboard');
         }
     },
@@ -109,11 +111,11 @@ export const Actions = {
     // --- SLEEP & WATER ACTIONS ---
     async saveSleep() {
         const input = document.getElementById('sleep-input');
-        if (!input || !input.value) { UI.showToast("Uyku saati girin!", "error"); return; }
+        if (!input || !input.value) { UI.showToast(i18n.t('ui.toast.enter_sleep'), 'error'); return; }
         const hours = parseFloat(input.value);
-        if (hours < 0 || hours > 14) { UI.showToast("Geçersiz değer (0-14)", "error"); return; }
+        if (hours < 0 || hours > 14) { UI.showToast(i18n.t('ui.toast.invalid_value'), 'error'); return; }
         await Store.setSleep(hours);
-        UI.showToast(`Uyku kaydedildi: ${hours} saat`);
+        UI.showToast(i18n.t('ui.toast.sleep_saved', { hours }));
         this.switchTab('dashboard');
     },
 
@@ -121,7 +123,7 @@ export const Actions = {
         const current = await Store.getWater(Utils.dateStr());
         const newVal = Math.max(0, current + cups);
         await Utils.storage.set(CONFIG.KEYS.WATER + Utils.dateStr(), newVal);
-        if (cups > 0) UI.showToast(`+ ${cups} bardak 💧`);
+        if (cups > 0) UI.showToast(i18n.t('ui.toast.water_added', { cups }));
         this.switchTab('dashboard');
     },
 
@@ -134,7 +136,7 @@ export const Actions = {
         const foods = Store.getAllFoods();
         const food = foods.find(f => f.id === foodId);
         if (!food) {
-            UI.showToast("Yiyecek bulunamadı!", "error");
+            UI.showToast(i18n.t('ui.toast.food_not_found'), 'error');
             return;
         }
 
@@ -165,7 +167,7 @@ export const Actions = {
             fat: Math.round(food.vals.fat * ratio)
         });
 
-        UI.showToast(`${food.name} eklendi ⚡`);
+        UI.showToast(i18n.t('ui.toast.food_added', { name: food.name }));
         this.switchTab('nutrition');
     },
 
@@ -236,7 +238,7 @@ export const Actions = {
 
         const elapsed = Math.floor((Date.now() - this.overrideState.startTime) / 1000);
         const mins = Math.floor(elapsed / 60);
-        UI.showToast(`Robot Modu: ${mins} dakika odaklandın.`);
+        UI.showToast(i18n.t('ui.toast.robot_mode_time', { mins }));
 
         document.removeEventListener('keydown', this.handleOverrideEsc);
     },
@@ -246,7 +248,7 @@ export const Actions = {
         const workout = await Store.getWorkout(today);
         const meals = await Store.getMeals(today);
         const day = new Date().getDay();
-        const plan = WEEKLY_PLAN[day];
+        const plan = DB.WEEKLY_PLAN[day];
 
         const incompleteTasks = plan.tasks.filter(t => !workout.includes(t)).length;
         const totalCal = meals.reduce((sum, m) => sum + m.cal, 0);
@@ -265,13 +267,13 @@ export const Actions = {
 
     async rerollPlan() {
         await Store.generateDailyPlan();
-        UI.showToast("Günlük menü yenilendi.");
+        UI.showToast(i18n.t('ui.toast.daily_menu_updated'));
         this.switchTab('nutrition');
     },
 
     async deleteMeal(index) {
         if (await Store.deleteMeal(index)) {
-            UI.showToast("Öğün silindi.");
+            UI.showToast(i18n.t('ui.toast.meal_deleted'));
             this.switchTab('nutrition');
         }
     },
@@ -313,7 +315,7 @@ export const Actions = {
                             <option value="ad">Adet/Porsiyon</option>
                         </select>
                     </div>
-                    <button ${Utils.actionAttrs('createCustomFood')} class="${THEME.btn} w-full border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black">VERİTABANINA KAYDET</button>
+                    <button ${Utils.actionAttrs('createCustomFood')} class="${THEME.btn} w-full border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black">${i18n.t('ui.save_db')}</button>
                 </div>
             </div>
         `);
@@ -370,7 +372,7 @@ export const Actions = {
         });
 
         UI.modal.close();
-        UI.showToast("Öğün eklendi.");
+        UI.showToast(i18n.t('ui.toast.meal_added'));
         this.switchTab('nutrition');
     },
 
@@ -382,7 +384,7 @@ export const Actions = {
         const f = parseFloat(document.getElementById('new-fat').value);
         const u = document.getElementById('new-unit').value;
 
-        if (!n || !c) { UI.showToast("Eksik bilgi!", "error"); return; }
+        if (!n || !c) { UI.showToast(i18n.t('ui.toast.incomplete_info'), 'error'); return; }
 
         await Store.addCustomFood({
             name: n,
@@ -392,7 +394,7 @@ export const Actions = {
         });
 
         UI.modal.close();
-        UI.showToast("Veritabanı güncellendi.");
+        UI.showToast(i18n.t('ui.toast.db_updated'));
         setTimeout(() => this.openMealModal(), 500);
     },
 
@@ -404,7 +406,7 @@ export const Actions = {
             leg: document.getElementById('stat-leg').value
         };
         await Store.saveStats(newStats);
-        UI.showToast("Ölçüler kaydedildi ✓");
+        UI.showToast(i18n.t('ui.toast.measurements_saved'));
         this.switchTab('progress');
     },
 
@@ -532,8 +534,8 @@ export const Actions = {
 
     async showPhase(id) {
         const phaseIcons = ['🐆', '🎭', '🤖', '🔧', '⚡', '🎯', '🍀', '🔄'];
-        const p = MENTAL_PHASES.find(x => x.id == id);
-        const idx = MENTAL_PHASES.findIndex(x => x.id == id);
+        const p = DB.MENTAL_PHASES.find(x => x.id == id);
+        const idx = DB.MENTAL_PHASES.findIndex(x => x.id == id);
         const icon = phaseIcons[idx] || '🧠';
 
         const mentalData = await Utils.storage.get(CONFIG.KEYS.MENTAL_PROGRESS) || { completedPhases: [] };
@@ -556,14 +558,14 @@ export const Actions = {
                 
                 <div class="bg-gradient-to-br from-purple-900/20 to-gray-900 p-4 rounded-xl border border-purple-500/20">
                     <div class="text-[10px] text-purple-400 font-bold tracking-widest mb-2">
-                        <i class="fas fa-lightbulb mr-1"></i>ÇEKİRDEK FİKİR
+                        <i class="fas fa-lightbulb mr-1"></i>${i18n.t('renderers.mental.core_idea')}
                     </div>
                     <p class="text-sm text-gray-300 leading-relaxed">${p.core}</p>
                 </div>
                 
                 <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-800">
                     <div class="text-[10px] text-gray-500 font-bold tracking-widest mb-2">
-                        <i class="fas fa-bullseye mr-1"></i>NİYET / AMAÇ
+                        <i class="fas fa-bullseye mr-1"></i>${i18n.t('renderers.mental.intent_aim')}
                     </div>
                     <p class="text-sm text-gray-400 leading-relaxed">${p.intent}</p>
                 </div>
@@ -571,7 +573,7 @@ export const Actions = {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-gray-900 p-4 rounded-xl border-l-4 border-purple-500">
                         <div class="text-[10px] text-purple-400 font-bold tracking-widest mb-3">
-                            <i class="fas fa-chess mr-1"></i>STRATEJİ
+                            <i class="fas fa-chess mr-1"></i>${i18n.t('renderers.mental.strategy_title')}
                         </div>
                         <ul class="space-y-2">
                             ${p.strategy.map(s => `
@@ -584,7 +586,7 @@ export const Actions = {
                     </div>
                     <div class="bg-gray-900 p-4 rounded-xl border-l-4 border-neon-green">
                         <div class="text-[10px] text-neon-green font-bold tracking-widest mb-3">
-                            <i class="fas fa-bolt mr-1"></i>PRATİK UYGULAMALAR
+                            <i class="fas fa-bolt mr-1"></i>${i18n.t('renderers.mental.practice_apps')}
                         </div>
                         <ul class="space-y-2">
                             ${p.practice.map(s => `
@@ -601,16 +603,16 @@ export const Actions = {
                     ${!isCompleted ? `
                         <button ${Utils.actionAttrs('markPhaseComplete', [p.id])}
                             class="flex-1 py-3 bg-neon-green/10 border-2 border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black transition-all">
-                            <i class="fas fa-check-double mr-2"></i>Bu Fazı Anladım
+                            <i class="fas fa-check-double mr-2"></i>${i18n.t('renderers.mental.understand_phase')}
                         </button>
                     ` : `
                         <div class="flex-1 py-3 bg-neon-green/10 border border-neon-green/30 text-neon-green text-center font-bold rounded-xl">
-                            <i class="fas fa-trophy mr-2"></i>Faz Tamamlandı!
+                            <i class="fas fa-trophy mr-2"></i>${i18n.t('renderers.mental.phase_completed')}
                         </div>
                     `}
                     <button ${Utils.actionAttrs('closeModal')}
                         class="px-6 py-3 bg-gray-800 border border-gray-700 text-gray-400 font-bold rounded-xl hover:bg-gray-700 hover:text-white transition-all">
-                        Kapat
+                        ${i18n.t('renderers.mental.close')}
                     </button>
                 </div>
             </div>
@@ -627,7 +629,7 @@ export const Actions = {
         mentalData.dailyPractice[today] = true;
         await Utils.storage.set(CONFIG.KEYS.MENTAL_PROGRESS, mentalData);
 
-        UI.showEpicOverlay('🧠', 'ZİHİN GÜÇLENDİ!', 'Günlük pratik tamamlandı. Bir adım daha ileridesin.', '#a855f7');
+        UI.showEpicOverlay('🧠', i18n.t('epic.mind_strong'), i18n.t('epic.mind_strong_desc'), '#a855f7');
         setTimeout(() => this.switchTab('mental'), 2300);
     },
 
@@ -642,9 +644,9 @@ export const Actions = {
             UI.modal.close();
 
             if (mentalData.completedPhases.length >= 8) {
-                UI.showEpicOverlay('👑', 'MENTAL MASTER!', 'Tüm fazları tamamladın. Zihinsel savaşı kazandın!', '#fbbf24');
+                UI.showEpicOverlay('👑', i18n.t('epic.mental_master'), i18n.t('epic.mental_master_desc'), '#fbbf24');
             } else {
-                UI.showEpicOverlay('⭐', 'FAZ TAMAMLANDI!', `${mentalData.completedPhases.length}/8 faz tamamlandı.`, '#a855f7');
+                UI.showEpicOverlay('⭐', i18n.t('epic.phase_done'), i18n.t('epic.phase_done_desc').replace('{c}', mentalData.completedPhases.length), '#a855f7');
             }
 
             setTimeout(() => this.switchTab('mental'), 2300);
@@ -661,11 +663,11 @@ export const Actions = {
         let alertMsg = "";
 
         if (!shakeDone) {
-            alertMsg += "<div class='mb-4'><span class='text-neon-yellow font-bold'>⚠️ KRİTİK UYARI:</span><br>Günlük Gainer Shake henüz sisteme girilmedi! Yakıt seviyesi kritik.</div>";
+            alertMsg += `<div class='mb-4'><span class='text-neon-yellow font-bold'>⚠️ ${i18n.t('alerts.critical_warning')}</span><br>${i18n.t('alerts.gainer_missing')}</div>`;
         }
 
         if (meals.length === 0) {
-            alertMsg += "<div><span class='text-neon-red font-bold'>⚠️ BESLENME HATASI:</span><br>Bugün hiçbir öğün kaydı yapılmadı. Sistem aç çalışamaz!</div>";
+            alertMsg += `<div><span class='text-neon-red font-bold'>⚠️ ${i18n.t('alerts.nutrition_error')}</span><br>${i18n.t('alerts.no_meals')}</div>`;
         }
 
         if (alertMsg !== "") {
@@ -732,19 +734,36 @@ export const Actions = {
 
     // --- SETTINGS & DATA ---
     openSettings() {
-        UI.modal.openHtml("VERİ YÖNETİMİ", `
+        UI.modal.openHtml(i18n.t('settings.data_management'), `
             <div class="space-y-6">
-                <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full bg-neon-green/20 flex items-center justify-center text-neon-green">
-                            <i class="fas fa-download"></i>
+                <!-- Language Toggle -->
+                <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-4">
+                            <i class="fas fa-language text-purple-400 text-2xl"></i>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">${i18n.t('nav.language') || 'SYSTEM LANGUAGE'}</h4>
+                                <p class="text-[10px] text-gray-500">${i18n.currentLocale.toUpperCase()}</p>
+                            </div>
                         </div>
+                        <button ${Utils.actionAttrs('toggleLanguage')} class="${THEME.btn} border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black">
+                            <i class="fas fa-sync-alt mr-2"></i>TR / EN
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export -->
+                <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+                    <div class="flex items-center gap-4 mb-4">
+                        <i class="fas fa-file-export text-neon-blue text-2xl"></i>
                         <div>
-                            <h4 class="text-white font-bold text-sm">YEDEKLE (EXPORT)</h4>
-                            <p class="text-[10px] text-gray-500">Tüm verilerini cihazına indir (.json)</p>
+                            <h4 class="text-white font-bold text-sm">${i18n.t('settings.backup_export')}</h4>
+                            <p class="text-[10px] text-gray-500">${i18n.t('settings.export_desc')}</p>
                         </div>
                     </div>
-                    <button ${Utils.actionAttrs('exportData')} class="${THEME.btn} w-full text-xs">YEDEĞİ İNDİR</button>
+                    <button ${Utils.actionAttrs('exportData')} class="${THEME.btn} w-full border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black">
+                        <i class="fas fa-download mr-2"></i>${i18n.t('settings.export_btn')}
+                    </button>
                 </div>
 
                 <div class="bg-gray-900 p-4 rounded-lg border border-gray-700">
@@ -753,36 +772,45 @@ export const Actions = {
                             <i class="fas fa-upload"></i>
                         </div>
                         <div>
-                            <h4 class="text-white font-bold text-sm">GERİ YÜKLE (IMPORT)</h4>
-                            <p class="text-[10px] text-gray-500">Dikkat: Mevcut veriler silinir!</p>
+                            <h4 class="text-white font-bold text-sm">${i18n.t('settings.restore_import')}</h4>
+                            <p class="text-[10px] text-gray-500">${i18n.t('settings.restore_warning') || 'Dikkat: Mevcut veriler silinir!'}</p>
                         </div>
                     </div>
                     <input type="file" id="import-file" accept=".json" class="hidden" ${Utils.actionAttrs('startImport', [], { event: 'change', passElement: true })}>
-                    <button ${Utils.actionAttrs('triggerImportFilePicker')} class="w-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 font-bold py-3 px-6 rounded-lg transition text-xs border border-dashed border-gray-600">DOSYA SEÇ VE YÜKLE</button>
+                    <button ${Utils.actionAttrs('triggerImportFilePicker')} class="w-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 font-bold py-3 px-6 rounded-lg transition text-xs border border-dashed border-gray-600">${i18n.t('settings.import_btn')}</button>
                 </div>
             </div>
         `);
     },
 
     async exportData() {
-        if (confirm("Tüm veri yedeği indirilsin mi?")) {
+        if (confirm(i18n.t('settings.confirm_export') || "Tüm veri yedeği indirilsin mi?")) {
             await Store.exportData();
-            UI.showToast("Yedekleme başarılı ✓");
+            UI.showToast(i18n.t('settings.backup_success') || 'Yedekleme başarılı ✓');
             UI.modal.close();
         }
     },
 
+    async toggleLanguage() {
+        const targetLocale = i18n.currentLocale === 'en' ? 'tr' : 'en';
+        await i18n.setLocale(targetLocale);
+        UI.modal.close();
+        this.openSettings(); // Reopen to see changes
+        UI.showToast(i18n.t('system.language_changed') || `System language set to ${targetLocale.toUpperCase()}`);
+        location.reload(); // Hard reload is safest for all static content to refresh
+    },
+
     async startImport(input) {
         if (input.files && input.files[0]) {
-            if (confirm("DİKKAT: Bu işlem mevcut tüm verileri silecek ve yedeği yükleyecektir. Emin misin?")) {
+            if (confirm(i18n.t('settings.confirm_import') || "DİKKAT: Bu işlem mevcut tüm verileri silecek ve yedeği yükleyecektir. Emin misin?")) {
                 const reader = new FileReader();
                 reader.onload = async function (e) {
                     const result = await Store.importData(e.target.result);
                     if (result.success) {
-                        alert(`Yedek başarıyla yüklendi! (Tarih: ${result.date})\nSayfa yenileniyor...`);
+                        alert(`${i18n.t('settings.import_success') || 'Yedek başarıyla yüklendi!'} (\nTarih: ${result.date})\nSayfa yenileniyor...`);
                         location.reload();
                     } else {
-                        alert("Hata: " + result.error);
+                        alert((i18n.t('settings.import_error') || "Hata: ") + result.error);
                     }
                 };
                 reader.readAsText(input.files[0]);
@@ -936,7 +964,8 @@ export const Actions = {
         UI.modal.close();
 
         const day = new Date().getDay();
-        const plan = WEEKLY_PLAN[day];
+        // BUG-001 FIX: Use DB.WEEKLY_PLAN instead of bare global
+        const plan = DB.WEEKLY_PLAN[day];
 
         if (plan && plan.tasks) {
             for (const taskId of plan.tasks) {

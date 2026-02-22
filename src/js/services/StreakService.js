@@ -2,7 +2,8 @@
 // Phase 5: Service Layer - Extracted from store.js
 
 import { config } from '../config/index.js';
-import { ValidationService } from '../ValidationService.js';
+// BUG-002 FIX: Correct import path - ValidationService is in same directory
+import { ValidationService } from './ValidationService.js';
 
 /**
  * StreakService

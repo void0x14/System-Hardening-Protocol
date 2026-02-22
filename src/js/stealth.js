@@ -17,7 +17,7 @@ export const Stealth = {
 
     init() {
         // Initialize original title with VERSION
-        this.origTitle = `SYSTEM HARDENING PROTOCOL | v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION : '8.3.1'}`;
+        this.origTitle = `SYSTEM HARDENING PROTOCOL | v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION : '9.0.0'}`;
         document.addEventListener('keydown', (e) => {
             // Ctrl+Shift+H - Türk klavyesi için uygun
             if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'h') {
@@ -83,7 +83,7 @@ export const Stealth = {
             if (sanitized) {
                 header.innerHTML = `FT <span class="text-sm text-text-muted">v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION.split('.').slice(0, 2).join('.') : '8.3'}</span>`;
             } else {
-                header.innerHTML = `PROTOCOL <span class="text-sm text-text-muted">v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION : '8.3.1'}</span>`;
+                header.innerHTML = `PROTOCOL <span class="text-sm text-text-muted">v${typeof CONFIG !== 'undefined' ? CONFIG.VERSION : '9.0.0'}</span>`;
             }
         }
 

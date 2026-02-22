@@ -29,7 +29,8 @@
 export { CacheService } from '../CacheService.js';
 
 // Memoize - Function memoization utilities
-export {
+// BUG-006 FIX: Use static import instead of require()
+import {
     memoize,
     memoizeWith,
     memoizeAsync,
@@ -38,6 +39,17 @@ export {
     memoizeThrottled,
     clearMemoizedCache
 } from '../Memoize.js';
+
+// Re-export memoize functions
+export {
+    memoize,
+    memoizeWith,
+    memoizeAsync,
+    memoizeByProperty,
+    memoizeWeak,
+    memoizeThrottled,
+    clearMemoizedCache
+};
 
 // VirtualList - Virtual scrolling for large lists
 export { VirtualList } from '../VirtualList.js';
@@ -92,8 +104,8 @@ export function createPerformanceContainer(options = {}) {
          * Create an async memoized function
          */
         memoizeAsync: (fn, memoOptions) => {
-            const { memoizeAsync: memoAsync } = require('./Memoize.js');
-            return memoAsync(fn, { ...options.memoize, ...memoOptions });
+            // BUG-006 FIX: Use imported function instead of require()
+            return memoizeAsync(fn, { ...options.memoize, ...memoOptions });
         },
         
         /**

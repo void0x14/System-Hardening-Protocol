@@ -115,7 +115,7 @@ export class AnatomyView {
                 <!-- Diagnostic Panel -->
                 <div class="${cardClass} relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div>
-                    <div class="${labelClass} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>
+                    <div class="${labelClass} text-neon-blue mb-6">${i18n.t('db.renderers.anatomy.diagnostic_panel')}</div>
                     
                     ${sel ? this._renderMuscleInfo(sel, displayFunction, displaySystem, labelClass) : this._renderEmptyState()}
                 </div>
@@ -171,14 +171,14 @@ export class AnatomyView {
                     </div>
                     
                     <div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange">
-                        <div class="${labelClass} mb-2">HARDENING PROTOCOL</div>
+                        <div class="${labelClass} mb-2">${i18n.t('db.renderers.anatomy.hardening_protocol')}</div>
                         <div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div>
                     </div>
                     
                     <div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50">
                         <div class="flex justify-between items-center">
                             <div>
-                                <div class="${labelClass} mb-1">RECOVERY TIME</div>
+                                <div class="${labelClass} mb-1">${i18n.t('db.renderers.anatomy.recovery_time')}</div>
                                 <div class="text-xl text-neon-blue font-bold">${sel.recovery}</div>
                             </div>
                             <i class="fas fa-clock text-neon-blue/30 text-3xl"></i>

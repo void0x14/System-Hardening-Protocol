@@ -313,7 +313,7 @@ export function createSystemHardeningStorage() {
         'monk_streak': '15',
         
         // App version
-        'monk_version': '8.3.1'
+        'monk_version': '9.0.0'
     });
 }
 

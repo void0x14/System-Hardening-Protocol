@@ -1,6 +1,8 @@
 // components/MacroRing.js - Macro Nutrient Ring Component
 // Extracted from components.js for reusability
 
+import { i18n } from '../services/i18nService.js';
+
 /**
  * Macro Ring Component Factory
  * SVG-based circular progress for nutrition tracking
@@ -25,14 +27,14 @@ export function MacroRing(label, current, target, unit, color, size = '80') {
     const safeCurrent = Math.max(0, Number(current) || 0);
     const safeTarget = Math.max(1, Number(target) || 1); // Prevent division by zero
     const percent = Math.min(100, (safeCurrent / safeTarget) * 100);
-    
+
     const radius = 35;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (percent / 100) * circumference;
-    
+
     const isOver = safeCurrent > safeTarget;
     const displayColor = isOver ? '#00ff41' : color;
-    
+
     return `
         <div class="flex flex-col items-center">
             <div class="relative" style="width: ${size}px; height: ${size}px;">
@@ -77,13 +79,13 @@ export function MacroRing(label, current, target, unit, color, size = '80') {
 export function MacroRings(macros, targets) {
     const { calories, protein, carbs, fat } = macros;
     const { calories: calTarget, protein: protTarget, carbs: carbTarget, fat: fatTarget } = targets;
-    
+
     return `
         <div class="flex justify-around items-center py-4">
-            ${MacroRing('KALORİ', calories, calTarget, '', '#00ff41', '90')}
-            ${MacroRing('PROTEİN', protein, protTarget, 'g', '#00f3ff', '70')}
-            ${MacroRing('KARB', carbs, carbTarget, 'g', '#ff6b35', '70')}
-            ${MacroRing('YAĞ', fat, fatTarget, 'g', '#ffed4a', '70')}
+            ${MacroRing(i18n.t('ui.nutrition.macros.calories'), calories, calTarget, '', '#00ff41', '90')}
+            ${MacroRing(i18n.t('ui.nutrition.macros.protein'), protein, protTarget, 'g', '#00f3ff', '70')}
+            ${MacroRing(i18n.t('ui.nutrition.macros.carbs'), carbs, carbTarget, 'g', '#ff6b35', '70')}
+            ${MacroRing(i18n.t('ui.nutrition.macros.fat'), fat, fatTarget, 'g', '#ffed4a', '70')}
         </div>
     `;
 }

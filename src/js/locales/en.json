@@ -1,0 +1,1238 @@
+{
+    "app": {
+        "title": "SYSTEM HARDENING PROTOCOL",
+        "version": "v9.0.0",
+        "status": "SYSTEM ONLINE",
+        "system_alert": "SYSTEM ALERT",
+        "alert_understood": "UNDERSTOOD COMMANDER",
+        "override_mission_default": "MISSION: INCOMPLETE TASKS",
+        "override_exit": "EXIT (ESC)",
+        "system_online": "SYSTEM ONLINE"
+    },
+    "nav": {
+        "settings": "SETTINGS",
+        "override": "OVERRIDE",
+        "language": "TR / EN"
+    },
+    "ui": {
+        "tabs": {
+            "dashboard": "DASHBOARD",
+            "training": "TRAINING",
+            "nutrition": "NUTRITION",
+            "progress": "PROGRESS",
+            "anatomy": "ANATOMY LAB",
+            "mental": "MENTAL"
+        },
+        "auto_1": "[EN] PROTOCOL",
+        "toast": {
+            "invalid_video_id": "Invalid video ID",
+            "invalid_weight": "Invalid weight!",
+            "weight_updated": "Weight updated.",
+            "fuel_taken": "FUEL ACQUIRED!",
+            "shake_drank": "SHAKE CONSUMED!",
+            "power_loaded": "POWER LOADED!",
+            "muscle_building_started": "MUSCLE BUILDING STARTED!",
+            "gainer_complete": "GAINER COMPLETE!",
+            "enter_sleep": "Enter sleep hours!",
+            "invalid_value": "Invalid value (0-14)",
+            "sleep_saved": "Sleep saved: {hours} hours",
+            "water_added": "+ {cups} cups 💧",
+            "food_not_found": "Food not found!",
+            "food_added": "{name} added ⚡",
+            "robot_mode_time": "Robot Mode: {mins} minutes focused.",
+            "daily_menu_updated": "Daily menu updated.",
+            "meal_deleted": "Meal deleted.",
+            "meal_added": "Meal added.",
+            "incomplete_info": "Incomplete info!",
+            "db_updated": "Database updated.",
+            "measurements_saved": "Measurements saved ✓",
+            "backup_never": "No backup has been made yet! Please back up your data.",
+            "backup_overdue": "⚠️ Time to backup! (>7 Days)"
+        },
+        "modal": {
+            "add_fuel": "ADD FUEL",
+            "select_from_list": "SELECT FROM LIST",
+            "define_new": "DEFINE NEW",
+            "search_food": "Search Food (e.g., Doner, Rice)",
+            "add": "ADD",
+            "food_name": "Food Name (e.g., Meatballs)",
+            "cal_100g": "Calories (100g or Piece)",
+            "protein": "Protein",
+            "carbs": "Carbohydrates",
+            "fat": "Fat",
+            "unit_type": "UNIT TYPE",
+            "grams_100": "Grams (per 100g)",
+            "piece_portion": "Piece/Portion",
+            "save_to_db": "SAVE TO DB",
+            "data_management": "DATA MANAGEMENT",
+            "backup_export": "BACKUP (EXPORT)",
+            "backup_info": "Download all your data to device (.json)",
+            "download_backup": "DOWNLOAD BACKUP",
+            "restore_import": "RESTORE (IMPORT)",
+            "restore_warning": "Warning: Existing data will be deleted!",
+            "select_file": "SELECT FILE & IMPORT"
+        },
+        "nutrition": {
+            "portion_select": "PORTION SELECT",
+            "amount_label": "AMOUNT ({unitName})",
+            "how_many": "How many {unitName}?",
+            "kcal": "kcal"
+        },
+        "save_db": "DATA MANAGEMENT"
+    },
+    "modal": {
+        "info": "INFO",
+        "close": "Close"
+    },
+    "system": {
+        "backup": {
+            "invalid_file": "Invalid backup file"
+        }
+    },
+    "alert": {
+        "title": "SYSTEM ALERT",
+        "acknowledge": "ACKNOWLEDGED COMMANDER"
+    },
+    "override": {
+        "mission": "MISSION: UNFINISHED BUSINESS",
+        "exit": "EXIT (ESC)"
+    },
+    "dashboard": {
+        "system_integrity": "SYSTEM INTEGRITY",
+        "goal": "GOAL:",
+        "update_sensor": "[ UPDATE SENSOR ]",
+        "uptime_streak": "UPTIME STREAK",
+        "days": "DAYS",
+        "last_28_days": "LAST 28 DAYS",
+        "consistency": "CONSISTENCY",
+        "daily_protocol": "DAILY PROTOCOL",
+        "training": "TRAINING",
+        "tasks": "Tasks",
+        "protein": "PROTEIN",
+        "missing": "MISSING",
+        "sleep": "SLEEP",
+        "hours": "Hours",
+        "click_to_save": "Click to save",
+        "hydration_level": "HYDRATION LEVEL",
+        "fuel_energy": "FUEL & ENERGY",
+        "energy_level": "ENERGY LEVEL",
+        "gainer_shake": "GAINER SHAKE",
+        "gainer_ingredients": "Milk + Oats + PB + Banana",
+        "injected": "INJECTED",
+        "inject_now": "INJECT NOW",
+        "system_check": "SYSTEM CHECK: COMPLETE DAY",
+        "all_tasks_done": "ALL TASKS DONE"
+    },
+    "training": {
+        "active_tasks": "ACTIVE TASKS",
+        "completed": "COMPLETED",
+        "select_region": "Select Region...",
+        "enter_set_rep": "Enter Set / Reps",
+        "weight_kg": "Weight (kg)",
+        "time_sec": "Time (sec)",
+        "weighted_set": "Weighted Set",
+        "timed_set": "Timed Set",
+        "finish_workout": "Complete Workout",
+        "save": "SAVE",
+        "done": "Done",
+        "ok": "OK",
+        "delete_set": "Delete Set",
+        "seconds": "SECONDS",
+        "completed_check": "COMPLETED ✓",
+        "complete": "COMPLETE",
+        "add_set": "ADD SET"
+    },
+    "nutrition": {
+        "macros": {
+            "calories": "CALORIES",
+            "protein": "PROTEIN",
+            "carbs": "CARBS",
+            "fat": "FAT"
+        },
+        "empty_fuel": "NO FUEL ENTERED YET",
+        "system_weak": "SYSTEM WEAKENING!",
+        "delete": "Delete",
+        "daily_protein": "Daily Protein:",
+        "daily_cal": "Daily Calories:",
+        "breakfast": "BREAKFAST",
+        "lunch": "LUNCH",
+        "dinner": "DINNER",
+        "shake": "SHAKE",
+        "snack": "SNACK",
+        "add_meal": "Add {mealName}",
+        "macro_details": "Macro Details",
+        "grams": "Grams",
+        "kcal": "Kcal",
+        "portion_select": "PORTION SELECT",
+        "amount": "AMOUNT",
+        "how_many": "How many {unit}?"
+    },
+    "sleep": {
+        "sleep_level": "SLEEP LEVEL",
+        "sleep_hours_placeholder": "Sleep hours...",
+        "save_data": "SAVE DATA",
+        "warning": "Insufficient sleep. Please prioritize resting."
+    },
+    "db": {
+        "milestones": {
+            "start": "Starting +3kg",
+            "half_hundred": "Half Hundred",
+            "half_way": "Half Way",
+            "target": "TARGET"
+        },
+        "weekly_plan": {
+            "0": {
+                "name": "SUNDAY",
+                "title": "SYSTEM REBOOT"
+            },
+            "1": {
+                "name": "MONDAY",
+                "title": "FULL BODY START"
+            },
+            "2": {
+                "name": "TUESDAY",
+                "title": "NUTRITION & RECOVERY"
+            },
+            "3": {
+                "name": "WEDNESDAY",
+                "title": "CORE & KERNEL"
+            },
+            "4": {
+                "name": "THURSDAY",
+                "title": "LEG DAY"
+            },
+            "5": {
+                "name": "FRIDAY",
+                "title": "STRESS TEST"
+            },
+            "6": {
+                "name": "SATURDAY",
+                "title": "ACTIVE REST"
+            }
+        },
+        "foods": {
+            "breakfast": {
+                "_0": "3 Eggs (Fried/Omelette) + 3 Slices Cheese + Bread",
+                "_1": "3 Boiled Eggs + 5-6 Olives + Lots of Bread",
+                "_2": "Turkish Omelette (Menemen) with 3 Eggs + Half Loaf Bread",
+                "_3": "Pancake (2 Eggs + 2 Glasses Milk + Flour) + Peanut Butter",
+                "_4": "Sausage with 3 Eggs + Bread",
+                "_5": "Honey + Clotted Cream + 2 Slices Bread + 1 Glass Milk",
+                "_6": "Turkish Bagel (Simit) x2 + White Cheese + Tea",
+                "_7": "Pastry x2 + Ayran (Yogurt Drink)",
+                "_8": "Cheese Plate (Yellow + White) + Olives + Tomato + Bread",
+                "_9": "Lentil Soup (2 Bowls) + Bread + Lemon",
+                "_10": "Oatmeal (with Milk) + Banana + Honey",
+                "_11": "Soft Pastry x2 + Nutella + Milk"
+            },
+            "fuel": {
+                "_0": "GAINER SHAKE (Base: Milk + Oats + Banana)",
+                "_1": "GAINER SHAKE + 1 Extra Banana",
+                "_2": "SHAKE: Milk + Oats + Peanut Butter + Banana",
+                "_3": "SHAKE: Milk + Cocoa + Oats + Honey",
+                "_4": "SHAKE: Milk + Banana + Dates (x3) + Oats",
+                "_5": "Chocolate Milk (500ml) + 2 Bananas",
+                "_6": "SHAKE: Milk + Baby Biscuits + Banana",
+                "_7": "Ayran (500ml) + Peanut Butter Bread"
+            },
+            "lunch": {
+                "_0": "Chicken with Rice (1.5 Portion / Extra Chicken)",
+                "_1": "Chicken Doner (Full Bread / Zurna Wrap)",
+                "_2": "Minced Meat Pita (1.5 Portion)",
+                "_3": "Pasta (Oily & Saucy) + Yogurt",
+                "_4": "Iskender Kebab (1.5 Portion)",
+                "_5": "Adana Wrap x2",
+                "_6": "Lahmacun x3 + Ayran",
+                "_7": "Baked Beans + Rice (Full Plate) + Pickles",
+                "_8": "Tantuni Wrap x2",
+                "_9": "Meatballs in Bread x2 + Ayran",
+                "_10": "Meat Bread (1 Portion)",
+                "_11": "Turkish Ravioli (Full Plate) + Yogurt + Butter",
+                "_12": "Spicy Bulgur Wrap x2 + Turnip Juice",
+                "_13": "Lentil Patties x10 + Ayran + Bread"
+            },
+            "dinner": {
+                "_0": "Burger Menu (Double Meat) + Fries",
+                "_1": "Whole Grilled Chicken + Quarter Bread",
+                "_2": "Pizza (Large Size / Mixed)",
+                "_3": "Casserole Dish + Rice + Cacik",
+                "_4": "Fish (2 Portions) + Salad + Bread",
+                "_5": "Kebab Set + Lavash + Grilled Veggies",
+                "_6": "Stuffed Eggplant / Peppers + Yogurt",
+                "_7": "Meat Saute + Bulgur Pilaf + Salad",
+                "_8": "Fried Chicken + Pasta + Cola",
+                "_9": "Noodle (Large Bowl / Chicken) + Spring Rolls",
+                "_10": "Turkish Pide (1.5 Portion) + Salad"
+            },
+            "snack": {
+                "_0": "Mixed Nuts (1 Handful / Roasted)",
+                "_1": "Dark Chocolate (1 Square) + Milk",
+                "_2": "Dried Fruits (Figs, Apricots, Raisins)",
+                "_3": "Rice Pudding (Sutlac) or Pudding",
+                "_4": "Fruit Salad (Banana, Apple, Seasonal)",
+                "_5": "Snickers / Chocolate Bar",
+                "_6": "Protein Bar or Flapjack",
+                "_7": "Toast (Double Kaşar Cheese)",
+                "_8": "Peanut Butter on Banana Slices",
+                "_9": "Remaining Shake (if any)",
+                "_10": "Plain Yogurt + Honey Mixture"
+            }
+        },
+        "exercises": {
+            "stomach_vacuum": {
+                "title": "Stomach Vacuum",
+                "desc": "Morning on empty stomach. Exhale completely. Stick belly button to spine without inhaling. Hold for 10-15s.<br><br><strong>TARGET:</strong> 3 Sets x 15-20 Sec Hold.",
+                "tags": {
+                    "_0": "Core",
+                    "_1": "Inner Core"
+                },
+                "steps": {
+                    "_0": "Exhale fully.",
+                    "_1": "Vakumla.",
+                    "_2": "Bekle."
+                }
+            },
+            "squat": {
+                "title": "Squat (Warmup)",
+                "desc": "Feet shoulder-width apart. Go down 'like sitting in a chair'. Don't let knees cave in. Push from heels.<br><br><strong>TARGET:</strong> 4 Sets x 20 Reps.",
+                "tags": {
+                    "_0": "Bacak",
+                    "_1": "Glutes"
+                },
+                "steps": {
+                    "_0": "Shoulder-width stance.",
+                    "_1": "Straight back.",
+                    "_2": "Topuklara bas."
+                }
+            },
+            "goblet_squat": {
+                "title": "Goblet Squat (Weighted)",
+                "desc": "Feet shoulder-width apart. Glue the weight to your chest. Go down 'like sitting in a chair'. Don't let knees cave in. Push from heels.<br><br><strong>TARGET:</strong> 4 Sets x 20 Reps.",
+                "tags": {
+                    "_0": "Bacak",
+                    "_1": "Power"
+                },
+                "steps": {
+                    "_0": "Hug the weight.",
+                    "_1": "Hips back.",
+                    "_2": "Topukla it."
+                }
+            },
+            "pushup": {
+                "title": "Incline/Standard Push-up",
+                "desc": "Hands on edge of bed/sofa (or floor). Body straight as an arrow. 3 seconds down, 1 second up (explosive).<br><br><strong>TARGET:</strong> 4 Sets x MAX Reps.",
+                "tags": {
+                    "_0": "Chest",
+                    "_1": "Explosive Power"
+                },
+                "steps": {
+                    "_0": "Body straight.",
+                    "_1": "Slow down (3s).",
+                    "_2": "Explode up (1s)."
+                }
+            },
+            "one_arm_row": {
+                "title": "One Arm Row",
+                "desc": "Go to edge of bed/sofa. Support with one hand and knee (Table pose). Pull weight with other hand to your POCKET.<br><br><strong>TARGET:</strong> 4 Sets x 12 Reps (Each Arm).",
+                "tags": {
+                    "_0": "Back",
+                    "_1": "Kanat"
+                },
+                "steps": {
+                    "_0": "Masa pozisyonu al.",
+                    "_1": "Brush elbow.",
+                    "_2": "Pull to pocket."
+                }
+            },
+            "plank": {
+                "title": "RKC Plank",
+                "desc": "Elbows under shoulders. Clench fists. Squeeze glutes, vacuum stomach.<br><br><strong>TARGET:</strong> 3 Sets x 30-45 Secs.",
+                "tags": {
+                    "_0": "Core",
+                    "_1": "Stabilizasyon"
+                },
+                "steps": {
+                    "_0": "Dirsekler yerde.",
+                    "_1": "Squeeze glutes.",
+                    "_2": "Pull elbows to feet."
+                }
+            },
+            "farmers_walk": {
+                "title": "Farmer's Walk",
+                "desc": "Grab weights in both hands. Shoulders back, chest out. Let arms hang like 'Dead Weight'.<br><br><strong>TARGET:</strong> 3 Rounds (Until fingers open).",
+                "tags": {
+                    "_0": "Bilek",
+                    "_1": "Grip Strength"
+                },
+                "steps": {
+                    "_0": "OBananalar geride.",
+                    "_1": "Kollar kilitli.",
+                    "_2": "Walk."
+                }
+            },
+            "hammer_curl": {
+                "title": "Hammer Curl",
+                "desc": "Stand. Grip weight like a hammer. GLUE elbows to your body.<br><br><strong>TARGET:</strong> 4 Sets x 12 Reps.",
+                "tags": {
+                    "_0": "Biceps",
+                    "_1": "Forearm"
+                },
+                "steps": {
+                    "_0": "Elbows glued.",
+                    "_1": "Hammer grip.",
+                    "_2": "Slowly down."
+                }
+            },
+            "kegel": {
+                "title": "Kegel",
+                "desc": "Squeeze PC muscle like holding in pee. Don't squeeze glutes or abs, isolate area.<br><br><strong>TARGET:</strong> 5 Sets x 10 Reps.",
+                "tags": {
+                    "_0": "Pelvis",
+                    "_1": "Sexual Power"
+                },
+                "steps": {
+                    "_0": "Isolate.",
+                    "_1": "Squeeze (3s).",
+                    "_2": "Release (3s)."
+                }
+            },
+            "mountain_climber": {
+                "title": "MoFlourtain Climber",
+                "desc": "Run on floor.<br><br><strong>TARGET:</strong> 3 x 45s.",
+                "tags": {
+                    "_0": "Kardiyo"
+                },
+                "steps": {
+                    "_0": "Pushup position.",
+                    "_1": "Run."
+                }
+            },
+            "lying_leg_raise": {
+                "title": "Lying Leg Raise",
+                "desc": "Lie flat. PUT HANDS UNDER BUTT. Seal lower back to floor. Raise legs, stop just before lower back lifts on way down.<br><br><strong>TARGET:</strong> 4 Sets x 12.",
+                "tags": {
+                    "_0": "Lower Abs",
+                    "_1": "Core"
+                },
+                "steps": {
+                    "_0": "Hands under butt.",
+                    "_1": "Belini bas.",
+                    "_2": "Controlled drop."
+                }
+            },
+            "eat_home": {
+                "title": "HOME COOKED",
+                "desc": "No outside food.",
+                "tags": {
+                    "_0": "Beslenme"
+                }
+            },
+            "single_leg_raise": {
+                "title": "Single Leg Raise",
+                "desc": "Raise one by one.<br><br><strong>TARGET:</strong> 4 Sets x 12.",
+                "tags": {
+                    "_0": "Lower Abs"
+                },
+                "steps": {
+                    "_0": "Tek bacak."
+                }
+            },
+            "bottle_curl": {
+                "title": "Bottle Curl",
+                "desc": "Curl with weight.<br><br><strong>TARGET:</strong> 4 Sets x 12.",
+                "tags": {
+                    "_0": "Biceps"
+                },
+                "steps": {
+                    "_0": "Lift."
+                }
+            },
+            "squat_heavy": {
+                "title": "Bulgarian Split Squat",
+                "desc": "Put foot on back sofa. Single leg squat.<br><br><strong>TARGET:</strong> 4 Sets x 12 (Each Leg).",
+                "tags": {
+                    "_0": "Bacak"
+                },
+                "steps": {
+                    "_0": "Tek ayak koltukta.",
+                    "_1": "Dik dur.",
+                    "_2": "Squat."
+                }
+            },
+            "superman": {
+                "title": "Superman",
+                "desc": "Lie face down. Raise arms and legs simultaneously. Hold for 2-3s at top.<br><br><strong>TARGET:</strong> 3 Sets x 12 Reps.",
+                "tags": {
+                    "_0": "Lower Back",
+                    "_1": "Core"
+                },
+                "steps": {
+                    "_0": "Face down.",
+                    "_1": "Raise arms/legs.",
+                    "_2": "Tepede tut."
+                }
+            },
+            "neck_curl": {
+                "title": "Lying Neck Curls (Network Hardening)",
+                "desc": "<strong>SYSTEM GOAL:</strong> Thick neck building - ",
+                "tags": {
+                    "_0": "BoyFlour",
+                    "_1": "Stabilizasyon"
+                },
+                "steps": {
+                    "_0": "Hang head.",
+                    "_1": "Weight on forehead.",
+                    "_2": "Curl chin."
+                }
+            },
+            "wrist_curl": {
+                "title": "Wrist Curls (I/O Controller Upgrade)",
+                "desc": "<strong>SYSTEM GOAL:</strong> Vascularity and Grip Strength.<br><br><strong>PROTOCOL:</strong> Sit, forearm on thigh. Curl wrist up.<br><br><strong>TARGET:</strong> 3 Sets x Failure.",
+                "tags": {
+                    "_0": "Forearm",
+                    "_1": "Kavrama"
+                },
+                "steps": {
+                    "_0": "Kol uylukta.",
+                    "_1": "Hand hanging.",
+                    "_2": "Curl wrist."
+                }
+            },
+            "tibialis_raise": {
+                "title": "Tibialis Raises (System Stability Patch)",
+                "desc": "<strong>SYSTEM GOAL:</strong> ",
+                "tags": {
+                    "_0": "Shin",
+                    "_1": "Denge"
+                },
+                "steps": {
+                    "_0": "Duvara yaslan.",
+                    "_1": "Straight legs.",
+                    "_2": "Raise toes."
+                }
+            },
+            "eat_bulk": {
+                "title": "EAT BULK (Calories)",
+                "desc": "Eat high calorie foods to reach target. No limits.",
+                "tags": {
+                    "_0": "Beslenme",
+                    "_1": "Yemek"
+                },
+                "steps": {
+                    "_0": "Yemek ye.",
+                    "_1": "Kalori takip et.",
+                    "_2": "Reach target."
+                }
+            },
+            "stretch": {
+                "title": "ESNEME (System Recovery)",
+                "desc": "Relax muscles. 5-10 min stretching. Target worked groups.",
+                "tags": {
+                    "_0": "Recovery",
+                    "_1": "Esneklik"
+                },
+                "steps": {
+                    "_0": "Rahatla.",
+                    "_1": "5-10 dk esne.",
+                    "_2": "Nefes al."
+                }
+            },
+            "weigh_in": {
+                "title": "TARTI (Weight Check)",
+                "desc": "Weigh in morning empty stomach and log. Critical for progress.",
+                "tags": {
+                    "_0": "Measurement",
+                    "_1": "Tracking"
+                },
+                "steps": {
+                    "_0": "Step on scale.",
+                    "_1": "Kiloyu not et.",
+                    "_2": "Sisteme gir."
+                }
+            },
+            "prep_food": {
+                "title": "YEMEK HAZIRLA (Meal Prep)",
+                "desc": "Prep weekly meals. Boil chicken, rice, eggs.",
+                "tags": {
+                    "_0": "Beslenme",
+                    "_1": "Planlama"
+                },
+                "steps": {
+                    "_0": "Malzemeleri al.",
+                    "_1": "Cook.",
+                    "_2": "Porsiyonla."
+                }
+            },
+            "walk_outside": {
+                "title": "WALK OUTSIDE",
+                "desc": "Min 20 mins outside. Sunlight, fresh air, mental reset.",
+                "tags": {
+                    "_0": "Cardio",
+                    "_1": "Mental"
+                },
+                "steps": {
+                    "_0": "Go outside.",
+                    "_1": "Walk 20+ mins.",
+                    "_2": "Nefes al."
+                }
+            },
+            "cool_down": {
+                "title": "COOL DOWN",
+                "desc": "Post workout. Lower heart rate, light stretching.",
+                "tags": {
+                    "_0": "Recovery",
+                    "_1": "Esneklik"
+                },
+                "steps": {
+                    "_0": "Walk slow.",
+                    "_1": "Nefes kontrol.",
+                    "_2": "Esne."
+                }
+            }
+        },
+        "foods_list": {
+            "_0": {
+                "name": "GAINER SHAKE (Bizim Tarif)",
+                "cat": "PROTOKOL"
+            },
+            "_1": {
+                "name": "Olive Oil",
+                "cat": "PROTOKOL"
+            },
+            "_2": {},
+            "_3": {},
+            "_4": {
+                "name": "Chicken Breast (Boiled/Grilled)",
+                "cat": "PROTEIN"
+            },
+            "_5": {},
+            "_6": {},
+            "_7": {},
+            "_8": {
+                "name": "Chicken Thigh",
+                "cat": "PROTEIN"
+            },
+            "_9": {},
+            "_10": {},
+            "_11": {
+                "name": "Meatballs (Homemade)",
+                "cat": "PROTEIN"
+            },
+            "_12": {
+                "name": "Tuna Fish (Drained)",
+                "cat": "PROTEIN"
+            },
+            "_13": {},
+            "_14": {},
+            "_15": {
+                "name": "Egg (Boiled)",
+                "cat": "PROTEIN"
+            },
+            "_16": {
+                "name": "Lor Peyniri",
+                "cat": "PROTEIN"
+            },
+            "_17": {},
+            "_18": {},
+            "_19": {
+                "name": "Cheddar/Kashar Cheese",
+                "cat": "PROTEIN"
+            },
+            "_20": {
+                "name": "Rice",
+                "cat": "CARBOHYDRATES"
+            },
+            "_21": {},
+            "_22": {},
+            "_23": {},
+            "_24": {
+                "name": "Bulgur",
+                "cat": "CARBOHYDRATES"
+            },
+            "_25": {},
+            "_26": {},
+            "_27": {},
+            "_28": {
+                "name": "Pasta (Plain/Sauce)",
+                "cat": "CARBOHYDRATES"
+            },
+            "_29": {},
+            "_30": {},
+            "_31": {},
+            "_32": {},
+            "_33": {
+                "name": "Boiled Potatoes",
+                "cat": "CARBOHYDRATES"
+            },
+            "_34": {
+                "name": "Ekmek (Beyaz/Somun)",
+                "cat": "CARBOHYDRATES"
+            },
+            "_35": {},
+            "_36": {},
+            "_37": {},
+            "_38": {
+                "name": "Lavash Bread",
+                "cat": "CARBOHYDRATES"
+            },
+            "_39": {
+                "name": "Chicken Doner",
+                "cat": "SOKAK"
+            },
+            "_40": {},
+            "_41": {},
+            "_42": {},
+            "_43": {
+                "name": "Meat Doner",
+                "cat": "SOKAK"
+            },
+            "_44": {},
+            "_45": {},
+            "_46": {},
+            "_47": {
+                "name": "Lahmacun",
+                "cat": "SOKAK"
+            },
+            "_48": {
+                "name": "Cig Kofte",
+                "cat": "SOKAK"
+            },
+            "_49": {},
+            "_50": {},
+            "_51": {
+                "name": "Simit",
+                "cat": "SOKAK"
+            },
+            "_52": {
+                "name": "Minced Meat Pita",
+                "cat": "SOKAK"
+            },
+            "_53": {
+                "name": "Kuru Fasulye / Nohut",
+                "cat": "HOME COOKED"
+            },
+            "_54": {},
+            "_55": {},
+            "_56": {},
+            "_57": {
+                "name": "Green Beans / Stew",
+                "cat": "HOME COOKED"
+            },
+            "_58": {},
+            "_59": {},
+            "_60": {
+                "name": "Lentil Soup",
+                "cat": "HOME COOKED"
+            },
+            "_61": {},
+            "_62": {},
+            "_63": {
+                "name": "Menemen",
+                "cat": "HOME COOKED"
+            },
+            "_64": {},
+            "_65": {},
+            "_66": {
+                "name": "Cici Bebe",
+                "cat": "SNACK"
+            },
+            "_67": {},
+            "_68": {},
+            "_69": {},
+            "_70": {
+                "name": "Peanut Butter",
+                "cat": "SNACK"
+            },
+            "_71": {},
+            "_72": {},
+            "_73": {},
+            "_74": {
+                "name": "Yulaf Ezmesi",
+                "cat": "SNACK"
+            },
+            "_75": {},
+            "_76": {},
+            "_77": {},
+            "_78": {
+                "name": "Muz",
+                "cat": "SNACK"
+            },
+            "_79": {
+                "name": "Milk (Whole/Semi)",
+                "cat": "SNACK"
+            },
+            "_80": {},
+            "_81": {},
+            "_82": {},
+            "_83": {
+                "name": "Yogurt",
+                "cat": "SNACK"
+            },
+            "_84": {},
+            "_85": {},
+            "_86": {
+                "name": "Cips",
+                "cat": "SNACK"
+            },
+            "_87": {},
+            "_88": {},
+            "_89": {},
+            "_90": {
+                "name": "Chocolate Milk",
+                "cat": "SNACK"
+            },
+            "_91": {
+                "name": "Indomie Noodle",
+                "cat": "SNACK"
+            },
+            "_92": {
+                "name": "Roasted Peanuts (Unsalted)",
+                "cat": "SNACK"
+            },
+            "_93": {},
+            "_94": {},
+            "_95": {
+                "name": "Dried Apricots",
+                "cat": "SNACK"
+            }
+        },
+        "food_options": {
+            "_0": {
+                "_0": "1 Teaspoon",
+                "_1": "1 Tablespoon"
+            },
+            "_1": {
+                "_0": "Small Portion (100g)",
+                "_1": "Normal Porsiyon (150g)",
+                "_2": "Sporcu Porsiyonu (250g)"
+            },
+            "_2": {
+                "_0": "1 Adet But",
+                "_1": "2 Adet But"
+            },
+            "_3": {
+                "_0": "Small Can (80g)",
+                "_1": "Large Can (160g)"
+            },
+            "_4": {
+                "_0": "3-4 Spoons (100g)",
+                "_1": "Half Pack (250g)"
+            },
+            "_5": {
+                "_0": "Little (4-5 Spoons)",
+                "_1": "Tabak (200g)",
+                "_2": "Dolu Tabak (300g)"
+            },
+            "_6": {
+                "_0": "Little (4-5 Spoons)",
+                "_1": "Tabak (200g)",
+                "_2": "Dolu Tabak (300g)"
+            },
+            "_7": {
+                "_0": "Small Plate",
+                "_1": "Normal Tabak",
+                "_2": "Tepeleme Dolu",
+                "_3": "Half Pack (Dry)"
+            },
+            "_8": {
+                "_0": "1 Dilim",
+                "_1": "Quarter Bread",
+                "_2": "Half Bread"
+            },
+            "_9": {
+                "_0": "Half Bread",
+                "_1": "Wrap",
+                "_2": "Zurna Wrap"
+            },
+            "_10": {
+                "_0": "Half Bread",
+                "_1": "Wrap",
+                "_2": "Porsiyon"
+            },
+            "_11": {
+                "_0": "Wrap",
+                "_1": "Portion (10 pieces)"
+            },
+            "_12": {
+                "_0": "Little (Half Plate)",
+                "_1": "Tam Porsiyon",
+                "_2": "Esnaf Porsiyonu (Bol)"
+            },
+            "_13": {
+                "_0": "Normal Tabak",
+                "_1": "Dolu Tabak"
+            },
+            "_14": {
+                "_0": "1 Kase",
+                "_1": "Large Bowl"
+            },
+            "_15": {
+                "_0": "Half Pan",
+                "_1": "Tam Tava"
+            },
+            "_16": {
+                "_0": "10 Adet",
+                "_1": "Half Pack",
+                "_2": "1 Bowl with Milk"
+            },
+            "_17": {
+                "_0": "1 Teaspoon",
+                "_1": "1 Tablespoon",
+                "_2": "Heaping Spoon"
+            },
+            "_18": {
+                "_0": "3-4 Spoons",
+                "_1": "1 Glass",
+                "_2": "Large Bowl"
+            },
+            "_19": {
+                "_0": "1 Bardak (200ml)",
+                "_1": "Large Mug (300ml)",
+                "_2": "Half Carton (500ml)"
+            },
+            "_20": {
+                "_0": "1 Kase",
+                "_1": "Large Bowl"
+            },
+            "_21": {
+                "_0": "1 Handful",
+                "_1": "Small Pack",
+                "_2": "Large Pack"
+            },
+            "_22": {
+                "_0": "1 Handful (~30g)",
+                "_1": "2 Handfuls (~60g)"
+            }
+        },
+        "mental_phases": {
+            "_0": {
+                "title": "PHASE 1: JAGUAR THEORY",
+                "desc": "Focus on the objective without getting lost in emotions. Jaguars don't complain; they hunt.",
+                "core": "Minimizing emotional reactions when hit by an impulse or difficulty.",
+                "intent": "Shifting the focus entirely to 'what should be done now' instead of why things are bad.",
+                "strategy": {
+                    "_0": "Notice when you start complaining and pause.",
+                    "_1": "Convert emotional pain into kinetic energy.",
+                    "_2": "Make cold and calculated decisions."
+                },
+                "practice": {
+                    "_0": "Daily: Stop complaining at least once and replace it with an action statement.",
+                    "_1": "Daily: When you catch negative self-talk, turn it into a neutral/solution-oriented statement."
+                }
+            },
+            "_1": {
+                "title": "PHASE 2: ALGORITHM MINDSET",
+                "desc": "Seeing life not as a drama, but as a system of cause and effect.",
+                "core": "Viewing results as 'output' and actions as 'input'. When output is bad, fix the input.",
+                "intent": "To get rid of 'Why is this happening to me?' mentality and adopt a 'system debugging' mindset.",
+                "strategy": {
+                    "_0": "Separate incidents from personal narratives.",
+                    "_1": "Determine which dynamics are at play in daily events.",
+                    "_2": "Do not debug without collecting data first."
+                },
+                "practice": {
+                    "_0": "Daily: Write down one problem and list 3 inputs that led to it.",
+                    "_1": "Weekly: Formulate a new algorithm for a recurring issue."
+                }
+            },
+            "_2": {
+                "title": "PHASE 3: RED PILL / HARSH TRUTHS",
+                "desc": "Confronting the realities you are running away from.",
+                "core": "Breaking self-deception.",
+                "intent": "Embracing uncomfortable facts rather than comfortable lies.",
+                "strategy": {
+                    "_0": "Analyze who wants what in affecting situations.",
+                    "_1": "Understand that 'hope' is not a strategy.",
+                    "_2": "Identify where you are lying to yourself."
+                },
+                "practice": {
+                    "_0": "Daily: Pick 1 event and analyze 'who wanted what'.",
+                    "_1": "Daily/Weekly: Write a 3-item log of the painful truths that left a mark on you."
+                }
+            },
+            "_3": {
+                "title": "PHASE 4: MINIMUM FRICTION",
+                "desc": "Removing obstacles in execution.",
+                "core": "Execution depends on reducing friction, not increasing motivation.",
+                "intent": "Lowering the barriers to starting tasks.",
+                "strategy": {
+                    "_0": "Make good habits very easy, bad habits very difficult.",
+                    "_1": "Preparation eliminates hesitation.",
+                    "_2": "Do the 'first 2 minutes' of the hardest task."
+                },
+                "practice": {
+                    "_0": "Daily: Set 2 micro-routines you will do no matter what.",
+                    "_1": "Daily: Even if you don't feel like it, perform the routine in its smallest form."
+                }
+            },
+            "_4": {
+                "title": "PHASE 5: ASYNC EXECUTION",
+                "desc": "Do not wait for perfect conditions. Execute on the fly.",
+                "core": "Perfectionism is procrastination.",
+                "intent": "Ship early, iterate fast.",
+                "strategy": {
+                    "_0": "Start even if you don't feel ready.",
+                    "_1": "Identify the critical path and hit it.",
+                    "_2": "Embrace failure as data."
+                },
+                "practice": {
+                    "_0": "Daily: Deploy a micro-feature or perform a task instantly.",
+                    "_1": "Weekly: Review friction logs and bypass bottlenecks."
+                }
+            },
+            "_5": {
+                "title": "PHASE 6: CHAOS TOLERANCE",
+                "desc": "Staying calm when the plan collapses.",
+                "core": "Embracing uncertainty and chaos as the natural state of existence.",
+                "intent": "Enhancing adaptability when unforeseen events destroy the schedule.",
+                "strategy": {
+                    "_0": "Expect things to go wrong.",
+                    "_1": "Focus on your reaction, not the disruption.",
+                    "_2": "Pivot instantly without emotional attachment to the plan."
+                },
+                "practice": {
+                    "_0": "Daily: Do 5-10 minutes of micro-action on a task you feel 'not ready' for.",
+                    "_1": "Daily: Make a list of 'Today wasn't perfect, but I accomplished these'."
+                }
+            },
+            "_6": {
+                "title": "PHASE 7: DOPAMINE DETOX",
+                "desc": "Regaining control over cheap dopamine sources.",
+                "core": "Understanding that high consumption destroys the ability to produce.",
+                "intent": "Resetting the baseline of pleasure by eliminating constant stimulation.",
+                "strategy": {
+                    "_0": "Cut out passive scrolling and endless feeds.",
+                    "_1": "Earn your dopamine through difficult tasks.",
+                    "_2": "Embrace boredom."
+                },
+                "practice": {
+                    "_0": "Daily: Leave at least 1 output (code, writing, art).",
+                    "_1": "Daily: Lock consumption within a specified time band."
+                }
+            },
+            "_7": {
+                "title": "PHASE 8: DARK ARTS",
+                "desc": "Going deep into your discipline. Advanced tactics.",
+                "core": "Mastery through intense focus and unconventional methods.",
+                "intent": "Achieve high-level results by breaking standard norms.",
+                "strategy": {
+                    "_0": "Exploit system loopholes for efficiency.",
+                    "_1": "Read the top tier knowledge.",
+                    "_2": "Combine skills aggressively."
+                },
+                "practice": {
+                    "_0": "Daily: Dedicate 30m to advanced theory.",
+                    "_1": "Weekly: Run a stress test on your limits."
+                }
+            }
+        },
+        "anatomy": {
+            "chest": {
+                "name": "Pectoralis Major",
+                "function": "Pushing force.",
+                "system": "Upper Body Push",
+                "action": "Push-up, Floor Press",
+                "recovery": "48-72 Hours"
+            },
+            "abs": {
+                "name": "Rectus Abdominis",
+                "function": "Core strength, sexual stamina.",
+                "system": "Central Balance",
+                "action": "Plank, Leg Raise, Vacuum",
+                "recovery": "24-48 Hours"
+            },
+            "quads": {
+                "name": "Quadriceps",
+                "function": "Body carrying, piston power.",
+                "system": "Locomotor",
+                "action": "Squat",
+                "recovery": "72 Hours"
+            },
+            "biceps": {
+                "name": "Biceps Brachii",
+                "function": "Pulling, gripping.",
+                "system": "Upper Body Pull",
+                "action": "Hammer Curl",
+                "recovery": "48 Hours"
+            },
+            "traps": {
+                "name": "Trapezius",
+                "function": "Shoulder stabilization.",
+                "system": "Posterior Chain",
+                "action": "Farmer's Walk",
+                "recovery": "48 Hours"
+            },
+            "lats": {
+                "name": "Latissimus Dorsi",
+                "function": "Torso pull up.",
+                "system": "Posterior Chain",
+                "action": "One Arm Row",
+                "recovery": "48-72 Hours"
+            },
+            "glutes": {
+                "name": "Gluteus Maximus",
+                "function": "Thrusting power.",
+                "system": "Power Center",
+                "action": "Squat",
+                "recovery": "72 Hours"
+            },
+            "hamstrings": {
+                "name": "Hamstrings",
+                "function": "Knee bending.",
+                "system": "Locomotor",
+                "action": "Squat",
+                "recovery": "48-72 Hours"
+            },
+            "lowerback": {
+                "name": "Erector Spinae",
+                "function": "Keeping spine upright.",
+                "system": "Core Support",
+                "action": "Superman",
+                "recovery": "48 Hours"
+            },
+            "pelvic": {
+                "name": "Pelvic Floor",
+                "function": "Ejaculation control.",
+                "system": "Reproductive",
+                "action": "Kegel",
+                "recovery": "24 Hours"
+            }
+        }
+    },
+    "renderers": {
+        "training": {
+            "warmup": "SYSTEM BOOT (WARMUP)",
+            "add_set": "ADD SET",
+            "sets": "Sets",
+            "duration": "Duration",
+            "activity": "Activity",
+            "task": "Task",
+            "done": "DONE",
+            "details": "Detailed Info & PR"
+        },
+        "nutrition": {
+            "no_fuel": "NO FUEL ADDED YET",
+            "system_weakening": "SYSTEM WEAKENING!",
+            "critical": "CRITICAL: {count}% missing",
+            "missing": "{count} kcal needed",
+            "goal_done": "GOAL REACHED",
+            "egg": "Egg",
+            "chicken": "Chicken",
+            "rice": "Rice",
+            "bread": "Bread",
+            "quick_add": "QUICK ADD",
+            "add_meal": "ADD MEAL",
+            "todays_fuel": "TODAY'S FUELS",
+            "daily_plan": "DAILY PLAN",
+            "refresh": "REFRESH",
+            "daily_macros": "DAILY MACROS",
+            "cal": "CALORIES",
+            "protein": "PROTEIN",
+            "carb": "CARBS",
+            "fat": "FAT",
+            "breakfast": "Breakfast",
+            "snack": "Snack",
+            "lunch": "Lunch",
+            "preworkout": "Pre Workout",
+            "dinner": "Dinner",
+            "night": "Night"
+        },
+        "progress": {
+            "no_data": "No data",
+            "no_training_data": "No training data yet",
+            "chest": "CHEST",
+            "arm": "ARM",
+            "waist": "WAIST",
+            "leg": "LEG",
+            "current": "CURRENT",
+            "today": "TODAY",
+            "weekly": "WEEKLY",
+            "monthly": "MONTHLY",
+            "total_sets": "TOTAL SETS",
+            "goal": "GOAL",
+            "weekly_sleep": "WEEKLY SLEEP",
+            "monthly_sleep": "MONTHLY SLEEP",
+            "weekly_water": "WEEKLY WATER",
+            "monthly_water": "MONTHLY WATER",
+            "hours_day": "hrs/day",
+            "glasses": "glasses",
+            "training_volume": "TRAINING VOLUME",
+            "last_7_days": "Last 7 Days",
+            "total_ton": "Total: {val} tons",
+            "weekly_summary": "WEEKLY SUMMARY (Last 4 Weeks)",
+            "week": "Week",
+            "avg_cal": "Avg. Calories",
+            "training": "Training",
+            "weight_delta": "Weight Δ",
+            "this_week": "This Week",
+            "last_week": "Last Week",
+            "weeks_ago": "Weeks Ago",
+            "days": "days",
+            "weight_history": "WEIGHT HISTORY (Last 7 Days)",
+            "measurements": "MEASUREMENTS (CM)",
+            "save": "SAVE",
+            "months": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+            "ton": "ton"
+        },
+        "anatomy": {
+            "front": "FRONT",
+            "back": "BACK",
+            "default_func": "Power and stabilization.",
+            "task": "TASK",
+            "waiting_selection": "Awaiting Muscle Selection...",
+            "core_support": "Core Support"
+        },
+        "mental": {
+            "today": "TODAY",
+            "title": "MENTAL WARFARE",
+            "subtitle": "Mental Hardening Protocol v8.0.0",
+            "phase": "Phase",
+            "phase_num": "PHASE {p}",
+            "examine_phase": "Examine Phase",
+            "phase_of_day": "PHASE OF THE DAY",
+            "daily_practice": "DAILY PRACTICE",
+            "completed": "COMPLETED",
+            "did_this": "I Did This!",
+            "detail": "DETAIL",
+            "strategy": "Strategy",
+            "practice": "Practice",
+            "core_idea": "CORE IDEA",
+            "intent_aim": "INTENT / AIM",
+            "strategy_title": "STRATEGY",
+            "practice_apps": "PRACTICAL APPLICATIONS",
+            "understand_phase": "I Understand This Phase",
+            "phase_completed": "Phase Completed!",
+            "close": "Close"
+        }
+    },
+    "epic": {
+        "mind_strong": "MIND FORTIFIED!",
+        "mind_strong_desc": "Daily practice completed. One step ahead.",
+        "mental_master": "MENTAL MASTER!",
+        "mental_master_desc": "All phases conquered. Mental warfare won!",
+        "phase_done": "PHASE COMPLETE!",
+        "phase_done_desc": "{c}/8 phases completed."
+    },
+    "alerts": {
+        "critical_warning": "CRITICAL WARNING:",
+        "gainer_missing": "Daily Gainer Shake not entered yet! Fuel level critical.",
+        "nutrition_error": "NUTRITION ERROR:",
+        "no_meals": "No meal logs today. System cannot function empty!"
+    },
+    "settings": {
+        "data_management": "DATA MANAGEMENT",
+        "backup_export": "BACKUP (EXPORT)",
+        "restore_import": "RESTORE (IMPORT)",
+        "export_btn": "Download to Device",
+        "import_btn": "Upload File (.json)",
+        "backup_success": "Backup successful ✓",
+        "restore_success": "System data restored 100% ✓",
+        "confirm_export": "Download all data backup?",
+        "confirm_import": "WARNING: This will delete all current data and load the backup. Are you sure?",
+        "import_success": "Backup loaded successfully!",
+        "import_error": "Error: ",
+        "restore_warning": "Warning: Current data will be deleted!",
+        "export_desc": "Downloads all progress in JSON format.",
+        "import_desc": "Overwrites all current data."
+    }
+}

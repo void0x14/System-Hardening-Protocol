@@ -7,6 +7,8 @@
  * 
  * @module config/targets
  */
+import { i18n } from '../services/i18nService.js';
+
 
 /**
  * Weight targets (kg).
@@ -78,19 +80,23 @@ export const SLEEP_TARGETS = {
 
 /**
  * Weight milestone definitions.
- * Each milestone has a weight threshold, title, and icon.
- * 
- * @constant {Object[]}
- * @property {number} weight - Weight threshold in kg
- * @property {string} title - Milestone title (Turkish)
- * @property {string} icon - Emoji icon for the milestone
+ * Initialized with placeholder values, populated by initMilestones() after i18n.init().
  */
-export const MILESTONES = [
-    { weight: 48, title: "Başlangıç +3kg", icon: "🌱" },
-    { weight: 50, title: "Yarım Yüzlük", icon: "⚡" },
-    { weight: 55, title: "Yarı Yol", icon: "🔥" },
-    { weight: 60, title: "HEDEF", icon: "🏆" }
-];
+export let MILESTONES = [];
+
+/**
+ * Populates MILESTONES with translated titles. Must be called after i18n.init().
+ */
+export function initMilestones() {
+    MILESTONES = [
+        { weight: 48, title: i18n.t('db.milestones.start'), icon: "🌱" },
+        { weight: 50, title: i18n.t('db.milestones.half_hundred'), icon: "⚡" },
+        { weight: 55, title: i18n.t('db.milestones.half_way'), icon: "🔥" },
+        { weight: 60, title: i18n.t('db.milestones.target'), icon: "🏆" }
+    ];
+    // Update TARGETS reference too
+    TARGETS.MILESTONES = MILESTONES;
+}
 
 /**
  * Combined targets object for easy access.

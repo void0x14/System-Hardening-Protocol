@@ -7,7 +7,7 @@
  * @since Phase 3
  */
 
-import { BaseRepository } from '../BaseRepository.js';
+import { BaseRepository } from './BaseRepository.js';
 import { KEYS } from '../config/keys.js';
 import { VALIDATION_LIMITS } from '../config/validation.js';
 

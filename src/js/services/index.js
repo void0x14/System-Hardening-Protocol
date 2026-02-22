@@ -14,7 +14,8 @@
  */
 
 // Export all services
-export { ValidationService } from '../ValidationService.js';
+// BUG-002 FIX: Correct import path - ValidationService is in same directory
+export { ValidationService } from './ValidationService.js';
 export { BackupService } from '../BackupService.js';
 export { StatisticsService } from '../StatisticsService.js';
 export { ExerciseHistoryService } from '../ExerciseHistoryService.js';

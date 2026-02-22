@@ -1,5 +1,3 @@
-# Build artifacts
-node_modules/
 *.log
 
 # OS files
@@ -11,7 +9,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-.jules/
 
 # Backups
 README_backup_*.md

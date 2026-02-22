@@ -5,6 +5,7 @@ import { WeightedSetRow, TimedSetRow, SimpleTaskBtn, AddSetButton } from '../com
 
 import { Store } from '../store.js';
 import { Stealth } from '../stealth.js';
+import { i18n } from '../services/i18nService.js';
 
 /**
  * Training View Class
@@ -39,10 +40,10 @@ export class TrainingView {
         const day = new Date().getDay();
         const plan = this.weeklyPlan[day];
         const today = this.utils.dateStr();
-        
+
         const done = await this.store.getWorkout(today);
         const workoutData = await this.store.getWorkoutData(today);
-        
+
         const btnClass = "bg-gray-800 hover:bg-neon-blue hover:text-black text-neon-blue border border-neon-blue font-bold py-3 px-6 rounded transition w-full mb-6 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,243,255,0.2)]";
 
         return this._template({
@@ -73,7 +74,7 @@ export class TrainingView {
                 </div>
                 
                 <button ${actionAttrs('openWarmup')} class="${btnClass}">
-                    <i class="fas fa-fire animate-pulse"></i> SYSTEM BOOT (ISINMA)
+                    <i class="fas fa-fire animate-pulse"></i> ${i18n.t('db.renderers.training.warmup')}
                 </button>
                 
                 <div class="space-y-4">
@@ -91,7 +92,7 @@ export class TrainingView {
         return tasks.map(tid => {
             const ex = this.db.EXERCISES[tid];
             if (!ex) return '';
-            
+
             const isDone = done.includes(tid);
             const logs = workoutData[tid] || [];
 
@@ -107,10 +108,10 @@ export class TrainingView {
             const totalForProgress = (trackingType === 'duration' || trackingType === 'activity' || trackingType === 'task') ? 1 : targetSets;
             const progressPercent = totalForProgress > 0 ? Math.round((completedSets / totalForProgress) * 100) : 0;
 
-            const typeLabel = trackingType === 'weighted' ? `${targetSets} Set` :
-                trackingType === 'timed' ? `${targetSets} Set` :
-                    trackingType === 'duration' ? 'Süre' :
-                        trackingType === 'activity' ? 'Aktivite' : 'Görev';
+            const typeLabel = trackingType === 'weighted' ? `${targetSets} ${i18n.t('db.renderers.training.sets')}` :
+                trackingType === 'timed' ? `${targetSets} ${i18n.t('db.renderers.training.sets')}` :
+                    trackingType === 'duration' ? i18n.t('db.renderers.training.duration') :
+                        trackingType === 'activity' ? i18n.t('db.renderers.training.activity') : i18n.t('db.renderers.training.task');
 
             const tags = this.stealth?.active ? this.stealth.filterTags(ex.tags) : ex.tags;
 
@@ -128,14 +129,14 @@ export class TrainingView {
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            ${isDone ? '<span class="text-[10px] text-neon-green font-bold bg-neon-green/10 px-2 py-1 rounded">TAMAM</span>' : ''}
+                            ${isDone ? `<span class="text-[10px] text-neon-green font-bold bg-neon-green/10 px-2 py-1 rounded">${i18n.t('db.renderers.training.done')}</span>` : ''}
                             <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300" id="icon-${tid}"></i>
                         </div>
                     </div>
                     <div id="body-${tid}" class="hidden bg-black/30 p-5 border-t border-gray-800">
                         <div class="flex justify-between items-start mb-5">
                             <div class="text-sm text-gray-300 p-4 bg-gray-800/70 rounded-xl border-l-4 border-neon-blue flex-1 mr-4 leading-relaxed">${ex.desc}</div>
-                            <button ${actionAttrs('showExercise', [tid], { stopPropagation: true })} class="flex-shrink-0 w-12 h-12 rounded-xl bg-neon-blue/10 hover:bg-neon-blue/30 border-2 border-neon-blue/50 text-neon-blue flex items-center justify-center transition-all hover:scale-105" title="Detaylı Bilgi & PR">
+                            <button ${actionAttrs('showExercise', [tid], { stopPropagation: true })} class="flex-shrink-0 w-12 h-12 rounded-xl bg-neon-blue/10 hover:bg-neon-blue/30 border-2 border-neon-blue/50 text-neon-blue flex items-center justify-center transition-all hover:scale-105" title="${i18n.t('db.renderers.training.details')}">
                                 <i class="fas fa-info-circle text-lg"></i>
                             </button>
                         </div>

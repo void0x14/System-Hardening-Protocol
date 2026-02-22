@@ -9,8 +9,8 @@
 
 ## Paket Yönetimi
 - **pnpm**: Proje paket yöneticisi (`packageManager` field ile sabitlenmiş)
-- **package.json**: Build scriptleri tanımlı, harici bağımlılık yok
-- **Build komutu**: `pnpm run build` → `node src/build.js`
+- **i18n Service**: Zero-dependency internationalization (Turkish/English) with JSON-based locale files.
+- **Zero-Dependency Goal**: Pure Vanilla JS/CSS architecture, no external libraries for logic or core functions.
 
 ## Build Sistemi
 - **Yaklaşım**: Build-time bundling (modüler src → tek dist/index.html)
@@ -305,8 +305,6 @@ Layer 10: app.js
 - `file://` altında YouTube Error 153 görülebilir; bu platform/policy kısıtıdır.
 
 ## Kısıtlamalar
-- Tek dosya olmalı (bağımsız çalışma)
 - İnternet kesilse de çalışmalı (localStorage)
-- Build adımı: `pnpm run build`
 - Test framework: Custom-built (Zero Dependencies)
 - Test coverage: 200+ test cases across all modules

@@ -1,8 +1,6 @@
 // theme.js - UI Theme Constants
 // Extracted from config.js for Phase 2: Configuration Extraction
 
-import { UI } from '../ui.js';
-
 /**
  * UI theme and styling constants for System Hardening app.
  * Tailwind CSS class compositions for consistent styling.
@@ -220,14 +218,14 @@ export function getClasses(component) {
  */
 export function getButtonVariant(variant = 'primary') {
     const baseClasses = "font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2";
-    
+
     const variants = {
         primary: `bg-surface-raised hover:bg-neon-green hover:text-gunmetal text-white ${baseClasses}`,
         secondary: `bg-surface-card hover:bg-surface-raised text-text-muted hover:text-white ${baseClasses}`,
         danger: `bg-error/20 hover:bg-error text-error hover:text-white ${baseClasses}`,
         success: `bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-gunmetal ${baseClasses}`
     };
-    
+
     return variants[variant] || variants.primary;
 }
 

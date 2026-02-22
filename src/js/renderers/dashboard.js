@@ -11,6 +11,7 @@ import { Utils } from '../utils.js';
 import { CONFIG } from '../config/index.js';
 import { THEME } from '../config/theme.js';
 import { DB } from '../config/db.js';
+import { Components } from '../components.js';
 
 const toSafeNumber = (value, fallback = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
     const parsed = Number(value);
@@ -25,7 +26,7 @@ const toSafeText = (value, maxLength = 160) => {
 
 const isIsoDateKey = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 
-const Renderers = {
+export const Renderers = {
     async dashboard() {
         const today = Utils.dateStr();
 
@@ -47,7 +48,7 @@ const Renderers = {
         const safeWater = Math.round(toSafeNumber(water, 0, 0, 50));
 
         const dayIdx = new Date().getDay();
-        const dailyPlan = WEEKLY_PLAN[dayIdx];
+        const dailyPlan = DB.WEEKLY_PLAN[dayIdx];
         const totalTasks = dailyPlan ? dailyPlan.tasks.length : 0;
         const completedTasks = workoutData.length;
 
@@ -127,7 +128,7 @@ const Renderers = {
                             <div class="p-3 bg-surface-raised rounded-lg border-l-2 ${isProteinDone ? 'border-neon-green' : 'border-accent-orange'}">
                                 <div class="flex justify-between items-center mb-1">
                                     <span class="text-xs font-bold text-gray-300">${i18n.t("dashboard.protein")}</span>
-                                    ${isProteinDone ? '<i class="fas fa-check text-neon-green"></i>' : '<span class="text-accent-orange text-[10px] font-bold">${i18n.t("dashboard.missing")}</span>'}
+                                    ${isProteinDone ? `<i class="fas fa-check text-neon-green"></i>` : `<span class="text-accent-orange text-[10px] font-bold">${i18n.t("dashboard.missing")}</span>`}
                                 </div>
                                 <div class="text-[10px] text-gray-500 font-mono">${Math.round(totalProtein)} / ${targetProtein}g</div>
                             </div>
@@ -228,7 +229,7 @@ const Renderers = {
 
             // Calculate level based on task completion (0-3 scale)
             const dayOfWeek = d.getDay();
-            const dayPlan = WEEKLY_PLAN[dayOfWeek];
+            const dayPlan = DB.WEEKLY_PLAN[dayOfWeek];
             const totalDayTasks = dayPlan ? dayPlan.tasks.length : 1;
             let level = 0;
             if (workout.length > 0) {
@@ -249,7 +250,7 @@ const Renderers = {
 
     async training() {
         const day = new Date().getDay();
-        const plan = WEEKLY_PLAN[day];
+        const plan = DB.WEEKLY_PLAN[day];
         const done = await Store.getWorkout(Utils.dateStr());
         const workoutData = await Store.getWorkoutData(Utils.dateStr());
         const btnClass = "bg-gray-800 hover:bg-neon-blue hover:text-black text-neon-blue border border-neon-blue font-bold py-3 px-6 rounded transition w-full mb-6 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,243,255,0.2)]";
@@ -259,7 +260,7 @@ const Renderers = {
                 <div><h2 class="text-3xl font-header font-bold text-white">${plan.name}</h2><div class="text-neon-green tracking-widest text-xs mt-1">${plan.title}</div></div>
                 <div class="text-xl font-mono text-white">0${day}</div>
             </div>
-            <button ${Utils.actionAttrs('openWarmup')} class="${btnClass}"><i class="fas fa-fire animate-pulse"></i> SYSTEM BOOT (ISINMA)</button>
+            <button ${Utils.actionAttrs('openWarmup')} class="${btnClass}"><i class="fas fa-fire animate-pulse"></i> ${i18n.t('renderers.training.warmup')}</button>
             <div class="space-y-4">
                 ${plan.tasks.map(tid => {
             const ex = DB.EXERCISES[tid];
@@ -287,7 +288,7 @@ const Renderers = {
                 // Add Set button for weighted exercises
                 addSetBtn = `<button ${Utils.actionAttrs('addSet', [tid])}
                     class="w-full mt-3 py-3 rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/30 text-gray-400 hover:border-neon-blue hover:text-neon-blue hover:bg-neon-blue/10 transition-all font-bold text-sm flex items-center justify-center gap-2">
-                    <i class="fas fa-plus"></i> SET EKLE
+                    <i class="fas fa-plus"></i> ${i18n.t('renderers.training.add_set')}
                 </button>`;
             } else if (trackingType === 'timed') {
                 for (let i = 0; i < targetSets; i++) {
@@ -299,7 +300,7 @@ const Renderers = {
                 // Add Set button for timed exercises
                 addSetBtn = `<button ${Utils.actionAttrs('addSet', [tid])}
                     class="w-full mt-3 py-3 rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/30 text-gray-400 hover:border-neon-blue hover:text-neon-blue hover:bg-neon-blue/10 transition-all font-bold text-sm flex items-center justify-center gap-2">
-                    <i class="fas fa-plus"></i> SET EKLE
+                    <i class="fas fa-plus"></i> ${i18n.t('renderers.training.add_set')}
                 </button>`;
             } else {
                 completedSets = isDone ? 1 : 0;
@@ -309,10 +310,10 @@ const Renderers = {
             const totalForProgress = (trackingType === 'duration' || trackingType === 'activity' || trackingType === 'task') ? 1 : targetSets;
             const progressPercent = totalForProgress > 0 ? Math.round((completedSets / totalForProgress) * 100) : 0;
 
-            const typeLabel = trackingType === 'weighted' ? `${targetSets} Set` :
-                trackingType === 'timed' ? `${targetSets} Set` :
-                    trackingType === 'duration' ? 'Süre' :
-                        trackingType === 'activity' ? 'Aktivite' : 'Görev';
+            const typeLabel = trackingType === 'weighted' ? `${targetSets} ${i18n.t('renderers.training.sets')}` :
+                trackingType === 'timed' ? `${targetSets} ${i18n.t('renderers.training.sets')}` :
+                    trackingType === 'duration' ? i18n.t('renderers.training.duration') :
+                        trackingType === 'activity' ? i18n.t('renderers.training.activity') : i18n.t('renderers.training.task');
 
             return `
                         <div class="bg-gray-900 border-2 ${isDone ? 'border-neon-green shadow-[0_0_15px_rgba(0,255,65,0.15)]' : 'border-gray-700'} rounded-xl overflow-hidden transition-all">
@@ -328,23 +329,24 @@ const Renderers = {
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    ${isDone ? '<span class="text-[10px] text-neon-green font-bold bg-neon-green/10 px-2 py-1 rounded">TAMAM</span>' : ''}
+                                    ${isDone ? `<span class="text-[10px] text-neon-green font-bold bg-neon-green/10 px-2 py-1 rounded">${i18n.t('renderers.training.done')}</span>` : ''
+                }
                                     <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300" id="icon-${tid}"></i>
-                                </div>
-                            </div>
-                            <div id="body-${tid}" class="hidden bg-black/30 p-5 border-t border-gray-800">
-                                <div class="flex justify-between items-start mb-5">
-                                    <div class="text-sm text-gray-300 p-4 bg-gray-800/70 rounded-xl border-l-4 border-neon-blue flex-1 mr-4 leading-relaxed">${ex.desc}</div>
-                                    <button ${Utils.actionAttrs('showExercise', [tid], { stopPropagation: true })} class="flex-shrink-0 w-12 h-12 rounded-xl bg-neon-blue/10 hover:bg-neon-blue/30 border-2 border-neon-blue/50 text-neon-blue flex items-center justify-center transition-all hover:scale-105" title="Detaylı Bilgi & PR">
-                                        <i class="fas fa-info-circle text-lg"></i>
-                                    </button>
-                                </div>
-                                <div class="space-y-3">
-                                    ${setsHtml}
-                                    ${addSetBtn}
-                                </div>
-                            </div>
-                        </div>`;
+                                </div >
+                            </div >
+    <div id="body-${tid}" class="hidden bg-black/30 p-5 border-t border-gray-800">
+        <div class="flex justify-between items-start mb-5">
+            <div class="text-sm text-gray-300 p-4 bg-gray-800/70 rounded-xl border-l-4 border-neon-blue flex-1 mr-4 leading-relaxed">${ex.desc}</div>
+            <button ${Utils.actionAttrs('showExercise', [tid], { stopPropagation: true })} class="flex-shrink-0 w-12 h-12 rounded-xl bg-neon-blue/10 hover:bg-neon-blue/30 border-2 border-neon-blue/50 text-neon-blue flex items-center justify-center transition-all hover:scale-105" title="${i18n.t('renderers.training.details')}">
+                <i class="fas fa-info-circle text-lg"></i>
+            </button>
+        </div>
+        <div class="space-y-3">
+            ${setsHtml}
+            ${addSetBtn}
+        </div>
+    </div>
+                        </div > `;
         }).join('')}
             </div>
         </div>`;
@@ -361,8 +363,8 @@ const Renderers = {
         }).join('') || `
             <div class="text-center text-gray-600 py-8 border-2 border-dashed border-gray-800 rounded-xl">
                 <i class="fas fa-utensils text-3xl mb-3 text-gray-700"></i>
-                <div class="font-bold">HENÜZ YAKIT GİRİLMEDİ</div>
-                <span class="text-[10px] text-neon-red">SİSTEM ZAYIFLIYOR!</span>
+                <div class="font-bold">${i18n.t('renderers.nutrition.no_fuel')}</div>
+                <span class="text-[10px] text-neon-red">${i18n.t('renderers.nutrition.system_weakening')}</span>
             </div>`;
 
         // Status feedback
@@ -372,24 +374,24 @@ const Renderers = {
         let statusBox = "";
         if (t.c < targetCal * 0.5) {
             statusBox = `<div class="p-3 border-2 border-red-600 bg-red-900/20 rounded-lg text-center">
-                <div class="text-red-500 font-bold"><i class="fas fa-skull mr-2"></i>KRİTİK: ${100 - calPercent}% eksik</div>
+                <div class="text-red-500 font-bold"><i class="fas fa-skull mr-2"></i>${i18n.t('renderers.nutrition.critical', { count: 100 - calPercent })}</div>
             </div>`;
         } else if (t.c < targetCal) {
             statusBox = `<div class="p-3 border-2 border-yellow-600 bg-yellow-900/20 rounded-lg text-center">
-                <div class="text-yellow-500 font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>${targetCal - t.c} kcal daha lazım</div>
+                <div class="text-yellow-500 font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>${i18n.t('renderers.nutrition.missing', { count: targetCal - t.c })}</div>
             </div>`;
         } else {
             statusBox = `<div class="p-3 border-2 border-neon-green bg-green-900/20 rounded-lg text-center">
-                <div class="text-neon-green font-bold"><i class="fas fa-check-circle mr-2"></i>HEDEF TAMAMLANDI</div>
+                <div class="text-neon-green font-bold"><i class="fas fa-check-circle mr-2"></i>${i18n.t('renderers.nutrition.goal_done')}</div>
             </div>`;
         }
 
         // Quick add buttons (most common foods)
         const quickFoods = [
-            { icon: 'fa-egg', name: 'Yumurta', id: 5 },
-            { icon: 'fa-drumstick-bite', name: 'Tavuk', id: 1 },
-            { icon: 'fa-bowl-rice', name: 'Pilav', id: 20 },
-            { icon: 'fa-bread-slice', name: 'Ekmek', id: 24 }
+            { icon: 'fa-egg', name: i18n.t('renderers.nutrition.egg'), id: 5 },
+            { icon: 'fa-drumstick-bite', name: i18n.t('renderers.nutrition.chicken'), id: 1 },
+            { icon: 'fa-bowl-rice', name: i18n.t('renderers.nutrition.rice'), id: 20 },
+            { icon: 'fa-bread-slice', name: i18n.t('renderers.nutrition.bread'), id: 24 }
         ];
         const quickAddHtml = quickFoods.map(f => `
             <button ${Utils.actionAttrs('quickAddMeal', [f.id])}
@@ -411,14 +413,14 @@ const Renderers = {
             <!-- Macro Rings Row -->
             <div class="${THEME.card}">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-[10px] text-gray-500 font-bold">GÜNLÜK MAKS TAKIP</span>
+                    <span class="text-[10px] text-gray-500 font-bold">${i18n.t('renderers.nutrition.daily_macros')}</span>
                     <span class="text-[10px] text-gray-500">${Utils.dateStr()}</span>
                 </div>
                 <div class="flex justify-around items-center py-4">
-                    ${Components.macroRing('KALORİ', t.c, targetCal, '', '#00ff41', '90')}
-                    ${Components.macroRing('PROTEİN', t.p, CONFIG.TARGETS.PROT, 'g', '#00f3ff', '70')}
-                    ${Components.macroRing('KARB', t.carb, CONFIG.TARGETS.CARB, 'g', '#ff6b35', '70')}
-                    ${Components.macroRing('YAĞ', t.f, CONFIG.TARGETS.FAT, 'g', '#ffed4a', '70')}
+                    ${Components.macroRing(i18n.t('renderers.nutrition.cal'), t.c, targetCal, '', '#00ff41', '90')}
+                    ${Components.macroRing(i18n.t('renderers.nutrition.protein'), t.p, CONFIG.TARGETS.PROT, 'g', '#00f3ff', '70')}
+                    ${Components.macroRing(i18n.t('renderers.nutrition.carb'), t.carb, CONFIG.TARGETS.CARB, 'g', '#ff6b35', '70')}
+                    ${Components.macroRing(i18n.t('renderers.nutrition.fat'), t.f, CONFIG.TARGETS.FAT, 'g', '#ffed4a', '70')}
                 </div>
                 ${statusBox}
             </div>
@@ -429,20 +431,20 @@ const Renderers = {
                     <!-- Quick Add Section -->
                     <div class="${THEME.card}">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="text-[10px] text-gray-500 font-bold">⚡ HIZLI EKLE</span>
+                            <span class="text-[10px] text-gray-500 font-bold"><i class=\"fas fa-bolt text-neon-yellow mr-1\"></i> ${i18n.t('renderers.nutrition.quick_add')}</span>
                         </div>
                         <div class="grid grid-cols-4 gap-2 mb-4">
                             ${quickAddHtml}
                         </div>
                         <button ${Utils.actionAttrs('openMealModal')} class="${THEME.btn} w-full">
-                            <i class="fas fa-plus mr-2"></i>ÖĞÜN EKLE
+                            <i class="fas fa-plus mr-2"></i>${i18n.t('renderers.nutrition.add_meal')}
                         </button>
                     </div>
 
                     <!-- Meal List -->
                     <div class="${THEME.card}">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="text-[10px] text-gray-500 font-bold">BUGÜNKÜ YAKITLAR (${meals.length})</span>
+                            <span class="text-[10px] text-gray-500 font-bold">${i18n.t('renderers.nutrition.todays_fuel')} (${meals.length})</span>
                             <span class="text-neon-green font-bold text-sm">${t.c} kcal</span>
                         </div>
                         <div class="max-h-[300px] overflow-y-auto custom-scrollbar space-y-2">
@@ -454,16 +456,16 @@ const Renderers = {
                 <!-- Right Column: Daily Plan -->
                 <div class="${THEME.card}">
                     <div class="flex justify-between mb-4 items-center">
-                        <span class="text-[10px] text-gray-500 font-bold">📋 GÜNLÜK PLAN (${totalPlanCal} kcal)</span>
+                        <span class="text-[10px] text-gray-500 font-bold">📋 ${i18n.t('renderers.nutrition.daily_plan')} (${totalPlanCal} kcal)</span>
                         <button ${Utils.actionAttrs('rerollPlan')} class="text-xs text-neon-blue hover:text-white font-bold">
-                            <i class="fas fa-sync-alt mr-1"></i>YENİLE
+                            <i class="fas fa-sync-alt mr-1"></i>${i18n.t('renderers.nutrition.refresh')}
                         </button>
                     </div>
                     <div class="space-y-3">
                         ${['breakfast', 'fuel', 'lunch', 'pre_workout', 'dinner', 'night'].map(k => {
             const times = { breakfast: '08:00', fuel: '11:00', lunch: '14:00', pre_workout: '17:00', dinner: '19:00', night: '23:00' };
             const icons = { breakfast: 'fa-sun', fuel: 'fa-bolt', lunch: 'fa-utensils', pre_workout: 'fa-dumbbell', dinner: 'fa-moon', night: 'fa-bed' };
-            const labels = { breakfast: 'Kahvaltı', fuel: 'Ara Öğün', lunch: 'Öğle', pre_workout: 'Antrenman Öncesi', dinner: 'Akşam', night: 'Gece' };
+            const labels = { breakfast: i18n.t('renderers.nutrition.breakfast'), fuel: i18n.t('renderers.nutrition.snack'), lunch: i18n.t('renderers.nutrition.lunch'), pre_workout: i18n.t('renderers.nutrition.preworkout'), dinner: i18n.t('renderers.nutrition.dinner'), night: i18n.t('renderers.nutrition.night') };
             const meal = plan[k];
             return `
                             <div class="flex items-center gap-3 p-2 rounded-lg ${meal ? 'bg-gray-900/50' : 'bg-gray-900/20 opacity-50'}">
@@ -494,7 +496,7 @@ const Renderers = {
         const weeklySummary = await Store.getWeeklySummary();
         const sleepStats = await Store.getSleepStats();
         const waterStats = await Store.getWaterStats();
-        const months = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+        const months = i18n.t('renderers.progress.months').split(',');
 
         let weightBars = '', dateLabels = '', weightHistoryTable = '';
 
@@ -513,7 +515,7 @@ const Renderers = {
                 return `<div class="flex-1 text-center text-[8px] text-gray-500">${day}${showMonth ? ' ' + months[monthIdx] : ''}</div>`;
             }).join('');
         } else {
-            weightBars = '<div class="text-gray-600 text-xs w-full text-center self-center flex flex-col items-center justify-center h-full"><i class="fas fa-weight text-3xl mb-2 opacity-30"></i><span>Veri yok</span></div>';
+            weightBars = `<div class="text-gray-600 text-xs w-full text-center self-center flex flex-col items-center justify-center h-full"><i class="fas fa-weight text-3xl mb-2 opacity-30"></i><span>${i18n.t('renderers.progress.no_data')}</span></div>`;
         }
 
         let volumeChart = '';
@@ -527,10 +529,10 @@ const Renderers = {
                 return `<div class="flex-1 flex flex-col items-center group"><div class="text-[8px] text-neon-blue font-bold mb-1 opacity-0 group-hover:opacity-100 transition">${val > 0 ? Math.round(val) : ''}</div><div class="w-full bg-gray-800 hover:bg-neon-blue/60 rounded-t transition-all" style="height:${Math.max(5, h)}%"></div><div class="text-[8px] text-gray-500 mt-1">${day}</div></div>`;
             }).join('');
         } else {
-            volumeChart = '<div class="text-gray-600 text-xs w-full text-center flex flex-col items-center justify-center h-full"><i class="fas fa-dumbbell text-3xl mb-2 opacity-30"></i><span>Henüz antrenman verisi yok</span></div>';
+            volumeChart = `<div class="text-gray-600 text-xs w-full text-center flex flex-col items-center justify-center h-full"><i class="fas fa-dumbbell text-3xl mb-2 opacity-30"></i><span>${i18n.t('renderers.progress.no_training_data')}</span></div>`;
         }
 
-        const labels = { chest: 'GÖĞÜS', arm: 'KOL', waist: 'BEL', leg: 'BACAK' };
+        const labels = { chest: i18n.t('renderers.progress.chest'), arm: i18n.t('renderers.progress.arm'), waist: i18n.t('renderers.progress.waist'), leg: i18n.t('renderers.progress.leg') };
         const safeStatValue = (value) => {
             const parsed = Number(value);
             return Number.isFinite(parsed) ? String(parsed) : '';
@@ -549,50 +551,50 @@ const Renderers = {
             <div class="space-y-6 animate-slide-up">
             <!-- SUMMARY ROW -->
             <div class="${summaryGridClass}">
-                <div class="${THEME.card} text-center py-3 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-gray-500 font-bold">MEVCUT</div><div class="text-xl font-bold text-white mt-1">${Store.state.weight} <span class="text-[10px] text-neon-green">kg</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-neon-green/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-neon-green font-bold">BUGÜN</div><div class="text-xl font-bold text-white mt-1">${Math.round(volStats.daily[Utils.dateStr()] || 0)} <span class="text-[10px] text-gray-500">kg</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-neon-blue/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-neon-blue font-bold">HAFTALIK</div><div class="text-xl font-bold text-white mt-1">${(volStats.weekly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-accent-orange/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-accent-orange font-bold">AYLIK</div><div class="text-xl font-bold text-white mt-1">${(volStats.monthly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div></div>
-                <div class="${THEME.card} text-center py-3 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-gray-500 font-bold">TOPLAM SET</div><div class="text-xl font-bold text-neon-blue mt-1">${volStats.totalSets}</div></div>
-                <div class="${THEME.card} text-center py-3 sensitive-content"><div class="text-[9px] text-gray-500 font-bold">HEDEF</div><div class="text-xl font-bold text-neon-green mt-1">${CONFIG.TARGETS.GOAL} <span class="text-[10px]">kg</span></div></div>
+                <div class="${THEME.card} text-center py-3 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-gray-500 font-bold">${i18n.t('renderers.progress.current')}</div><div class="text-xl font-bold text-white mt-1">${Store.state.weight} <span class="text-[10px] text-neon-green">kg</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-neon-green/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-neon-green font-bold">${i18n.t('renderers.progress.today')}</div><div class="text-xl font-bold text-white mt-1">${Math.round(volStats.daily[Utils.dateStr()] || 0)} <span class="text-[10px] text-gray-500">kg</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-neon-blue/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-neon-blue font-bold">${i18n.t('renderers.progress.weekly')}</div><div class="text-xl font-bold text-white mt-1">${(volStats.weekly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-accent-orange/30 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-accent-orange font-bold">${i18n.t('renderers.progress.monthly')}</div><div class="text-xl font-bold text-white mt-1">${(volStats.monthly / 1000).toFixed(1)} <span class="text-[10px] text-gray-500">ton</span></div></div>
+                <div class="${THEME.card} text-center py-3 ${isSanitized ? 'w-32 md:w-40' : ''}"><div class="text-[9px] text-gray-500 font-bold">${i18n.t('renderers.progress.total_sets')}</div><div class="text-xl font-bold text-neon-blue mt-1">${volStats.totalSets}</div></div>
+                <div class="${THEME.card} text-center py-3 sensitive-content"><div class="text-[9px] text-gray-500 font-bold">${i18n.t('renderers.progress.goal')}</div><div class="text-xl font-bold text-neon-green mt-1">${CONFIG.TARGETS.GOAL} <span class="text-[10px]">kg</span></div></div>
             </div>
 
             <!-- SLEEP & WATER STATS -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="${THEME.card} text-center py-3 border-purple-500/30"><div class="text-[9px] text-purple-400 font-bold">😴 HAFTALIK UYKU</div><div class="text-xl font-bold text-white mt-1">${sleepStats.weekAvg} <span class="text-[10px] text-gray-500">saat/gün</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-purple-500/30"><div class="text-[9px] text-purple-400 font-bold">😴 AYLIK UYKU</div><div class="text-xl font-bold text-white mt-1">${sleepStats.monthAvg} <span class="text-[10px] text-gray-500">saat/gün</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-neon-blue/30"><div class="text-[9px] text-neon-blue font-bold">💧 HAFTALIK SU</div><div class="text-xl font-bold text-white mt-1">${waterStats.weekTotal} <span class="text-[10px] text-gray-500">bardak</span></div></div>
-                <div class="${THEME.card} text-center py-3 border-neon-blue/30"><div class="text-[9px] text-neon-blue font-bold">💧 AYLIK SU</div><div class="text-xl font-bold text-white mt-1">${waterStats.monthTotal} <span class="text-[10px] text-gray-500">bardak</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-purple-500/30"><div class="text-[9px] text-purple-400 font-bold"><i class=\"fas fa-bed mr-1\"></i> ${i18n.t('renderers.progress.weekly_sleep')}</div><div class="text-xl font-bold text-white mt-1">${sleepStats.weekAvg} <span class="text-[10px] text-gray-500">${i18n.t('renderers.progress.hours_day')}</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-purple-500/30"><div class="text-[9px] text-purple-400 font-bold"><i class=\"fas fa-bed mr-1\"></i> ${i18n.t('renderers.progress.monthly_sleep')}</div><div class="text-xl font-bold text-white mt-1">${sleepStats.monthAvg} <span class="text-[10px] text-gray-500">${i18n.t('renderers.progress.hours_day')}</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-neon-blue/30"><div class="text-[9px] text-neon-blue font-bold"><i class=\"fas fa-tint mr-1\"></i> ${i18n.t('renderers.progress.weekly_water')}</div><div class="text-xl font-bold text-white mt-1">${waterStats.weekTotal} <span class="text-[10px] text-gray-500">${i18n.t('renderers.progress.glasses')}</span></div></div>
+                <div class="${THEME.card} text-center py-3 border-neon-blue/30"><div class="text-[9px] text-neon-blue font-bold"><i class=\"fas fa-tint mr-1\"></i> ${i18n.t('renderers.progress.monthly_water')}</div><div class="text-xl font-bold text-white mt-1">${waterStats.monthTotal} <span class="text-[10px] text-gray-500">${i18n.t('renderers.progress.glasses')}</span></div></div>
             </div>
 
             <!-- VOLUME ANALYSIS -->
             <div class="${THEME.card}">
                 <div class="flex justify-between items-center mb-4">
-                    <div><span class="text-neon-blue font-bold text-sm">ANTRENMAN HACMİ</span><span class="text-[10px] text-gray-500 ml-2">Son 7 Gün</span></div>
-                    <div class="text-xs text-gray-500">${volStats.weekly > 0 ? `Toplam: ${(volStats.weekly / 1000).toFixed(2)} ton` : ''}</div>
+                    <div><span class="text-neon-blue font-bold text-sm">${i18n.t('renderers.progress.training_volume')}</span><span class="text-[10px] text-gray-500 ml-2">${i18n.t('renderers.progress.last_7_days')}</span></div>
+                    <div class="text-xs text-gray-500">${volStats.weekly > 0 ? `${i18n.t('renderers.progress.total_ton', { val: (volStats.weekly / 1000).toFixed(2) })}` : ''}</div>
                 </div>
                 <div class="flex items-end gap-1 h-28">${volumeChart}</div>
             </div>
             
             <!-- WEEKLY SUMMARY -->
             <div class="${THEME.card}">
-                <div class="${THEME.label}">📅 HAFTALIK ÖZET (Son 4 Hafta)</div>
+                <div class="${THEME.label}"><i class=\"fas fa-calendar-alt mr-1\"></i> ${i18n.t('renderers.progress.weekly_summary')}</div>
                 <div class="overflow-x-auto mt-4">
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="text-gray-500 text-xs border-b border-gray-800">
-                                <th class="text-left py-2">Hafta</th>
-                                <th class="text-center py-2">Ort. Kalori</th>
-                                <th class="text-center py-2">Antrenman</th>
-                                <th class="text-right py-2">Kilo Δ</th>
+                                <th class="text-left py-2">${i18n.t('renderers.progress.week')}</th>
+                                <th class="text-center py-2">${i18n.t('renderers.progress.avg_cal')}</th>
+                                <th class="text-center py-2">${i18n.t('renderers.progress.training')}</th>
+                                <th class="text-right py-2">${i18n.t('renderers.progress.weight_delta')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${weeklySummary.map((w, i) => `
                                 <tr class="border-b border-gray-800/50 ${i === 0 ? 'bg-gray-800/30' : ''}">
-                                    <td class="py-2 ${i === 0 ? 'text-neon-green font-bold' : 'text-gray-400'}">${i === 0 ? 'Bu Hafta' : i === 1 ? 'Geçen Hafta' : `${w.week}. Hafta Önce`}</td>
+                                    <td class="py-2 ${i === 0 ? 'text-neon-green font-bold' : 'text-gray-400'}">${i === 0 ? i18n.t('renderers.progress.this_week') : i === 1 ? i18n.t('renderers.progress.last_week') : `${w.week}. ${i18n.t('renderers.progress.weeks_ago')}`}</td>
                                     <td class="text-center py-2 font-mono ${w.avgCal >= CONFIG.TARGETS.CAL ? 'text-neon-green' : w.avgCal > 0 ? 'text-accent-orange' : 'text-gray-600'}">${w.avgCal > 0 ? w.avgCal : '-'}</td>
-                                    <td class="text-center py-2">${w.workoutDays > 0 ? `<span class="text-neon-blue font-bold">${w.workoutDays}</span> gün` : '<span class="text-gray-600">-</span>'}</td>
+                                    <td class="text-center py-2">${w.workoutDays > 0 ? `<span class="text-neon-blue font-bold">${w.workoutDays}</span> ${i18n.t('renderers.progress.days')}` : '<span class="text-gray-600">-</span>'}</td>
                                     <td class="text-right py-2 font-mono ${w.weightChange > 0 ? 'text-neon-green' : w.weightChange < 0 ? 'text-neon-red' : 'text-gray-500'}">${w.weightChange !== null ? (w.weightChange > 0 ? '+' : '') + w.weightChange + ' kg' : '-'}</td>
                                 </tr>
                             `).join('')}
@@ -604,7 +606,7 @@ const Renderers = {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- WEIGHT HISTORY -->
                 <div class="${THEME.card} flex flex-col">
-                    <span class="text-[10px] text-gray-500 font-bold mb-2">AĞIRLIK GEÇMİŞİ (Son 7 Gün)</span>
+                    <span class="text-[10px] text-gray-500 font-bold mb-2">${i18n.t('renderers.progress.weight_history')}</span>
                     <div class="flex items-end gap-1 h-32 border-b border-gray-800">${weightBars}</div>
                     <div class="flex gap-1 mt-1">${dateLabels}</div>
                 </div>
@@ -612,9 +614,9 @@ const Renderers = {
                 <!-- MEASUREMENTS -->
                 <div class="${THEME.card}">
                     <div class="flex justify-between mb-4 items-center">
-                        <span class="text-[10px] text-gray-500 font-bold block">ÖLÇÜLER (CM)</span>
+                        <span class="text-[10px] text-gray-500 font-bold block">${i18n.t('renderers.progress.measurements')}</span>
                         <button ${Utils.actionAttrs('saveStats')} class="bg-neon-green/20 hover:bg-neon-green text-neon-green hover:text-black text-xs font-bold px-4 py-2 rounded-lg transition-all">
-                            <i class="fas fa-save mr-1"></i>KAYDET
+                            <i class="fas fa-save mr-1"></i>${i18n.t('renderers.progress.save')}
                         </button>
                     </div>
                     <div class="grid grid-cols-2 gap-3">${measurementInputs}</div>
@@ -657,7 +659,9 @@ const Renderers = {
             if (displaySystem.toLowerCase().includes('üreme')) displaySystem = 'Core Destek';
         }
 
-        return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button ${Utils.actionAttrs('setAnatomyView', ['front'])} class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ÖN</button><button ${Utils.actionAttrs('setAnatomyView', ['back'])} class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">ARKA</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="2"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${displaySystem}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">GÖREV</div><div class="text-base text-gray-200">${displayFunction || 'Güç ve stabilizasyon.'}</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : '<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">Kas Seçimi Bekleniyor...</p></div>'}</div></div>`;
+        return `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up h-full"><div class="${THEME.card} flex flex-col items-center justify-center anatomy-grid min-h-[400px] relative"><div class="absolute top-4 left-4 flex gap-2"><button ${Utils.actionAttrs('setAnatomyView', ['front'])} class="px-4 py-2 text-xs font-bold border ${view === 'front' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">${i18n.t('renderers.anatomy.front')}</button><button ${Utils.actionAttrs('setAnatomyView', ['back'])} class="px-4 py-2 text-xs font-bold border ${view === 'back' ? 'border-neon-green text-neon-green bg-neon-green/10' : 'border-gray-700 text-gray-500 hover:border-gray-500'} rounded-lg transition-all">${i18n.t('renderers.anatomy.back')}</button></div><div class="relative w-64 h-96"><svg viewBox="0 0 200 300" class="w-full h-full drop-shadow-[0_0_15px_rgba(0,255,65,0.1)]"><path d="M100,20 L120,25 L130,40 L160,45 L150,100 L160,150 L140,280 L130,290 L100,250 L70,290 L60,280 L40,150 L50,100 L40,45 L70,40 L80,25 Z" fill="#111" stroke="#333" stroke-width="1"/>${paths[view]}</svg></div></div><div class="${THEME.card} relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue via-neon-green to-neon-blue"></div><div class="${THEME.label} text-neon-blue mb-6">DIAGNOSTIC PANEL</div>${sel ? `<div class="space-y-6"><div class="mb-6"><h2 class="text-3xl md:text-4xl font-header font-bold text-white mb-2">${sel.name}</h2><div class="text-sm text-gray-400 font-mono tracking-wide">// ${displaySystem}</div></div><div class="grid gap-4"><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-neon-green"><div class="${THEME.label} mb-2">${i18n.t('renderers.anatomy.task')}</div><div class="text-base text-gray-200">${displayFunction || i18n.t('renderers.anatomy.default_func')}
+</div></div><div class="bg-surface-raised p-4 rounded-lg border-l-4 border-accent-orange"><div class="${THEME.label} mb-2">HARDENING PROTOCOL</div><div class="text-lg text-accent-orange font-bold font-mono">${sel.action}</div></div><div class="bg-surface-raised p-4 rounded-lg border border-gray-700/50"><div class="flex justify-between items-center"><div><div class="${THEME.label} mb-1">RECOVERY TIME</div><div class="text-xl text-neon-blue font-bold">${sel.recovery}</div></div><i class="fas fa-clock text-neon-blue/30 text-3xl"></i></div></div></div></div>` : `<div class="h-full flex flex-col items-center justify-center text-gray-600"><i class="fas fa-fingerprint text-6xl mb-6 opacity-30"></i><p class="text-sm uppercase tracking-widest">${i18n.t('renderers.anatomy.waiting_selection')}</p></div>`
+            }</div></div>`;
     },
 
     async mental() {
@@ -665,75 +669,73 @@ const Renderers = {
         const mentalData = await Utils.storage.get(CONFIG.KEYS.MENTAL_PROGRESS) || { completedPhases: [], dailyPractice: {}, lastPracticeDate: null };
         const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
         const todayPhaseIndex = dayOfYear % 8;
-        const todayPhase = MENTAL_PHASES[todayPhaseIndex];
+        const todayPhase = DB.MENTAL_PHASES[todayPhaseIndex];
         const completedCount = mentalData.completedPhases?.length || 0;
         const progressPercent = Math.round((completedCount / 8) * 100);
-        const allPractices = MENTAL_PHASES.flatMap((p, idx) => p.practice.map(pr => ({ text: pr, phaseId: p.id, icon: phaseIcons[idx] })));
+        const allPractices = DB.MENTAL_PHASES.flatMap((p, idx) => p.practice.map(pr => ({ text: pr, phaseId: p.id, icon: phaseIcons[idx] })));
         const dailyPractice = allPractices[dayOfYear % allPractices.length];
         const practiceKey = Utils.dateStr();
         const isPracticeDone = mentalData.dailyPractice?.[practiceKey] === true;
 
-        const phaseCards = MENTAL_PHASES.map((p, idx) => {
+        const phaseCards = DB.MENTAL_PHASES.map((p, idx) => {
             const icon = phaseIcons[idx];
             const isCompleted = mentalData.completedPhases?.includes(p.id);
             const isToday = idx === todayPhaseIndex;
 
             return `
-                <div class="group relative bg-gradient-to-br ${isToday ? 'from-purple-900/40 to-gray-900' : 'from-gray-900 to-gray-800'} 
-                    border-2 ${isToday ? 'border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.2)]' : isCompleted ? 'border-neon-green/50' : 'border-gray-700'}
-                    rounded-2xl p-5 transition-all hover:border-neon-purple/80 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] cursor-pointer"
+            <div class="group relative bg-gradient-to-br ${isToday ? 'from-purple-900/40 to-gray-900' : 'from-gray-900 to-gray-800'} border-2 ${isToday ? 'border-neon-purple shadow-[0_0_20px_rgba(168,85,247,0.2)]' : isCompleted ? 'border-neon-green/50' : 'border-gray-700'} rounded-2xl p-5 transition-all hover:border-neon-purple/80 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] cursor-pointer"
                     ${Utils.actionAttrs('showPhase', [p.id])}>
-                    ${isToday ? '<div class="absolute -top-2 -right-2 bg-neon-purple text-black text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">BUGÜN</div>' : ''}
-                    ${isCompleted ? '<div class="absolute top-3 right-3 text-neon-green text-lg">✓</div>' : ''}
-                    <div class="flex items-start gap-4">
-                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 border border-purple-500/30 
+                ${isToday ? `<div class="absolute -top-2 -right-2 bg-neon-purple text-black text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">${i18n.t('renderers.progress.today')}</div>` : ''}
+                ${isCompleted ? '<div class="absolute top-3 right-3 text-neon-green text-lg">✓</div>' : ''}
+                <div class="flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 border border-purple-500/30 
                             flex items-center justify-center text-3xl ${isToday ? 'animate-pulse' : ''} 
                             group-hover:scale-110 transition-transform">
                             ${icon}
                         </div>
                         <div class="flex-1">
-                            <div class="text-[10px] text-purple-400 font-mono mb-1">FAZ ${p.id}</div>
-                            <div class="font-bold text-white text-base group-hover:text-purple-200 transition">${p.title.replace(/FAZ \d+: /, '')}</div>
+                            <div class="text-[10px] text-purple-400 font-mono mb-1">${i18n.t('renderers.mental.phase_num', { p: p.id })}</div>
+                            <div class="font-bold text-white text-base group-hover:text-purple-200 transition">${p.title.replace(new RegExp(`${i18n.t('renderers.mental.phase').toUpperCase()} \\d+: `), '')}</div>
                             <div class="text-xs text-gray-400 mt-2 leading-relaxed">${p.desc}</div>
                         </div>
                     </div>
-                    <div class="mt-4 pt-4 border-t border-gray-700/50 flex justify-between items-center">
-                        <div class="text-[10px] text-gray-500">
-                            <i class="fas fa-list-check mr-1"></i>${p.strategy.length} Strateji • ${p.practice.length} Pratik
-                        </div>
-                        <div class="text-neon-purple text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
-                            DETAY <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
+                <div class="mt-4 pt-4 border-t border-gray-700/50 flex justify-between items-center">
+            <div class="text-[10px] text-gray-500">
+                <i class="fas fa-list-check mr-1"></i>${p.strategy.length} ${i18n.t('renderers.mental.strategy')} • ${p.practice.length} ${i18n.t('renderers.mental.practice')}
+            </div>
+            <div class="text-neon-purple text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                ${i18n.t('renderers.mental.detail')} <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
                 </div>
-            `;
+        `;
         }).join('');
 
         return `
-            <div class="animate-slide-up space-y-6">
-                <!-- Header -->
+        <div class="animate-slide-up space-y-6">
+                <!--Header -->
                 <div class="flex items-center justify-between border-b border-gray-800 pb-4">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
                             <i class="fas fa-brain text-white text-xl"></i>
                         </div>
                         <div>
-                            <h2 class="font-header font-bold text-white text-xl">ZİHİNSEL SAVAŞ</h2>
-                            <div class="text-xs text-gray-500">Mental Hardening Protokolü v8.0.0</div>
+                            <h2 class="font-header font-bold text-white text-xl">${i18n.t('renderers.mental.title')}</h2>
+                            <div class="text-xs text-gray-500">${i18n.t('renderers.mental.subtitle')}</div>
                         </div>
                     </div>
                     <div class="text-right">
                         <div class="text-2xl font-bold ${progressPercent === 100 ? 'text-neon-green' : 'text-neon-purple'}">${progressPercent}%</div>
-                        <div class="text-[10px] text-gray-500">${completedCount}/8 Faz</div>
+                        <div class="text-[10px] text-gray-500">${completedCount}/8 ${i18n.t('renderers.mental.phase')}</div>
                     </div>
                 </div>
                 
-                <!-- Günün Fazı Spotlight -->
+                <!--Günün Fazı Spotlight-->
                 <div class="bg-gradient-to-r from-purple-900/30 via-gray-900 to-pink-900/30 rounded-2xl p-6 border border-purple-500/30 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
                     <div class="relative z-10">
                         <div class="text-[10px] text-purple-400 font-bold tracking-widest mb-3">
-                            <i class="fas fa-star mr-1"></i>GÜNÜN FAZI
+                            <i class="fas fa-star mr-1"></i>${i18n.t('renderers.mental.phase_of_day')}
                         </div>
                         <div class="flex items-center gap-4">
                             <div class="text-5xl">${phaseIcons[todayPhaseIndex]}</div>
@@ -744,45 +746,46 @@ const Renderers = {
                         </div>
                         <button ${Utils.actionAttrs('showPhase', [todayPhase.id])}
                             class="mt-4 px-4 py-2 bg-purple-600/20 border border-purple-500/50 rounded-lg text-purple-300 text-sm font-bold hover:bg-purple-600/40 transition">
-                            <i class="fas fa-book-open mr-2"></i>Fazı İncele
+                            <i class="fas fa-book-open mr-2"></i>${i18n.t('renderers.mental.examine_phase')}
                         </button>
                     </div>
                 </div>
                 
-                <!-- Günlük Pratik -->
+                <!--Günlük Pratik-->
                 <div class="bg-gray-900 rounded-xl p-5 border ${isPracticeDone ? 'border-neon-green' : 'border-gray-700'}">
                     <div class="flex items-center justify-between mb-3">
                         <div class="text-[10px] text-gray-500 font-bold tracking-widest">
-                            <i class="fas fa-bolt text-neon-yellow mr-1"></i>GÜNLÜK PRATİK
+                            <i class="fas fa-bolt text-neon-yellow mr-1"></i>${i18n.t('renderers.mental.daily_practice')}
                         </div>
-                        ${isPracticeDone ? '<span class="text-neon-green text-xs font-bold">✓ TAMAMLANDI</span>' : ''}
+                        ${isPracticeDone ? `<span class="text-neon-green text-xs font-bold">✓ ${i18n.t('renderers.mental.completed')}</span>` : ''}
                     </div>
                     <div class="flex items-start gap-3">
                         <div class="text-2xl">${dailyPractice.icon}</div>
                         <div class="flex-1">
                             <div class="text-sm text-gray-300 leading-relaxed">${dailyPractice.text}</div>
-                            <div class="text-[10px] text-gray-600 mt-2">Faz ${dailyPractice.phaseId}</div>
+                            <div class="text-[10px] text-gray-600 mt-2">${i18n.t('renderers.mental.phase_num', { p: dailyPractice.phaseId })}</div>
                         </div>
                     </div>
                     ${!isPracticeDone ? `
                         <button ${Utils.actionAttrs('completeDailyPractice')}
                             class="mt-4 w-full py-3 bg-neon-green/10 border-2 border-neon-green text-neon-green font-bold rounded-xl hover:bg-neon-green hover:text-black transition-all">
-                            <i class="fas fa-check mr-2"></i>Bunu Yaptım!
+                            <i class="fas fa-check mr-2"></i>${i18n.t('renderers.mental.did_this')}
                         </button>
-                    ` : ''}
-                </div>
+                    ` : ''
+            }
+                </div >
                 
-                <!-- Progress Bar -->
+                <!--Progress Bar-->
                 <div class="bg-gray-800/50 rounded-full h-3 overflow-hidden">
                     <div class="h-full bg-gradient-to-r from-purple-600 to-pink-500 transition-all duration-500" 
                         style="width: ${progressPercent}%"></div>
                 </div>
                 
-                <!-- Faz Kartları Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    ${phaseCards}
-                </div>
-            </div>
+                <!--Faz Kartları Grid-->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${phaseCards}
+        </div>
+            </div >
         `;
     }
 };

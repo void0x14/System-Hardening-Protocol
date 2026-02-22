@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-8.3.1-00ff88?style=for-the-badge&labelColor=0a0a0a" alt="Version">
+  <img src="https://img.shields.io/badge/version-9.0.0-00ff88?style=for-the-badge&labelColor=0a0a0a" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&labelColor=0a0a0a" alt="License">
   <img src="https://img.shields.io/badge/zero-dependencies-ff4444?style=for-the-badge&labelColor=0a0a0a" alt="Zero Dependencies">
   <img src="https://img.shields.io/badge/offline-first-00ccff?style=for-the-badge&labelColor=0a0a0a" alt="Offline First">
@@ -115,35 +115,48 @@ State-Renderer-Actions Pattern
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) 18+
-- [pnpm](https://pnpm.io/) (recommended) or npm
+### Download and Run (Simple)
 
-### Installation
+1. **Download** the latest release from GitHub
+2. **Extract** the folder anywhere
+3. **Run one of these commands:**
 
+#### Option 1: Python (macOS/Linux/Windows)
 ```bash
-# Clone the repository
-git clone git@github.com:void0x14/System-Hardening-Protocol.git
-cd System-Hardening-Protocol
-
-# Build the application
-pnpm run build
-
-# Serve dist/ on localhost (recommended, required for reliable YouTube embeds)
-python3 -m http.server 4173 --directory dist
-# then open: http://localhost:4173
-
-# Direct file-open fallback (core tracking works, YouTube may fail on file://)
-open dist/index.html         # macOS
-xdg-open dist/index.html     # Linux
-start dist/index.html        # Windows
+cd System-Hardening
+python3 -m http.server 8000
 ```
 
-### Or Simply
+#### Option 2: Node.js (if installed)
+```bash
+cd System-Hardening
+node server.js
+```
 
-Download `dist/index.html` and open it in any modern browser. That's it for core tracking features.
+4. **Open browser**: `http://localhost:8000`
 
-**Video note:** YouTube embeds are supported reliably when served over `http://localhost` / `https`, not guaranteed on `file://`.
+---
+
+### Why HTTP Server?
+Browser security prevents `file://` protocol from loading resources. Simple HTTP server fixes this.
+
+### Why Not Require Build Tools?
+- **Zero npm packages** — No supply chain risk
+- **Pure Vanilla JavaScript** — Code never breaks from external updates
+- **Ship as-is** — What you see in source is what you get
+- **Terry Davis Philosophy** — Build only what you need
+
+---
+
+### Development (Optional)
+
+If you want to contribute or run tests:
+
+```bash
+cd System-Hardening
+node tests/run-all.js    # Run test suite
+node server.js           # Or any HTTP server
+```
 
 ---
 
@@ -183,15 +196,8 @@ System-Hardening-Protocol/
 
 ## 🗺️ Roadmap
 
-- [ ] Test coverage with Playwright
 - [ ] Accessibility (A11Y) improvements
-- [ ] Data export/import (JSON backup)
 - [ ] PWA support for mobile installation
-- [ ] i18n — Multi-language support
-- [ ] Architecture Modernization (Vite)
-- [ ] Automated i18n String Extraction
-- [ ] Zero-Trust Offline Connectivity (Local Assets)
-- [ ] Performance profiling & optimization
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
 

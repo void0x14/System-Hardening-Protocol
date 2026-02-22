@@ -1,9 +1,6 @@
 // index.js - ConfigService and Module Exports
 // Phase 2: Configuration Extraction - Unified Config Access
 
-import { UI } from '../ui.js';
-import { THEME } from '../config/theme.js';
-
 /**
  * ConfigService - Unified configuration access for System Hardening app.
  * Provides centralized access to all configuration modules.
@@ -15,16 +12,16 @@ import { THEME } from '../config/theme.js';
  * const calorieTarget = config.getTarget('CALORIES');
  */
 
-import { KEYS, isDatePrefixedKey, createDatedKey, getAllKeys } from '../keys.js';
-import { TARGETS, getNextMilestone, getCompletedMilestones, getProgressPercentage, getRemainingToGoal } from '../targets.js';
-import { VALIDATION_LIMITS, clampToRange, isValidIsoDate, isValidTimestamp } from '../validation.js';
-import { THEME, getClasses, getButtonVariant, COLORS, ANIMATION_DURATIONS, Z_INDEX, BREAKPOINTS, SPACING, BORDER_RADIUS } from '../theme.js';
+import { KEYS, isDatePrefixedKey, createDatedKey, getAllKeys } from './keys.js';
+import { TARGETS, MILESTONES, initMilestones, getNextMilestone, getCompletedMilestones, getProgressPercentage, getRemainingToGoal } from './targets.js';
+import { VALIDATION_LIMITS, clampToRange, isValidIsoDate, isValidTimestamp } from './validation.js';
+import { THEME, getClasses, getButtonVariant, COLORS, ANIMATION_DURATIONS, Z_INDEX, BREAKPOINTS, SPACING, BORDER_RADIUS } from './theme.js';
 
 /**
  * Application version string.
  * @constant {string}
  */
-const VERSION = '8.3.1';
+const VERSION = '9.0.0';
 
 /**
  * Debug mode flag.
@@ -56,19 +53,19 @@ export class ConfigService {
     constructor() {
         /** @type {Object} Storage keys */
         this.keys = KEYS;
-        
+
         /** @type {Object} Nutrition/fitness targets */
         this.targets = TARGETS;
-        
+
         /** @type {Object} Validation limits */
         this.limits = VALIDATION_LIMITS;
-        
+
         /** @type {Object} UI theme constants */
         this.theme = THEME;
-        
+
         /** @type {string} Application version */
         this.version = VERSION;
-        
+
         /** @type {boolean} Debug mode flag */
         this.debugMode = DEBUG_MODE;
     }
@@ -275,15 +272,38 @@ export class ConfigService {
  * @constant {ConfigService}
  * @example
  * import { config } from '../config/index.js';
- * console.log(config.getVersion()); // '8.3.1'
+ * console.log(config.getVersion()); // '9.0.0'
  */
 export const config = new ConfigService();
 
 // Re-export all modules for direct access
-export { KEYS, isDatePrefixedKey, createDatedKey, getAllKeys } from '../keys.js';
-export { TARGETS, getNextMilestone, getCompletedMilestones, getProgressPercentage, getRemainingToGoal } from '../targets.js';
-export { VALIDATION_LIMITS, clampToRange, isValidIsoDate, isValidTimestamp } from '../validation.js';
-export { THEME, getClasses, getButtonVariant, COLORS, ANIMATION_DURATIONS, Z_INDEX, BREAKPOINTS, SPACING, BORDER_RADIUS } from '../theme.js';
+export { KEYS, isDatePrefixedKey, createDatedKey, getAllKeys };
+export { TARGETS, MILESTONES, initMilestones, getNextMilestone, getCompletedMilestones, getProgressPercentage, getRemainingToGoal };
+export { VALIDATION_LIMITS, clampToRange, isValidIsoDate, isValidTimestamp };
+export { THEME, getClasses, getButtonVariant, COLORS, ANIMATION_DURATIONS, Z_INDEX, BREAKPOINTS, SPACING, BORDER_RADIUS };
 
 // Default export is the config singleton
 export default config;
+
+// Restore backwards compatibility for files destructing { CONFIG }
+export const CONFIG = {
+    VERSION: '9.0.0',
+    DEBUG_MODE: false,
+    KEYS,
+    TARGETS: {
+        ...TARGETS,
+        START: TARGETS.WEIGHT.START,
+        GOAL: TARGETS.WEIGHT.GOAL,
+        WATER: TARGETS.WATER.TARGET,
+        CAL: TARGETS.CALORIES.TARGET,
+        PROT: TARGETS.MACROS.PROTEIN,
+        CARB: TARGETS.MACROS.CARBS,
+        FAT: TARGETS.MACROS.FAT
+    },
+    MILESTONES: [
+        { weight: 48, title: "Başlangıç +3kg", icon: "🌱" },
+        { weight: 50, title: "Yarım Yüzlük", icon: "⚡" },
+        { weight: 55, title: "Yarı Yol", icon: "🔥" },
+        { weight: 60, title: "HEDEF", icon: "🏆" }
+    ]
+};

@@ -249,7 +249,8 @@ export const Store = {
         const today = Utils.dateStr();
         const workout = await this.getWorkout(today);
         const day = new Date().getDay();
-        const plan = WEEKLY_PLAN[day];
+        // BUG-001 FIX: Use DB.WEEKLY_PLAN instead of bare global
+        const plan = DB.WEEKLY_PLAN[day];
 
         if (workout.length >= Math.ceil(plan.tasks.length / 2)) {
             let streakData = await Utils.storage.get(CONFIG.KEYS.STREAK) || { count: 0, lastDate: null };
@@ -299,7 +300,8 @@ export const Store = {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        await Utils.storage.set(CONFIG.KEYS.BACKUP, Utils.dateStr());
+        // BUG-005 FIX: Use ISO string for timezone-safe backup date
+        await Utils.storage.set(CONFIG.KEYS.BACKUP, new Date().toISOString());
         return true;
     },
 
@@ -658,17 +660,47 @@ export const Store = {
             }
 
             const data = this._sanitizeImportedData(validation.data);
-            const prefixes = Object.values(CONFIG.KEYS).map(k => k.replace(/_$/, ''));
-            const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && prefixes.some(p => key.startsWith(p))) keysToRemove.push(key);
+
+            // BUG-004 FIX: Create rollback snapshot before any modifications
+            const snapshot = {};
+            const configValues = Object.values(CONFIG.KEYS);
+            for (const key of Object.keys(localStorage)) {
+                const shouldBackup = configValues.some(cv => 
+                    cv.endsWith('_') ? key.startsWith(cv) : key === cv
+                );
+                if (shouldBackup) {
+                    snapshot[key] = localStorage.getItem(key);
+                }
             }
-            keysToRemove.forEach(k => localStorage.removeItem(k));
-            for (const key in data) {
-                if (key !== 'meta') await Utils.storage.set(key, data[key]);
+
+            try {
+                // BUG-003 FIX: Correct prefix matching logic
+                const keysToRemove = [];
+                const configKeys = Object.values(CONFIG.KEYS);
+                for (const lsKey of Object.keys(localStorage)) {
+                    const shouldRemove = configKeys.some(configKey => {
+                        if (configKey.endsWith('_')) {
+                            return lsKey.startsWith(configKey); // prefix match
+                        }
+                        return lsKey === configKey; // exact match
+                    });
+                    if (shouldRemove) keysToRemove.push(lsKey);
+                }
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+
+                // Write new data
+                for (const key in data) {
+                    if (key !== 'meta') await Utils.storage.set(key, data[key]);
+                }
+                return { success: true, date: data.meta.date };
+            } catch (writeError) {
+                // BUG-004 FIX: Rollback on error
+                console.error("Import write error, rolling back:", writeError);
+                Object.entries(snapshot).forEach(([k, v]) => {
+                    if (v !== null) localStorage.setItem(k, v);
+                });
+                return { success: false, error: "Import failed, data restored: " + writeError.message };
             }
-            return { success: true, date: data.meta.date };
         } catch (e) {
             console.error("Import Error:", e);
             return { success: false, error: e.message };
@@ -768,7 +800,8 @@ export const Store = {
         await this.updateStreak();
 
         const day = new Date().getDay();
-        const plan = WEEKLY_PLAN[day];
+        // BUG-001 FIX: Use DB.WEEKLY_PLAN instead of bare global
+        const plan = DB.WEEKLY_PLAN[day];
         if (tasks.length >= plan.tasks.length) {
             const messages = [
                 { emoji: "🏆", text: "GÜN TAMAMLANDI!", sub: "Bugünü fethetttin. Yarın daha güçlü dön." },
@@ -820,7 +853,8 @@ export const Store = {
     async getTodayProgress() {
         const today = Utils.dateStr();
         const day = new Date().getDay();
-        const plan = WEEKLY_PLAN[day];
+        // BUG-001 FIX: Use DB.WEEKLY_PLAN instead of bare global
+        const plan = DB.WEEKLY_PLAN[day];
         const workout = await this.getWorkout(today);
         const meals = await this.getMeals(today);
 
