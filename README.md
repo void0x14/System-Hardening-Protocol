@@ -302,6 +302,7 @@ System-Hardening/
 
 - [ ] Accessibility (A11Y) improvements
 - [ ] PWA support for mobile installation
+- [ ] In-depth maintenance regarding hardcode string expressions + route, target etc. everything will be changeable, not fixed.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
 
