@@ -1,12 +1,8 @@
 <p align="center">
-  <img src="docs/screenshots/dashboard_full_hd.png" alt="System Hardening Protocol Dashboard" width="800">
+  <img src="docs/assets/void_tux_mascot.png" alt="Void Dual Tux Mascot" width="600">
 </p>
 
 <h1 align="center">🛡️ System Hardening Protocol</h1>
-
-<p align="center">
-  <strong>Military-grade personal tracking system for human performance optimization.</strong>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-9.0.0-00ff88?style=for-the-badge&labelColor=0a0a0a" alt="Version">
@@ -17,7 +13,7 @@
 </p>
 
 <p align="center">
-  <em>"Discipline equals Freedom."</em><br>
+  <em>"Zero-dependency. Zero-leaks. Zero-weakness."</em><br>
   Operational Security (OPSEC) for your biological and mental capabilities.
 </p>
 
@@ -90,11 +86,9 @@ Psychological conditioning through 8 progressive phases, daily micro-actions, an
 | Technology | Purpose |
 |-----------|---------|
 | **HTML5** | Single-file application structure |
-| **Vanilla JavaScript** | Zero-framework, pure ES6+ logic |
-| **Tailwind CSS** | Utility-first styling via CDN |
+| **Vanilla JavaScript (ES6+)** | Zero-framework, pure ES6+ logic. No external libraries |
+| **CSS3** | Local stylesheets. Zero external dependencies |
 | **localStorage** | Client-side data persistence |
-| **Node.js** | Build-time bundling only |
-| **pnpm** | Package manager for build scripts |
 
 ### Architecture
 
@@ -150,12 +144,17 @@ Browser security prevents `file://` protocol from loading resources. Simple HTTP
 
 ### Development (Optional)
 
-If you want to contribute or run tests:
+To contribute or run the full test suite, switch to the **`workspace` branch**:
 
 ```bash
+git checkout workspace
 cd System-Hardening
-node tests/run-all.js    # Run test suite
-node server.js           # Or any HTTP server
+
+# Run test suite
+node tests/run-all.js
+
+# Start dev server
+node server.js
 ```
 
 ---
@@ -172,24 +171,129 @@ Press **`Ctrl + Shift + H`** to activate **Sanitize Mode**:
 ## 📁 Project Structure
 
 ```
-System-Hardening-Protocol/
-├── dist/
-│   └── index.html          # ← Production build (single file)
-├── src/
-│   ├── template.html       # Base HTML template
-│   ├── build.js            # Build script
-│   ├── js/                 # 15 modular JavaScript files
-│   │   ├── config.js       # Global configuration
-│   │   ├── db/             # Exercise, food & plan databases
-│   │   ├── store.js        # State management (localStorage)
-│   │   ├── ui.js           # UI rendering engine
-│   │   ├── actions.js      # User interaction handlers
-│   │   └── app.js          # Entry point
-│   └── styles/             # 4 CSS modules
-├── docs/screenshots/       # Application screenshots
-├── package.json            # Build scripts (pnpm)
-├── LICENSE                 # MIT License
-└── CONTRIBUTING.md         # Contribution guidelines
+System-Hardening/
+├── .gitignore
+├── AGENTS.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── index.html
+├── server.js
+├── docs/
+│   ├── assets/
+│   │   └── void_tux_mascot.png
+│   └── screenshots/
+│       ├── anatomy_interactive.png
+│       ├── dashboard_full_hd.png
+│       ├── mental_full_hd.png
+│       ├── nutrition_full_hd.png
+│       ├── progress_full_hd.png
+│       └── training_full_hd.png
+├── memory-bank/
+│   ├── activeContext.md
+│   ├── productContext.md
+│   ├── projectbrief.md
+│   ├── progress.md
+│   ├── roadmap.md
+│   ├── systemPatterns.md
+│   └── techContext.md
+└── src/
+    ├── assets/
+    │   ├── fonts/
+    │   │   ├── fa-brands-400.woff2
+    │   │   ├── fa-regular-400.woff2
+    │   │   └── fa-solid-900.woff2
+    │   └── icons/
+    ├── css/
+    │   └── main.css
+    ├── js/
+    │   ├── actions.js
+    │   ├── app.js
+    │   ├── components.js
+    │   ├── stealth.js
+    │   ├── store.js
+    │   ├── ui.js
+    │   ├── utils.js
+    │   ├── video-player.js
+    │   ├── components/
+    │   │   ├── Card.js
+    │   │   ├── MacroRing.js
+    │   │   ├── MealCard.js
+    │   │   ├── Modal.js
+    │   │   ├── ProgressBar.js
+    │   │   ├── SetRow.js
+    │   │   ├── Toast.js
+    │   │   └── index.js
+    │   ├── config/
+    │   │   ├── db.js
+    │   │   ├── index.js
+    │   │   ├── keys.js
+    │   │   ├── targets.js
+    │   │   ├── theme.js
+    │   │   └── validation.js
+    │   ├── core/
+    │   │   ├── Container.js
+    │   │   ├── EventBus.js
+    │   │   └── index.js
+    │   ├── db/
+    │   │   ├── anatomy.js
+    │   │   ├── exercises.js
+    │   │   ├── foods.js
+    │   │   ├── mental-phases.js
+    │   │   └── weekly-plan.js
+    │   ├── infrastructure/
+    │   │   ├── LocalStorageAdapter.js
+    │   │   ├── MemoryStorageAdapter.js
+    │   │   ├── StorageAdapter.js
+    │   │   └── index.js
+    │   ├── locales/
+    │   │   ├── en.json
+    │   │   └── tr.json
+    │   ├── performance/
+    │   │   ├── CacheService.js
+    │   │   ├── LazyLoader.js
+    │   │   ├── Memoize.js
+    │   │   ├── VirtualList.js
+    │   │   └── index.js
+    │   ├── renderers/
+    │   │   └── dashboard.js
+    │   ├── repositories/
+    │   │   ├── BaseRepository.js
+    │   │   ├── MealRepository.js
+    │   │   ├── WeightRepository.js
+    │   │   ├── WorkoutRepository.js
+    │   │   └── index.js
+    │   ├── services/
+    │   │   ├── BackupService.js
+    │   │   ├── ExerciseHistoryService.js
+    │   │   ├── StatisticsService.js
+    │   │   ├── StreakService.js
+    │   │   ├── ValidationService.js
+    │   │   ├── i18nService.js
+    │   │   └── index.js
+    │   ├── state/
+    │   │   ├── StateManager.js
+    │   │   ├── index.js
+    │   │   ├── initialState.js
+    │   │   ├── middleware.js
+    │   │   └── reducers.js
+    │   ├── vendors/
+    │   │   ├── fontawesome-local.css
+    │   │   ├── fontawesome.min.css
+    │   │   └── tailwindcss.min.js
+    │   └── views/
+    │       ├── AnatomyView.js
+    │       ├── DashboardView.js
+    │       ├── MentalView.js
+    │       ├── NutritionView.js
+    │       ├── ProgressView.js
+    │       ├── TrainingView.js
+    │       └── index.js
+    └── styles/
+        ├── animations.css
+        ├── base.css
+        ├── components.css
+        └── overrides.css
 ```
 
 ---
@@ -198,6 +302,7 @@ System-Hardening-Protocol/
 
 - [ ] Accessibility (A11Y) improvements
 - [ ] PWA support for mobile installation
+- [ ] In-depth maintenance regarding hardcode string expressions + route, target etc. everything will be changeable, not fixed.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
 
