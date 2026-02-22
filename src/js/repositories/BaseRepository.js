@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * BaseRepository - Base class for all repositories
  * 
  * Provides common CRUD operations and patterns for data access.

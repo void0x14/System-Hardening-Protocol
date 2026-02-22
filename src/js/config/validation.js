@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // validation.js - Input Validation Limits
 // Extracted from store.js magic numbers for Phase 2: Configuration Extraction
 

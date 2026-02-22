@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * Performance Module - Zero-dependency performance optimization utilities
  * 
  * @module performance

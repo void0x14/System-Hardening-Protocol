@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // ui.js - User Interface Management
 // Extracted from original index.html lines 1985-2236
 

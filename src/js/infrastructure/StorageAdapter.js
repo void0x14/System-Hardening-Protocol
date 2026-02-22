@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * StorageAdapter - Abstract base class for storage operations
  * 
  * This defines the interface that all storage adapters must implement.

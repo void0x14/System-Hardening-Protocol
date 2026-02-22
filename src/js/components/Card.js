@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // components/Card.js - Card Container Component
 // Extracted from components.js for reusability
 

@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * LocalStorageAdapter - localStorage implementation of StorageAdapter
  * 
  * Provides persistent storage using the browser's localStorage API.

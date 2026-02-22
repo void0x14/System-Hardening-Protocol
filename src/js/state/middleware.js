@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // middleware.js - State Middleware Functions
 // Provides logging, persistence, and other cross-cutting concerns
 

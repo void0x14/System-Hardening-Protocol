@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 import { i18n } from '../services/i18nService.js';
 // views/DashboardView.js - Main Dashboard View Component
 // Extracted from renderers/dashboard.js

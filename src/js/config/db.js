@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // config/db.js
 // Exports the central DB namespace and deferred init functions
 

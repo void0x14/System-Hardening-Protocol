@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // index.js - ConfigService and Module Exports
 // Phase 2: Configuration Extraction - Unified Config Access
 

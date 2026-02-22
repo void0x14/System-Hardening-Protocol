@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // views/ProgressView.js - Progress Tab View Component
 // Extracted from renderers/dashboard.js
 

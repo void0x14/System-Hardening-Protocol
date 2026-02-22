@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // ValidationService.js - Data Validation and Sanitization
 // Phase 5: Service Layer - Extracted from store.js
 

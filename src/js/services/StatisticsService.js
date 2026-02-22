@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // StatisticsService.js - Metrics and Analytics
 // Phase 5: Service Layer - Extracted from store.js
 

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // components.js - Reusable UI Component Factory Functions
 // Extracted from original index.html lines 672-872
 

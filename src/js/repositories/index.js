@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * Repositories Module - Data Access Layer
  * 
  * This module provides repository classes for data access operations.

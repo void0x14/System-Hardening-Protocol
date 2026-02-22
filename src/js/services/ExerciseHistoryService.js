@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // ExerciseHistoryService.js - Exercise History Tracking
 // Phase 5: Service Layer - Extracted from store.js
 

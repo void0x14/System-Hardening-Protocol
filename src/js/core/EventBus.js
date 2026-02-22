@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * Event Bus for decoupled communication
  * Zero-dependency implementation for publish/subscribe pattern
  * 

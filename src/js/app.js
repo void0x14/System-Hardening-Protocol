@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // app.js - Application Bootstrap / Init
 // Native ESM Migration with Top-Level Await
 

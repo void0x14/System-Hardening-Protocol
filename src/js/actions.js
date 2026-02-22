@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // actions.js - User Interaction Event Handlers
 // Extracted from original index.html lines 3038-3973
 

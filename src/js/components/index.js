@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // components/index.js - UI Components Module
 // Re-exports all UI components for easy importing
 
