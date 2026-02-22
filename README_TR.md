@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/screenshots/dashboard_full_hd.png" alt="Sistem Sertleştirme Protokolü Paneli" width="800">
+  <img src="docs/assets/void_tux_mascot.png" alt="Void Dual Tux Maskotu" width="600">
 </p>
 
 <p align="center">
@@ -7,10 +7,6 @@
 </p>
 
 <h1 align="center">🛡️ Sistem Sertleştirme Protokolü</h1>
-
-<p align="center">
-  <strong>İnsan performansı optimizasyonu için askeri düzeyde kişisel takip sistemi.</strong>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/versiyon-9.0.0-00ff88?style=for-the-badge&labelColor=0a0a0a" alt="Versiyon">
@@ -21,7 +17,7 @@
 </p>
 
 <p align="center">
-  <em>"Disiplin Özgürlüktür."</em><br>
+  <em>"Sıfır bağımlılık. Sıfır sızıntı. Sıfır zayıflık."</em><br>
   Biyolojik ve zihinsel yetenekleriniz için Operasyonel Güvenlik (OPSEC).
 </p>
 
@@ -29,13 +25,13 @@
 
 ## ⚡ Bu Nedir?
 
-**Sistem Sertleştirme Protokolü (System Hardening Protocol)**, bedenini ve zihnini yüksek değerli bir varlık (asset) olarak ele alan, sıfır bağımlılıklı, önce çevrimdışı öncelikli bir kişisel komuta merkezidir. **Tek bir HTML dosyasına** derlenir — sunucu yok, bulut yok, veri sızıntısı yok. Her şey yerel olarak tarayıcınızda çalışır.
+**Sistem Sertleştirme Protokolü**, bedenini ve zihnini yüksek değerli bir varlık olarak ele alan, sıfır bağımlılıklı, önce çevrimdışı öncelikli bir kişisel komuta merkezidir. **Tek bir HTML dosyasına** derlenir — sunucu yok, bulut yok, veri sızıntısı yok. Her şey yerel olarak tarayıcınızda çalışır.
 
 Bu bir fitness takipçisi **değildir**. Bu bir diyet uygulaması **değildir**. Bu, biyolojik varlığınız için bir **komuta merkezidir**.
 
 ### Neden Kullanmalı?
 
-- 🔒 **%100 Özel** — Tüm veriler tarayıcınızın `localStorage` alanında kalır. Hesap yok, takip yok, telemetri yok.
+- 🔒 **%100 Özel** — Tüm veriler tarayıcınızın localStorage alanında kalır. Hesap yok, takip yok, telemetri yok.
 - ⚡ **Anında** — Tek HTML dosyası, sıfır yükleme süresi. Çevrimdışı çalışır.
 - 🎯 **Hepsi Bir Arada** — Antrenman, beslenme, ilerleme analitiği, anatomi görselleştirme ve zihinsel koşullandırma tek bir yerde.
 - 🖥️ **Cyberpunk Arayüz** — Neon vurgulu askeri düzeyde karanlık arayüz. Sıradan sağlık uygulamalarından farklıdır.
@@ -94,11 +90,9 @@ Belirli kas gruplarını hedeflemek için etkileşimli görsel vücut haritası.
 | Teknoloji | Amaç |
 |-----------|---------|
 | **HTML5** | Tek dosya uygulama yapısı |
-| **Vanilla JavaScript** | Framework'süz, saf ES6+ mantığı |
-| **Tailwind CSS** | CDN üzerinden yardımcı program öncelikli görselleştirme |
+| **Vanilla JavaScript (ES6+)** | Sıfır framework, saf ES6+ mantığı. Harici kütüphane yok |
+| **CSS3** | Yerel stil sayfaları. Sıfır harici bağımlılık |
 | **localStorage** | İstemci tarafı veri kalıcılığı |
-| **Node.js** | Sadece derleme zamanı paketleme |
-| **pnpm** | Derleme betikleri için paket yöneticisi |
 
 ### Mimari
 
@@ -154,12 +148,17 @@ Tarayıcı güvenliği, `file://` protokolünün kaynakları yüklemesini engell
 
 ### Geliştirme (İsteğe Bağlı)
 
-Katkıda bulunmak veya testleri çalıştırmak isterseniz:
+Katkıda bulunmak veya tam test paketini çalıştırmak için **`workspace` branch**'ine geçin:
 
 ```bash
+git checkout workspace
 cd System-Hardening
-node tests/run-all.js    # Test paketini çalıştır
-node server.js           # Veya herhangi bir HTTP sunucusu
+
+# Test paketini çalıştır
+node tests/run-all.js
+
+# Geliştirme sunucusunu başlat
+node server.js
 ```
 
 ---
@@ -176,24 +175,35 @@ node server.js           # Veya herhangi bir HTTP sunucusu
 ## 📁 Proje Yapısı
 
 ```
-System-Hardening-Protocol/
-├── dist/
-│   └── index.html          # ← Üretim derlemesi (tek dosya)
-├── src/
-│   ├── template.html       # Temel HTML şablonu
-│   ├── build.js            # Derleme betiği
-│   ├── js/                 # 15 modüler JavaScript dosyası
-│   │   ├── config.js       # Global yapılandırma
-│   │   ├── db/             # Egzersiz, gıda ve plan veritabanları
-│   │   ├── store.js        # Durum yönetimi (localStorage)
-│   │   ├── ui.js           # UI oluşturma motoru
-│   │   ├── actions.js      # Kullanıcı etkileşim yöneticileri
-│   │   └── app.js          # Giriş noktası
-│   └── styles/             # 4 CSS modülü
-├── docs/screenshots/       # Uygulama ekran görüntüleri
-├── package.json            # Derleme betikleri (pnpm)
-├── LICENSE                 # MIT Lisansı
-└── CONTRIBUTING.md         # Katkıda bulunma kılavuzu
+System-Hardening/
+├── .gitignore
+├── AGENTS.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── index.html
+├── server.js
+├── docs/
+│   ├── assets/
+│   │   └── void_tux_mascot.png
+│   └── screenshots/
+│       ├── anatomy_interactive.png
+│       ├── dashboard_full_hd.png
+│       ├── mental_full_hd.png
+│       ├── nutrition_full_hd.png
+│       ├── progress_full_hd.png
+│       └── training_full_hd.png
+├── memory-bank/
+│   ├── activeContext.md
+│   ├── productContext.md
+│   ├── projectbrief.md
+│   ├── progress.md
+│   ├── roadmap.md
+│   ├── systemPatterns.md
+│   └── techContext.md
+└── src/
+    ├── assets/
+... (Yapı README.md ile aynıdır)
 ```
 
 ---
@@ -202,6 +212,7 @@ System-Hardening-Protocol/
 
 - [ ] Erişilebilirlik (A11Y) iyileştirmeleri
 - [ ] Mobil kurulum için PWA desteği
+- [ ] Hardcode dizgi ifadeleri + rota, hedef vb. ile ilgili derinlemesine bakım. Sabit değil, her şey değiştirilebilir olacak.
 
 Nasıl dahil olacağınızı öğrenmek için [CONTRIBUTING.md](CONTRIBUTING.md) dosyasına bakın.
 
