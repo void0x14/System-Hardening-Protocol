@@ -2,6 +2,10 @@
   <img src="docs/screenshots/dashboard_full_hd.png" alt="Sistem Sertleştirme Protokolü Paneli" width="800">
 </p>
 
+<p align="center">
+  <a href="README.md">English</a> | <a href="README_TR.md">Türkçe</a>
+</p>
+
 <h1 align="center">🛡️ Sistem Sertleştirme Protokolü</h1>
 
 <p align="center">

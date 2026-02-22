@@ -2,6 +2,10 @@
   <img src="docs/assets/void_tux_mascot.png" alt="Void Dual Tux Mascot" width="600">
 </p>
 
+<p align="center">
+  <a href="README.md">English</a> | <a href="README_TR.md">Türkçe</a>
+</p>
+
 <h1 align="center">🛡️ System Hardening Protocol</h1>
 
 <p align="center">
