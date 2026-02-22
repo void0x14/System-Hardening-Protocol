@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // BackupService.js - Data Export/Import Functionality
 // Phase 5: Service Layer - Extracted from store.js
 

@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * LazyLoader - Zero-dependency lazy loading for components and images
  * 
  * @module performance/LazyLoader

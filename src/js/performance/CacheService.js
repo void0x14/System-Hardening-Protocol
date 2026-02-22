@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * CacheService - Zero-dependency in-memory cache with TTL support
  * 
  * @module performance/CacheService

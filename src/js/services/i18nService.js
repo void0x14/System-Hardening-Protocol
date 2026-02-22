@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * i18nService - Native Zero-Dependency Localization Engine
  * Parses deep keys e.g t('app.title') using native JS reduce without package.json.
  * Uses async fetch, localStorage, and browser detection.

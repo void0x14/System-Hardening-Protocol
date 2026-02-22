@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * WeightRepository - Repository for weight data operations
  * 
  * Handles weight history, current weight, and weight-related statistics.

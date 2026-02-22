@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // StateManager.js - Zero-dependency State Management
 // Inspired by Redux but simplified for this project's needs
 

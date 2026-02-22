@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * Infrastructure Module - Storage Abstraction Layer
  * 
  * This module provides storage adapters and infrastructure components

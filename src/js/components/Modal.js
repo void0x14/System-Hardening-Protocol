@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // components/Modal.js - Modal Dialog Component
 // Extracted from ui.js for reusability
 

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // mental-phases.js - Mental Hardening Phases
 // Extracted from original index.html
 

@@ -1,88 +1,106 @@
 # Contributing to System Hardening Protocol
 
-First off, thanks for considering contributing to the **System Hardening Protocol**! Every contribution helps make this tool sharper and more battle-tested.
+First off, thank you for stepping up. Contributing to the **System Hardening Protocol** means you're helping build a tool for human optimization and digital sovereignty. We don't just write code; we harden existence.
 
-## 🎯 How to Contribute
+---
 
-### Reporting Bugs
+<p align="center">
+  <a href="CONTRIBUTING.md">English</a> | <a href="CONTRIBUTING_TR.md">Türkçe</a>
+</p>
 
-Found a bug? Open an [issue](https://github.com/void0x14/System-Hardening-Protocol/issues) with:
-- A clear title and description
-- Steps to reproduce the behavior
-- Expected vs actual behavior
-- Browser and OS version
-- Screenshots if applicable
+---
 
-### Suggesting Features
+---
 
-Have an idea? Open an issue with the `enhancement` label:
-- Describe the feature and its use case
-- Explain why it would benefit the project
-- Include mockups/sketches if possible
+## 🔱 Guiding Principles (The Code)
 
-### Code Contributions
+Before you write a single line, understand our philosophy:
 
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feat/your-feature`
-3. **Build** the project: `pnpm run build`
-4. **Test** by opening `dist/index.html` in your browser
-5. **Commit** with clear messages: `git commit -m "feat: add new feature"`
-6. **Push** to your fork: `git push origin feat/your-feature`
-7. **Open** a Pull Request
+1.  **Zero Dependencies**: No `npm install`. No `External Frameworks`. No `Supply Chain Risks`. If you need a utility, write it or use a native Web API.
+2.  **Vanilla Performance**: Pure ES6+ JavaScript and CSS3. We don't use virtual DOMs or heavy abstractions. The code must be fast, lean, and readable.
+3.  **Privacy First**: All data belongs to the user. No telemetry, no cloud sync, no tracking. LocalStorage is the only source of truth.
+4.  **Terry Davis Philosophy**: Build only what you actually need. Avoid bloat. "A ten-foot pole is not a replacement for a brain."
+5.  **Hardcore UI**: The interface is military-grade. High contrast, dark mode, neon accents, and high informational density.
 
-### Commit Convention
+---
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
+## 🚀 Branching Strategy
 
-| Prefix | When to Use |
-|--------|-------------|
-| `feat:` | New feature |
-| `fix:` | Bug fix |
-| `docs:` | Documentation only |
-| `style:` | Formatting, no logic change |
-| `refactor:` | Code restructuring |
-| `perf:` | Performance improvement |
-| `chore:` | Maintenance tasks |
+We operate with two primary branches:
 
-## 🏗️ Project Architecture
+-   **`main`**: The "Stable/Production" branch. Contains the current battle-ready version.
+-   **`workspace`**: The "Development" branch. All active development, experiments, and tests happen here.
+
+**Rule**: NEVER submit a PR directly to `main`. Always target `workspace`.
+
+---
+
+## 🛠️ How to Contribute
+
+1.  **Fork** the repository.
+2.  **Switch to workspace**: `git checkout workspace`.
+3.  **Create your mission branch**: `git checkout -b feat/your-mission`.
+4.  **Implement**: Follow the architecture patterns (State-Renderer-Actions).
+5.  **Test**: Ensure no regressions. Run `node tests/run-all.js`. 
+    *(Note: The `tests/` directory exists **strictly on the `workspace` branch**; it is not included in the production `main` branch).*
+6.  **Commit**: Use Conventional Commits.
+7.  **Push and PR**: Open a Pull Request into the `workspace` branch.
+
+---
+
+## 📁 Project Architecture (Intelligence)
+
+Your code must fit into the existing modular structure:
 
 ```
-src/
-├── template.html          # Base HTML template
-├── build.js               # Build script (Node.js)
-├── js/
-│   ├── config.js          # Global configuration
-│   ├── db/                # Exercise, food, and plan databases
-│   ├── utils.js           # Utility functions
-│   ├── store.js           # State management (localStorage)
-│   ├── ui.js              # UI rendering engine
-│   ├── components.js      # Reusable UI components
-│   ├── renderers/         # Section-specific renderers
-│   ├── actions.js         # User interaction handlers
-│   └── app.js             # Application entry point
-└── styles/
-    ├── base.css            # Core styles
-    ├── components.css      # Component styles
-    ├── animations.css      # Animations & transitions
-    └── overrides.css       # Tailwind overrides
+src/js/
+├── config/         # System constants, DB keys, and validation rules
+├── core/           # EventBus and base container logic
+├── db/             # Static databases (Exercises, Foods, Anatomy)
+├── infrastructure/ # Storage adapters (LocalStorage/Memory)
+├── locales/        # Internationalization strings (en.json, tr.json)
+├── performance/    # Virtual lists, caching, and lazy loading
+├── renderers/      # Low-level UI rendering logic
+├── repositories/   # Data access layer for State
+├── services/       # Business logic (i18n, Statistics, Backup)
+├── state/          # State management (Reducers, Middleware)
+├── ui/             # High-level UI management
+├── views/          # Section-specific views (Dashboard, Training, etc.)
+└── components/     # Reusable UI elements (Modals, Cards, Buttons)
 ```
 
-### Build Process
+---
 
-The project bundles into a **single HTML file** (`dist/index.html`):
+## 📏 Code Standards
 
-```bash
-pnpm run build
-```
+### JavaScript
+- Use **ES6+ Modules**.
+- Use **Strict Mode** implicitly.
+- No `var`. Use `const` by default, `let` if necessary.
+- Document complex logic with JSDoc.
+- **Pure Functions**: Keep logic separate from side effects where possible.
 
-This concatenates all JS modules in dependency order and injects them into `template.html`.
+### CSS
+- Use **CSS Variables** defined in `:root`.
+- No inline styles.
+- Maintain the **Cyberpunk/Military** aesthetic (Glows, borders, specific HSL values).
 
-## 📜 Code of Conduct
+### Commit Messages
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:` for new capabilities.
+- `fix:` for tactical bug fixes.
+- `perf:` for increasing speed/reducing size.
+- `docs:` for intelligence updates.
+- `refactor:` for structural hardening without changing logic.
 
-- Be respectful and constructive
-- Focus on the code, not the person
-- Help others learn and grow
+---
 
 ## 📄 License
 
-By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing, you agree that your work will be licensed under the **MIT License**.
+
+---
+
+<p align="center">
+  <em>Discipline equals freedom. Code with intent.</em>
+</p>

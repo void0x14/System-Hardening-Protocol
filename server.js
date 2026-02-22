@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 #!/usr/bin/env node
 /**
  * System Hardening Protocol - Dev Server

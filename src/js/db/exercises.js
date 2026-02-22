@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // exercises.js - Exercise Database
 // Extracted from original index.html
 

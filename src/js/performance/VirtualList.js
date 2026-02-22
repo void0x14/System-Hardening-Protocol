@@ -1,4 +1,8 @@
 /**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
+/**
  * VirtualList - Zero-dependency virtual scrolling for large lists
  * 
  * @module performance/VirtualList

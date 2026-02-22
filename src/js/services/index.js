@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // services/index.js - Service Layer Exports
 // Phase 5: Service Layer
 

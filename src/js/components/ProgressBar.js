@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // components/ProgressBar.js - Progress Bar Component
 // Extracted from components.js for reusability
 

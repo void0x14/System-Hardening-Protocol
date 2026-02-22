@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 import { i18n } from '../services/i18nService.js';
 // renderers/dashboard.js - Main Renderers Namespace
 // Contains: dashboard, training, nutrition, progress, anatomy, mental

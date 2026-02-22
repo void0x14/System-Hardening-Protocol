@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // foods.js - Meal Plan Database
 // Extracted from original index.html
 

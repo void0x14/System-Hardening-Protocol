@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // stealth.js - Sanitize Mode for Privacy Protection
 // Hides sensitive content while keeping app fully functional
 

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // theme.js - UI Theme Constants
 // Extracted from config.js for Phase 2: Configuration Extraction
 

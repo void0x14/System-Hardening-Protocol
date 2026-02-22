@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // views/MentalView.js - Mental Health Tab View Component
 // Extracted from renderers/dashboard.js
 

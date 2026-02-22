@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // StreakService.js - Streak Calculation and Management
 // Phase 5: Service Layer - Extracted from store.js
 

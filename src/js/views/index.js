@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // views/index.js - View Components Module
 // Re-exports all view components for easy importing
 

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025-2026 void0x14
+ */
+
 // utils.js - Utility Functions and Storage Adapter
 // Extracted from original index.html lines 1202-1316
 
